@@ -1,0 +1,29 @@
+{
+  "project": "LabInsight AI Health Analysis Platform",
+  "phase": "Phase 2A - Zep Memory Integration",
+  "objectives": [
+    "Secure Zep API key integration",
+    "Install and configure Zep SDK",
+    "Implement basic memory storage for health analysis",
+    "Create user session management",
+    "Establish HIPAA-compliant memory operations",
+    "Test and validate foundation"
+  ],
+  "zep_api_key": "PROVIDED (secured)",
+  "compliance_requirements": [
+    "HIPAA",
+    "Healthcare Data Security"
+  ],
+  "technical_stack": [
+    "Next.js",
+    "TypeScript",
+    "Prisma",
+    "PostgreSQL"
+  ],
+  "integration_points": [
+    "User session management",
+    "Health analysis memory storage",
+    "HIPAA-compliant data handling",
+    "Memory retrieval for analysis context"
+  ]
+}

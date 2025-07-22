@@ -1,0 +1,14 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/compliance/page": "app/admin/compliance/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/auth/signup/route": "app/api/auth/signup/route.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/api/consent/route": "app/api/consent/route.js",
+  "/page": "app/page.js",
+  "/api/consent/validate/route": "app/api/consent/validate/route.js",
+  "/api/analysis/[id]/route": "app/api/analysis/[id]/route.js",
+  "/api/compliance/audit-logs/route": "app/api/compliance/audit-logs/route.js",
+  "/api/compliance/metrics/route": "app/api/compliance/metrics/route.js",
+  "/api/comprehensive-analysis/route": "app/api/comprehensive-analysis/route.js"
+}

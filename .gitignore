@@ -1,0 +1,58 @@
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+/coverage
+*.lcov
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts
+
+# Production
+/build
+/dist
+
+# Environment variables
+.env
+.env*.local
+.env.production
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local development
+.DS_Store
+*.tsbuildinfo
+
+# Vercel
+.vercel
+
+# Prisma
+/prisma/migrations/dev.db*
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+/logs
+/.logs
+
+# BMAD specific
+.bmad-core/
+*.tar.gz
+dev.log
+migration_log_*.log
+supabase_conn.tmp
+
+# Sentry
+.sentryclirc

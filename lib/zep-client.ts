@@ -1,0 +1,284 @@
+import { ZepClient } from "@getzep/zep-js";
+import InputValidator from './input-validation';
+
+import CryptoJS from "crypto-js";
+
+export interface ZepClientConfig {
+  apiKey: string;
+  baseURL?: string;
+  sessionConfig: SessionConfig;
+  memoryConfig: MemoryConfig;
+}
+
+export interface SessionConfig {
+  sessionIdPrefix: string;
+  sessionTimeout: number; // minutes
+  userIdMapping: boolean;
+}
+
+export interface MemoryConfig {
+  memoryType: 'perpetual' | 'sliding_window';
+  maxTokens: number;
+  summarizationEnabled: boolean;
+  hipaaCompliant: boolean;
+}
+
+export interface EncryptedMemory {
+  encryptedContent: string;
+  encryptedKey: string;
+  algorithm: string;
+  timestamp: Date;
+  keyId: string;
+}
+
+export class LabInsightZepClient {
+  private client: ZepClient;
+  private config: ZepClientConfig;
+  private encryptionKey: string;
+
+  constructor(config: ZepClientConfig) {
+    this.config = config;
+    this.client = new ZepClient({
+      apiKey: config.apiKey,
+      baseURL: config.baseURL || "https://api.getzep.com"
+    });
+    
+    // Initialize encryption key for HIPAA compliance
+    this.encryptionKey = process.env.ZEP_ENCRYPTION_KEY || this.generateEncryptionKey();
+  }
+
+  /**
+   * Create a new user session with HIPAA compliance
+   */
+  async createUserSession(userId: string): Promise<string> {
+    const sessionId = `${this.config.sessionConfig.sessionIdPrefix}_${userId}_${Date.now()}`;
+    
+    try {
+      await this.client.user.add({
+        userId: sessionId,
+        email: `user_${userId}@labinsight.ai`,
+        firstName: "LabInsight",
+        lastName: "User",
+        metadata: {
+          originalUserId: userId,
+          platform: "labinsight-ai",
+          hipaaCompliant: true,
+          createdAt: new Date().toISOString()
+        }
+      });
+
+      console.log(`✅ Zep session created: ${sessionId}`);
+      return sessionId;
+    } catch (error) {
+      console.error("❌ Failed to create Zep session:", error);
+      throw new Error(`Failed to create Zep session: ${error}`);
+    }
+  }
+
+  /**
+   * Store health analysis memory with HIPAA encryption
+   */
+  async storeHealthAnalysisMemory(
+    sessionId: string,
+    analysisData: any,
+    metadata: any = {}
+  ): Promise<void> {
+    try {
+      // Encrypt sensitive health data
+      const encryptedData = this.encryptPHI(analysisData);
+      
+      // Store in Zep with encrypted content
+      await this.client.memory.add(sessionId, {
+        messages: [{
+          role: "assistant",
+          content: `Health analysis completed: ${metadata.analysisType || 'general'}`,
+          metadata: {
+            type: "health_analysis",
+            encrypted: true,
+            timestamp: new Date().toISOString(),
+            ...metadata
+          }
+        }],
+        metadata: {
+          encryptedData: encryptedData,
+          dataType: "health_analysis",
+          hipaaCompliant: true
+        }
+      });
+
+      console.log(`✅ Health analysis memory stored for session: ${sessionId}`);
+    } catch (error) {
+      console.error("❌ Failed to store health analysis memory:", error);
+      throw new Error(`Failed to store memory: ${error}`);
+    }
+  }
+
+  /**
+   * Retrieve relevant memory context for health analysis
+   */
+  async getRelevantContext(
+    sessionId: string,
+    query: string,
+    limit: number = 5
+  ): Promise<any[]> {
+    try {
+      // Search for relevant memories
+      const searchResults = await this.client.memory.search(sessionId, {
+        text: query,
+        metadata: {
+          where: { type: "health_analysis" }
+        },
+        limit
+      });
+
+      // Decrypt and return relevant context
+      const decryptedResults = searchResults.results?.map(result => {
+        if (result.metadata?.encryptedData) {
+          const decryptedData = this.decryptPHI(result.metadata.encryptedData);
+          return {
+            ...result,
+            decryptedData,
+            relevanceScore: result.score
+          };
+        }
+        return result;
+      }) || [];
+
+      console.log(`✅ Retrieved ${decryptedResults.length} relevant memories`);
+      return decryptedResults;
+    } catch (error) {
+      console.error("❌ Failed to retrieve memory context:", error);
+      throw new Error(`Failed to retrieve context: ${error}`);
+    }
+  }
+
+  /**
+   * Get conversation history for session continuity
+   */
+  async getConversationHistory(sessionId: string): Promise<any[]> {
+    try {
+      const memory = await this.client.memory.get(sessionId);
+      
+      if (!memory) {
+        return [];
+      }
+
+      // Decrypt conversation data if encrypted
+      const messages = memory.messages?.map(message => {
+        if (message.metadata?.encrypted) {
+          return {
+            ...message,
+            content: this.decryptPHI(message.content)
+          };
+        }
+        return message;
+      }) || [];
+
+      console.log(`✅ Retrieved conversation history: ${messages.length} messages`);
+      return messages;
+    } catch (error) {
+      console.error("❌ Failed to get conversation history:", error);
+      throw new Error(`Failed to get conversation history: ${error}`);
+    }
+  }
+
+  /**
+   * Update user session metadata
+   */
+  async updateSessionMetadata(sessionId: string, metadata: any): Promise<void> {
+    try {
+      await this.client.user.update(sessionId, {
+        metadata: {
+          ...metadata,
+          lastUpdated: new Date().toISOString()
+        }
+      });
+
+      console.log(`✅ Session metadata updated: ${sessionId}`);
+    } catch (error) {
+      console.error("❌ Failed to update session metadata:", error);
+      throw new Error(`Failed to update session metadata: ${error}`);
+    }
+  }
+
+  /**
+   * Delete user session and all associated data
+   */
+  async deleteUserSession(sessionId: string): Promise<void> {
+    try {
+      await this.client.user.delete(sessionId);
+      console.log(`✅ Session deleted: ${sessionId}`);
+    } catch (error) {
+      console.error("❌ Failed to delete session:", error);
+      throw new Error(`Failed to delete session: ${error}`);
+    }
+  }
+
+  /**
+   * Encrypt PHI data for HIPAA compliance
+   */
+  private encryptPHI(data: any): string {
+    const jsonString = JSON.stringify(data);
+    const encrypted = CryptoJS.AES.encrypt(jsonString, this.encryptionKey).toString();
+    return encrypted;
+  }
+
+  /**
+   * Decrypt PHI data
+   */
+  private decryptPHI(encryptedData: string): any {
+    try {
+      const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey);
+      const jsonString = decrypted.toString(CryptoJS.enc.Utf8);
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.error("❌ Failed to decrypt PHI data:", error);
+      throw new Error("Failed to decrypt PHI data");
+    }
+  }
+
+  /**
+   * Generate encryption key for HIPAA compliance
+   */
+  private generateEncryptionKey(): string {
+    return CryptoJS.lib.WordArray.random(256/8).toString();
+  }
+
+  /**
+   * Test connection to Zep service
+   */
+  async testConnection(): Promise<boolean> {
+    try {
+      // Test basic connectivity
+      const testSessionId = `test_${Date.now()}`;
+      await this.createUserSession(testSessionId);
+      await this.deleteUserSession(testSessionId);
+      
+      console.log("✅ Zep connection test successful");
+      return true;
+    } catch (error) {
+      console.error("❌ Zep connection test failed:", error);
+      return false;
+    }
+  }
+}
+
+// Default configuration for LabInsight AI
+export const defaultZepConfig: ZepClientConfig = {
+  apiKey: process.env.ZEP_API_KEY || "",
+  baseURL: process.env.ZEP_BASE_URL || "https://api.getzep.com",
+  sessionConfig: {
+    sessionIdPrefix: "labinsight",
+    sessionTimeout: 1440, // 24 hours
+    userIdMapping: true
+  },
+  memoryConfig: {
+    memoryType: 'perpetual',
+    maxTokens: 4000,
+    summarizationEnabled: true,
+    hipaaCompliant: true
+  }
+};
+
+// Export singleton instance
+export const zepClient = new LabInsightZepClient(defaultZepConfig);

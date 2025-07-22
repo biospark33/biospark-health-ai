@@ -1,0 +1,460 @@
+// Health AI System Database Schema
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// User model for health data management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  initials  String?
+  age       Int?
+  city      String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Health data relationships
+  healthAssessments HealthAssessment[]
+  biomarkers        Biomarker[]
+  consultations     Consultation[]
+  achievements      Achievement[]
+  analyses          Analysis[]
+  userStats         UserStats?
+  
+  // Zep memory integration
+  zepSessions       ZepSession[]
+  
+  @@map("users")
+}
+
+// Health Assessment model for comprehensive analysis
+model HealthAssessment {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Assessment metadata
+  assessmentType String // "bioenergetic", "metabolic", "comprehensive"
+  status         String @default("active") // "active", "archived", "draft"
+  
+  // Core health metrics
+  overallScore    Float
+  energyLevel     Float
+  metabolicHealth Float
+  stressLevel     Float
+  
+  // Bioenergetic analysis (Ray Peat principles)
+  thyroidFunction    Float
+  mitochondrialHealth Float
+  hormonalBalance    Float
+  inflammationLevel  Float
+  
+  // Analysis results
+  keyFindings      Json // Critical findings for Layer 1
+  detailedInsights Json // Contextual explanations for Layer 2
+  comprehensiveData Json // Full technical details for Layer 3
+  
+  // Recommendations
+  immediateActions Json // Urgent recommendations
+  recommendations  Json // Detailed recommendations
+  
+  // Engagement tracking
+  viewCount       Int @default(0)
+  timeSpent       Int @default(0) // seconds
+  layerProgress   Json // tracks which layers user explored
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("health_assessments")
+}
+
+// Biomarker model for detailed health metrics
+model Biomarker {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Biomarker details
+  name        String
+  value       Float
+  unit        String
+  category    String // "metabolic", "hormonal", "inflammatory", "nutritional"
+  
+  // Reference ranges
+  optimalMin  Float?
+  optimalMax  Float?
+  normalMin   Float?
+  normalMax   Float?
+  
+  // Analysis
+  status      String // "optimal", "suboptimal", "concerning", "critical"
+  trend       String? // "improving", "stable", "declining"
+  
+  // Ray Peat context
+  rayPeatContext String?
+  significance   String?
+  
+  // Metadata
+  testDate    DateTime
+  labProvider String?
+  notes       String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("biomarkers")
+}
+
+// Consultation model for booking integration
+model Consultation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Consultation details
+  type          String // "initial", "follow-up", "emergency"
+  status        String @default("requested") // "requested", "scheduled", "completed", "cancelled"
+  
+  // Scheduling
+  requestedDate DateTime?
+  scheduledDate DateTime?
+  duration      Int @default(60) // minutes
+  
+  // Context
+  concerns      String?
+  priority      String @default("normal") // "low", "normal", "high", "urgent"
+  
+  // Results
+  notes         String?
+  recommendations String?
+  followUpDate  DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("consultations")
+}
+
+// Achievement model for gamification
+model Achievement {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Achievement details
+  type        String // "exploration", "improvement", "consistency", "milestone"
+  title       String
+  description String
+  
+  // Progress
+  earned      Boolean @default(false)
+  progress    Float   @default(0.0) // 0.0 to 1.0
+  
+  // Metadata
+  category    String // "engagement", "health", "learning"
+  points      Int @default(0)
+  
+  earnedAt  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("achievements")
+}
+
+// Analysis model for lab report analysis
+model Analysis {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // User details
+  email     String
+  initials  String
+  age       Int
+  city      String
+  
+  // Analysis data
+  biomarkers        Json
+  metabolicScore    Float
+  thyroidScore      Float
+  metabolicHealth   Json
+  inflammation      Json
+  nutrients         Json
+  patterns          Json
+  criticalFindings  Json
+  recommendations   Json
+  
+  // Metadata
+  analysisType      String @default("comprehensive")
+  aiEnhanced        Boolean @default(false)
+  originalFilename  String?
+  fileSize          Int?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("analyses")
+}
+
+// User statistics model
+model UserStats {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Analysis statistics
+  totalAnalyses         Int      @default(0)
+  averageMetabolicScore Float?
+  bestMetabolicScore    Float?
+  latestAnalysisDate    DateTime?
+  
+  // Engagement statistics
+  totalTimeSpent        Int      @default(0)
+  layersExplored        Int      @default(0)
+  achievementsEarned    Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("user_stats")
+}
+
+// HIPAA Compliance Models
+
+// Audit logging for HIPAA compliance
+model AuditLog {
+  id            String   @id @default(cuid())
+  userId        String?
+  sessionId     String?
+  
+  // Event details
+  eventType     String   // "login", "data_access", "analysis_request", "export", "delete"
+  resource      String   // "health_assessment", "biomarker", "analysis", "user_profile"
+  resourceId    String?
+  action        String   // "create", "read", "update", "delete", "export"
+  
+  // Request details
+  ipAddress     String?
+  userAgent     String?
+  endpoint      String?
+  method        String?
+  
+  // Data details
+  dataAccessed  Json?    // Summary of what data was accessed
+  changes       Json?    // What was changed (before/after for updates)
+  
+  // Compliance fields
+  timestamp     DateTime @default(now())
+  success       Boolean  @default(true)
+  errorMessage  String?
+  riskLevel     String   @default("low") // "low", "medium", "high", "critical"
+  
+  // Immutability hash for tamper detection
+  contentHash   String
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, timestamp])
+  @@index([eventType, timestamp])
+  @@index([riskLevel, timestamp])
+  @@map("audit_logs")
+}
+
+// Role-based access control
+enum UserRole {
+  PATIENT
+  HEALTHCARE_PROVIDER
+  ADMIN
+  AUDITOR
+  RESEARCHER
+}
+
+enum Permission {
+  READ_OWN_DATA
+  READ_ALL_DATA
+  WRITE_OWN_DATA
+  WRITE_ALL_DATA
+  DELETE_OWN_DATA
+  DELETE_ALL_DATA
+  EXPORT_DATA
+  MANAGE_USERS
+  VIEW_AUDIT_LOGS
+  SYSTEM_ADMIN
+}
+
+model UserRole_Assignment {
+  id        String   @id @default(cuid())
+  userId    String
+  role      UserRole
+  
+  // Assignment details
+  assignedBy String?  // userId of who assigned this role
+  assignedAt DateTime @default(now())
+  expiresAt  DateTime?
+  active     Boolean  @default(true)
+  
+  // Audit trail
+  reason     String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, role])
+  @@map("user_role_assignments")
+}
+
+model RolePermission {
+  id         String     @id @default(cuid())
+  role       UserRole
+  permission Permission
+  
+  // Permission details
+  granted    Boolean    @default(true)
+  conditions Json?      // Additional conditions for permission
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([role, permission])
+  @@map("role_permissions")
+}
+
+// Encrypted PHI storage
+model EncryptedPHI {
+  id            String   @id @default(cuid())
+  userId        String
+  
+  // Encryption details
+  fieldName     String   // "email", "name", "biomarker_value", etc.
+  encryptedData String   // Base64 encoded encrypted data
+  keyVersion    String   @default("v1")
+  
+  // Reference to source record
+  sourceTable   String   // "users", "biomarkers", "health_assessments"
+  sourceId      String
+  
+  // Metadata
+  dataType      String   // "string", "number", "json"
+  classification String  @default("PHI") // "PHI", "PII", "SENSITIVE"
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([sourceTable, sourceId, fieldName])
+  @@index([userId])
+  @@map("encrypted_phi")
+}
+
+// Consent management
+model UserConsent {
+  id            String   @id @default(cuid())
+  userId        String
+  
+  // Consent details
+  consentType   String   // "data_processing", "analysis", "research", "marketing"
+  granted       Boolean
+  version       String   @default("1.0")
+  
+  // Legal details
+  consentText   String
+  ipAddress     String?
+  userAgent     String?
+  
+  // Lifecycle
+  grantedAt     DateTime?
+  revokedAt     DateTime?
+  expiresAt     DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId, consentType])
+  @@map("user_consents")
+}
+
+// Data retention and deletion tracking
+model DataRetention {
+  id            String   @id @default(cuid())
+  userId        String
+  
+  // Retention details
+  dataType      String   // "health_assessment", "biomarker", "analysis"
+  recordId      String
+  retentionPeriod Int    // days
+  
+  // Deletion tracking
+  scheduledDeletion DateTime
+  deleted           Boolean @default(false)
+  deletedAt         DateTime?
+  deletedBy         String?
+  
+  // Legal hold
+  legalHold         Boolean @default(false)
+  legalHoldReason   String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([scheduledDeletion, deleted])
+  @@map("data_retention")
+}
+
+// Compliance monitoring
+model ComplianceMetric {
+  id            String   @id @default(cuid())
+  
+  // Metric details
+  metricType    String   // "audit_coverage", "encryption_rate", "consent_rate"
+  value         Float
+  target        Float?
+  status        String   // "compliant", "warning", "violation"
+  
+  // Time period
+  periodStart   DateTime
+  periodEnd     DateTime
+  
+  // Details
+  details       Json?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([metricType, periodStart])
+  @@map("compliance_metrics")
+}
+
+// Zep Memory Integration Models
+model ZepSession {
+  id          String   @id @default(cuid())
+  userId      String
+  sessionId   String   @unique
+  zepUserId   String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  expiresAt   DateTime
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("zep_sessions")
+}
+
+model MemoryAuditLog {
+  id          String   @id @default(cuid())
+  sessionId   String
+  operation   String
+  dataType    String
+  userId      String
+  timestamp   DateTime @default(now())
+  metadata    Json?
+  
+  @@map("memory_audit_logs")
+}
