@@ -1,39 +1,28 @@
-
 {
+  "buildCommand": "npm ci --force && npm run build",
+  "installCommand": "npm ci --force",
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
   "functions": {
-    "app/api/**/*.ts": {
+    "app/api/**/*.js": {
       "maxDuration": 30
     }
   },
+  "crons": [],
   "env": {
-    "NEXT_PUBLIC_APP_ENV": "production"
+    "NODE_ENV": "production"
   },
-  "regions": ["iad1"],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+  "build": {
+    "env": {
+      "SKIP_ENV_VALIDATION": "1"
     }
-  ],
+  },
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
         {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     }
