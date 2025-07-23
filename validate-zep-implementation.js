@@ -24,8 +24,8 @@ function validateZepImplementation() {
         const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
         const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
         
-        if (dependencies['@getzep/zep-js']) {
-            console.log(`✅ Zep SDK installed: ${dependencies['@getzep/zep-js']}`);
+        if (dependencies['@getzep/zep-cloud']) {
+            console.log(`✅ Zep SDK installed: ${dependencies['@getzep/zep-cloud']}`);
             results.validations.push("Zep SDK dependency installed");
         } else {
             console.log("❌ Zep SDK not found in dependencies");

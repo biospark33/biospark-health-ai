@@ -6,7 +6,7 @@
  * Fixed: Zep API only requires API key, no URL parameter needed
  */
 
-import { ZepClient } from '@getzep/zep-js';
+import { ZepClient } from '@getzep/zep-cloud';
 
 // Environment validation - Zep only needs API key
 const ZEP_API_KEY = process.env.ZEP_API_KEY;
@@ -21,9 +21,8 @@ async function initializeZepClient() {
   }
 
   try {
-    // Zep client initialization - SDK expects (baseURL, apiKey) parameters
-    // Using default Zep API URL since SDK requires it
-    zepClient = await ZepClient.init('https://api.getzep.com', ZEP_API_KEY);
+    // Zep Cloud client initialization - new constructor pattern
+    zepClient = new ZepClient(ZEP_API_KEY);
     console.log('Zep client initialized successfully with API key');
     return zepClient;
   } catch (error) {

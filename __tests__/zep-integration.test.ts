@@ -4,7 +4,7 @@ import { MemoryManager } from '../lib/memory-manager';
 import { SessionManager } from '../lib/session-manager';
 
 // Mock Zep client for testing
-jest.mock('@getzep/zep-js');
+jest.mock('@getzep/zep-cloud');
 
 describe('Zep Integration Tests', () => {
   let zepClient: LabInsightZepClient;

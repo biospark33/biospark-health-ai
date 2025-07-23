@@ -5,7 +5,7 @@
  */
 
 require('dotenv').config();
-const { ZepClient } = require('@getzep/zep-js');
+const { ZepClient } = require('@getzep/zep-cloud');
 
 async function testZepConnection() {
   console.log('🔍 Testing Zep API connection...');

@@ -6,7 +6,7 @@
  * Tests the full BMAD-implemented Zep integration for Phase 2A
  */
 
-const { ZepClient } = require("@getzep/zep-js");
+const { ZepClient } = require("@getzep/zep-cloud");
 
 async function testZepIntegration() {
     console.log("🧪 TESTING COMPLETE ZEP INTEGRATION - PHASE 2A");

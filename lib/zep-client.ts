@@ -3,7 +3,7 @@
 // Zep Memory Client for Healthcare AI
 // HIPAA-compliant memory management with encryption
 
-import { ZepClient, ISession, IMemory, IMessage } from "@getzep/zep-js";
+import { ZepClient, ISession, IMemory, IMessage } from "@getzep/zep-cloud";
 import { createHash, randomBytes, createCipher, createDecipher } from 'crypto';
 
 export interface ZepClientConfig {
