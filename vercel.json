@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm ci --force && npm run build",
-  "installCommand": "npm ci --force",
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
   "framework": "nextjs",
   "functions": {
     "app/api/**/*.js": {
