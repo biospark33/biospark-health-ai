@@ -4,6 +4,8 @@
  * Phase 2B - Get Personalized Insights Based on Memory
  */
 
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';

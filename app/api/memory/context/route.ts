@@ -4,6 +4,8 @@
  * Phase 2B - Get Relevant Context for Current Conversation
  */
 
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';

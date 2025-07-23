@@ -4,6 +4,8 @@
  * Phase 2B - Analyze Trends in User's Health Journey
  */
 
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
