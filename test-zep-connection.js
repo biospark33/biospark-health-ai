@@ -1,3 +1,4 @@
+
 /**
  * Simple Zep Connection Test
  * Phase 2A Foundation - Validate API connectivity
@@ -21,8 +22,9 @@ async function testZepConnection() {
   console.log('🌐 API URL:', apiUrl);
   
   try {
-    const client = new ZepClient({
-      apiKey: apiKey
+    const client = await ZepClient.init({
+      apiKey: apiKey,
+      baseURL: apiUrl
     });
     
     console.log('🔗 Zep client created successfully');

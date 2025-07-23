@@ -1,3 +1,4 @@
+
 #!/usr/bin/env node
 
 /**
@@ -16,8 +17,9 @@ async function testZepIntegration() {
     try {
         // Initialize Zep client
         console.log("🔧 Initializing Zep client...");
-        const client = new ZepClient({
-            apiKey: apiKey
+        const client = await ZepClient.init({
+            apiKey: apiKey,
+            baseURL: "https://api.getzep.com"
         });
         
         // Test 1: Create user session
