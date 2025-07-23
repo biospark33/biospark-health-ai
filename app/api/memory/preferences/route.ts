@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/app/api/auth/[...nextauth]/route';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { storePreferences, getPreferences } from '@/lib/zep/preferences';
 import { auditLog } from '@/lib/compliance/audit';
@@ -13,7 +13,7 @@ import { validateHIPAACompliance } from '@/lib/compliance/hipaa';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Authentication check
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
