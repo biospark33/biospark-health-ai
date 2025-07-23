@@ -3,13 +3,13 @@
 /**
  * Zep Memory Integration Client
  * Phase 2A Foundation - HIPAA Compliant Memory Management
+ * Fixed: Zep API only requires API key, no URL parameter needed
  */
 
 import { ZepClient } from '@getzep/zep-js';
 
-// Environment validation
+// Environment validation - Zep only needs API key
 const ZEP_API_KEY = process.env.ZEP_API_KEY;
-const ZEP_API_URL = process.env.ZEP_API_URL || 'https://api.getzep.com';
 
 // Initialize Zep client with error handling
 let zepClient: ZepClient | null = null;
@@ -21,11 +21,10 @@ async function initializeZepClient() {
   }
 
   try {
-    zepClient = await ZepClient.init({
-      apiKey: ZEP_API_KEY,
-      baseURL: ZEP_API_URL
-    });
-    console.log('Zep client initialized successfully');
+    // Zep client initialization - SDK expects (baseURL, apiKey) parameters
+    // Using default Zep API URL since SDK requires it
+    zepClient = await ZepClient.init('https://api.getzep.com', ZEP_API_KEY);
+    console.log('Zep client initialized successfully with API key');
     return zepClient;
   } catch (error) {
     console.error('Failed to initialize Zep client:', error);
@@ -33,8 +32,10 @@ async function initializeZepClient() {
   }
 }
 
-// Initialize client on module load
-initializeZepClient();
+// Initialize client on module load (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  initializeZepClient();
+}
 
 export { zepClient };
 

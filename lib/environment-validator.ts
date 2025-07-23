@@ -24,7 +24,6 @@ export interface EnvironmentConfig {
   
   // Zep Memory
   ZEP_API_KEY?: string;
-  ZEP_BASE_URL?: string;
   ZEP_ENCRYPTION_KEY?: string;
   
   // Application
@@ -59,7 +58,6 @@ export class EnvironmentValidator {
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
       ZEP_API_KEY: process.env.ZEP_API_KEY,
-      ZEP_BASE_URL: process.env.ZEP_BASE_URL,
       ZEP_ENCRYPTION_KEY: process.env.ZEP_ENCRYPTION_KEY,
       NODE_ENV: process.env.NODE_ENV,
       VERCEL_ENV: process.env.VERCEL_ENV,
@@ -91,7 +89,6 @@ export class EnvironmentValidator {
     
     const optional = [
       'ZEP_API_KEY',
-      'ZEP_BASE_URL',
       'ZEP_ENCRYPTION_KEY',
     ];
     
@@ -110,7 +107,6 @@ export class EnvironmentValidator {
   private getOptionalVariables(): string[] {
     return [
       'ZEP_API_KEY',
-      'ZEP_BASE_URL', 
       'ZEP_ENCRYPTION_KEY',
       'NEXTAUTH_URL',
     ];

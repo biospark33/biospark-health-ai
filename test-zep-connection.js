@@ -11,7 +11,6 @@ async function testZepConnection() {
   console.log('🔍 Testing Zep API connection...');
   
   const apiKey = process.env.ZEP_API_KEY;
-  const apiUrl = process.env.ZEP_API_URL || 'https://api.getzep.com';
   
   if (!apiKey) {
     console.error('❌ ZEP_API_KEY not found in environment variables');
@@ -19,13 +18,11 @@ async function testZepConnection() {
   }
   
   console.log('✅ API Key found');
-  console.log('🌐 API URL:', apiUrl);
+  console.log('🔧 Zep API only requires API key - no URL parameter needed');
   
   try {
-    const client = await ZepClient.init({
-      apiKey: apiKey,
-      baseURL: apiUrl
-    });
+    // Fixed: Zep client initialization - SDK expects (baseURL, apiKey) parameters
+    const client = await ZepClient.init('https://api.getzep.com', apiKey);
     
     console.log('🔗 Zep client created successfully');
     console.log('🔍 Available methods:', Object.getOwnPropertyNames(client.memory));

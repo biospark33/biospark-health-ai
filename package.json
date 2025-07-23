@@ -22,7 +22,6 @@
     "@auth/prisma-adapter": "^2.10.0",
     "@getzep/zep-js": "^0.10.0",
     "@hookform/resolvers": "^3.3.2",
-
     "@prisma/client": "^5.7.1",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
@@ -49,6 +48,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "compression": "^1.7.4",
+    "dotenv": "^17.2.0",
     "eslint": "^9.31.0",
     "eslint-config-next": "15.4.3",
     "framer-motion": "^12.23.6",
@@ -77,7 +77,8 @@
     "@types/jest": "^29.5.8",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.0.1",
+    "whatwg-fetch": "^3.6.20"
   },
   "overrides": {
     "napi-postinstall": "0.3.2",
