@@ -1,199 +1,263 @@
-/**
- * Environment Validation Utility
- * Validates all required environment variables with detailed error reporting
- */
 
-interface EnvironmentConfig {
+// Environment Configuration Validator
+// Validates required environment variables for different deployment stages
+
+export interface EnvironmentConfig {
   // Database
   DATABASE_URL?: string;
-  DIRECT_URL?: string;
   
   // Supabase
   NEXT_PUBLIC_SUPABASE_URL?: string;
   NEXT_PUBLIC_SUPABASE_ANON_KEY?: string;
   SUPABASE_SERVICE_ROLE_KEY?: string;
   
-  // Redis
-  REDIS_URL?: string;
+  // Authentication
+  NEXTAUTH_SECRET?: string;
+  NEXTAUTH_URL?: string;
   
-  // Sentry
-  SENTRY_DSN?: string;
-  NEXT_PUBLIC_SENTRY_DSN?: string;
-  SENTRY_ORG?: string;
-  SENTRY_PROJECT?: string;
-  SENTRY_AUTH_TOKEN?: string;
-  
-  // ZepAI
-  ZEP_API_KEY?: string;
-  ZEP_API_URL?: string;
+  // Google OAuth
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
   
   // OpenAI
   OPENAI_API_KEY?: string;
   
-  // NextAuth
-  NEXTAUTH_SECRET?: string;
-  NEXTAUTH_URL?: string;
+  // Zep Memory
+  ZEP_API_KEY?: string;
+  ZEP_BASE_URL?: string;
+  ZEP_ENCRYPTION_KEY?: string;
+  
+  // Application
+  NODE_ENV?: string;
+  VERCEL_ENV?: string;
 }
 
-interface ValidationResult {
+export interface ValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
   config: EnvironmentConfig;
+  stage: 'development' | 'preview' | 'production';
 }
 
 export class EnvironmentValidator {
-  private static instance: EnvironmentValidator;
-  private validationCache: ValidationResult | null = null;
-
-  static getInstance(): EnvironmentValidator {
-    if (!EnvironmentValidator.instance) {
-      EnvironmentValidator.instance = new EnvironmentValidator();
-    }
-    return EnvironmentValidator.instance;
+  private config: EnvironmentConfig;
+  
+  constructor() {
+    this.config = this.loadEnvironmentConfig();
   }
-
-  /**
-   * Validate all environment variables
-   */
-  validate(): ValidationResult {
-    if (this.validationCache) {
-      return this.validationCache;
-    }
-
-    const errors: string[] = [];
-    const warnings: string[] = [];
-    const config: EnvironmentConfig = {};
-
-    // Critical environment variables
-    const critical = [
+  
+  private loadEnvironmentConfig(): EnvironmentConfig {
+    return {
+      DATABASE_URL: process.env.DATABASE_URL,
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+      NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+      ZEP_API_KEY: process.env.ZEP_API_KEY,
+      ZEP_BASE_URL: process.env.ZEP_BASE_URL,
+      ZEP_ENCRYPTION_KEY: process.env.ZEP_ENCRYPTION_KEY,
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL_ENV: process.env.VERCEL_ENV,
+    };
+  }
+  
+  private getDeploymentStage(): 'development' | 'preview' | 'production' {
+    if (process.env.VERCEL_ENV === 'production') return 'production';
+    if (process.env.VERCEL_ENV === 'preview') return 'preview';
+    if (process.env.NODE_ENV === 'production') return 'production';
+    return 'development';
+  }
+  
+  private getRequiredVariables(stage: string): string[] {
+    const base = [
       'DATABASE_URL',
+      'NEXTAUTH_SECRET',
+    ];
+    
+    const production = [
+      ...base,
       'NEXT_PUBLIC_SUPABASE_URL',
       'NEXT_PUBLIC_SUPABASE_ANON_KEY',
       'SUPABASE_SERVICE_ROLE_KEY',
-      'NEXTAUTH_SECRET'
+      'GOOGLE_CLIENT_ID',
+      'GOOGLE_CLIENT_SECRET',
+      'OPENAI_API_KEY',
     ];
-
-    // Optional but recommended
-    const recommended = [
-      'REDIS_URL',
-      'SENTRY_DSN',
+    
+    const optional = [
       'ZEP_API_KEY',
-      'OPENAI_API_KEY'
+      'ZEP_BASE_URL',
+      'ZEP_ENCRYPTION_KEY',
     ];
-
-    // Check critical variables
-    critical.forEach(key => {
-      const value = process.env[key];
+    
+    switch (stage) {
+      case 'production':
+        return production;
+      case 'preview':
+        return production;
+      case 'development':
+        return base;
+      default:
+        return base;
+    }
+  }
+  
+  private getOptionalVariables(): string[] {
+    return [
+      'ZEP_API_KEY',
+      'ZEP_BASE_URL', 
+      'ZEP_ENCRYPTION_KEY',
+      'NEXTAUTH_URL',
+    ];
+  }
+  
+  public validate(): ValidationResult {
+    const stage = this.getDeploymentStage();
+    const requiredVars = this.getRequiredVariables(stage);
+    const optionalVars = this.getOptionalVariables();
+    
+    const errors: string[] = [];
+    const warnings: string[] = [];
+    
+    // Check required variables
+    for (const varName of requiredVars) {
+      const value = this.config[varName as keyof EnvironmentConfig];
       if (!value || value.trim() === '') {
-        errors.push(`Missing critical environment variable: ${key}`);
-      } else {
-        config[key as keyof EnvironmentConfig] = value;
+        errors.push(`Missing required environment variable: ${varName}`);
+      } else if (value.includes('your-') || value.includes('YOUR-') || value.includes('placeholder')) {
+        errors.push(`Environment variable ${varName} contains placeholder value: ${value}`);
       }
-    });
-
-    // Check recommended variables
-    recommended.forEach(key => {
-      const value = process.env[key];
+    }
+    
+    // Check optional variables
+    for (const varName of optionalVars) {
+      const value = this.config[varName as keyof EnvironmentConfig];
       if (!value || value.trim() === '') {
-        warnings.push(`Missing recommended environment variable: ${key}`);
-      } else {
-        config[key as keyof EnvironmentConfig] = value;
+        warnings.push(`Optional environment variable not set: ${varName}`);
+      } else if (value.includes('your-') || value.includes('YOUR-') || value.includes('placeholder')) {
+        warnings.push(`Environment variable ${varName} contains placeholder value: ${value}`);
       }
-    });
-
-    // Validate URL formats
-    this.validateUrls(config, errors, warnings);
-
-    const result: ValidationResult = {
-      isValid: errors.length === 0,
+    }
+    
+    // Validate specific formats
+    this.validateDatabaseUrl(errors, warnings);
+    this.validateSupabaseConfig(errors, warnings);
+    this.validateAuthConfig(errors, warnings);
+    
+    const isValid = errors.length === 0;
+    
+    return {
+      isValid,
       errors,
       warnings,
-      config
+      config: this.config,
+      stage
     };
-
-    this.validationCache = result;
-    return result;
   }
-
-  private validateUrls(config: EnvironmentConfig, errors: string[], warnings: string[]): void {
-    const urlFields = [
-      'DATABASE_URL',
-      'DIRECT_URL',
-      'NEXT_PUBLIC_SUPABASE_URL',
-      'REDIS_URL',
-      'ZEP_API_URL',
-      'NEXTAUTH_URL'
-    ];
-
-    urlFields.forEach(field => {
-      const value = config[field as keyof EnvironmentConfig];
-      if (value && !this.isValidUrl(value)) {
-        errors.push(`Invalid URL format for ${field}: ${value}`);
+  
+  private validateDatabaseUrl(errors: string[], warnings: string[]): void {
+    const dbUrl = this.config.DATABASE_URL;
+    if (dbUrl) {
+      if (!dbUrl.startsWith('postgresql://') && !dbUrl.startsWith('postgres://')) {
+        errors.push('DATABASE_URL must be a valid PostgreSQL connection string');
       }
-    });
-  }
-
-  private isValidUrl(url: string): boolean {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
+      
+      // Check for Supabase format
+      if (dbUrl.includes('supabase.co') && !dbUrl.includes('sslmode=require')) {
+        warnings.push('Supabase DATABASE_URL should include sslmode=require parameter');
+      }
     }
   }
-
-  /**
-   * Get environment variable with fallback
-   */
-  getEnvVar(key: string, fallback?: string): string {
-    const value = process.env[key];
-    if (!value || value.trim() === '') {
-      if (fallback !== undefined) {
-        return fallback;
-      }
-      throw new Error(`Missing required environment variable: ${key}`);
+  
+  private validateSupabaseConfig(errors: string[], warnings: string[]): void {
+    const supabaseUrl = this.config.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = this.config.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (supabaseUrl && !supabaseUrl.startsWith('https://')) {
+      errors.push('NEXT_PUBLIC_SUPABASE_URL must be a valid HTTPS URL');
     }
-    return value;
+    
+    if (supabaseUrl && supabaseKey) {
+      if (!supabaseUrl.includes('supabase.co')) {
+        warnings.push('NEXT_PUBLIC_SUPABASE_URL does not appear to be a Supabase URL');
+      }
+    }
   }
-
-  /**
-   * Check if running in development mode
-   */
-  isDevelopment(): boolean {
-    return process.env.NODE_ENV === 'development';
+  
+  private validateAuthConfig(errors: string[], warnings: string[]): void {
+    const authSecret = this.config.NEXTAUTH_SECRET;
+    if (authSecret && authSecret.length < 32) {
+      warnings.push('NEXTAUTH_SECRET should be at least 32 characters long for security');
+    }
   }
-
-  /**
-   * Check if running in production mode
-   */
-  isProduction(): boolean {
-    return process.env.NODE_ENV === 'production';
-  }
-
-  /**
-   * Get safe environment info for logging
-   */
-  getSafeEnvInfo(): Record<string, any> {
+  
+  public getConfigSummary(): Record<string, any> {
     const validation = this.validate();
+    
     return {
-      nodeEnv: process.env.NODE_ENV,
+      stage: validation.stage,
+      isValid: validation.isValid,
+      errorCount: validation.errors.length,
+      warningCount: validation.warnings.length,
       hasDatabase: !!validation.config.DATABASE_URL,
       hasSupabase: !!validation.config.NEXT_PUBLIC_SUPABASE_URL,
-      hasRedis: !!validation.config.REDIS_URL,
-      hasSentry: !!validation.config.SENTRY_DSN,
-      hasZep: !!validation.config.ZEP_API_KEY,
+      hasAuth: !!validation.config.NEXTAUTH_SECRET,
       hasOpenAI: !!validation.config.OPENAI_API_KEY,
-      validationErrors: validation.errors.length,
-      validationWarnings: validation.warnings.length
+      hasZep: !!validation.config.ZEP_API_KEY,
+      timestamp: new Date().toISOString()
     };
+  }
+  
+  public printValidationReport(): void {
+    const validation = this.validate();
+    
+    console.log('\n🔍 Environment Configuration Validation Report');
+    console.log('================================================');
+    console.log(`Stage: ${validation.stage.toUpperCase()}`);
+    console.log(`Status: ${validation.isValid ? '✅ VALID' : '❌ INVALID'}`);
+    console.log(`Errors: ${validation.errors.length}`);
+    console.log(`Warnings: ${validation.warnings.length}`);
+    
+    if (validation.errors.length > 0) {
+      console.log('\n❌ ERRORS:');
+      validation.errors.forEach(error => console.log(`  • ${error}`));
+    }
+    
+    if (validation.warnings.length > 0) {
+      console.log('\n⚠️  WARNINGS:');
+      validation.warnings.forEach(warning => console.log(`  • ${warning}`));
+    }
+    
+    const summary = this.getConfigSummary();
+    console.log('\n📊 Configuration Summary:');
+    console.log(`  • Database: ${summary.hasDatabase ? '✅' : '❌'}`);
+    console.log(`  • Supabase: ${summary.hasSupabase ? '✅' : '❌'}`);
+    console.log(`  • Authentication: ${summary.hasAuth ? '✅' : '❌'}`);
+    console.log(`  • OpenAI: ${summary.hasOpenAI ? '✅' : '❌'}`);
+    console.log(`  • Zep Memory: ${summary.hasZep ? '✅' : '⚠️  Optional'}`);
+    
+    console.log('\n================================================\n');
   }
 }
 
 // Export singleton instance
-export const envValidator = EnvironmentValidator.getInstance();
+export const environmentValidator = new EnvironmentValidator();
 
-// Export validation function for immediate use
+// Utility functions
 export function validateEnvironment(): ValidationResult {
-  return envValidator.validate();
+  return environmentValidator.validate();
+}
+
+export function printEnvironmentReport(): void {
+  environmentValidator.printValidationReport();
+}
+
+export function isProductionReady(): boolean {
+  const validation = environmentValidator.validate();
+  return validation.isValid && validation.stage === 'production';
 }

@@ -10,19 +10,20 @@ import { ZepClient } from '@getzep/zep-js';
 const ZEP_API_KEY = process.env.ZEP_API_KEY;
 const ZEP_API_URL = process.env.ZEP_API_URL || 'https://api.getzep.com';
 
-if (!ZEP_API_KEY) {
-  throw new Error('ZEP_API_KEY environment variable is required');
-}
-
 // Initialize Zep client with error handling
 let zepClient: ZepClient | null = null;
 
-try {
-  zepClient = new ZepClient({
-    apiKey: ZEP_API_KEY,
-  });
-} catch (error) {
-  console.error('Failed to initialize Zep client:', error);
+if (!ZEP_API_KEY) {
+  console.warn('ZEP_API_KEY not set - Zep memory features will be disabled');
+} else {
+  try {
+    zepClient = new ZepClient({
+      apiKey: ZEP_API_KEY,
+    });
+    console.log('Zep client initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize Zep client:', error);
+  }
 }
 
 export { zepClient };

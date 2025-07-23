@@ -1,105 +1,86 @@
 
 // Supabase Client Configuration
-// Production-ready Supabase integration for Health AI system
+// Handles database connections with proper error handling and fallbacks
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+let supabaseClient: SupabaseClient | null = null;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
-
-// Client-side Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-})
-
-// Server-side Supabase client (for API routes)
-export const supabaseAdmin = createClient(
-  supabaseUrl,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+export function getSupabaseClient(): SupabaseClient | null {
+  if (supabaseClient) {
+    return supabaseClient;
   }
-)
 
-// Health AI specific database operations
-export const healthAI = {
-  // User health assessments
-  async createAssessment(userId: string, assessmentData: any) {
-    const { data, error } = await supabase
-      .from('health_assessments')
-      .insert({
-        user_id: userId,
-        ...assessmentData,
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single()
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (error) throw error
-    return data
-  },
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn('Supabase configuration missing - database features will be limited');
+      return null;
+    }
 
-  async getAssessment(assessmentId: string) {
-    const { data, error } = await supabase
-      .from('health_assessments')
-      .select('*')
-      .eq('id', assessmentId)
-      .single()
+    // Validate URL format
+    if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('supabase.co')) {
+      console.error('Invalid Supabase URL format');
+      return null;
+    }
 
-    if (error) throw error
-    return data
-  },
+    supabaseClient = createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      },
+      db: {
+        schema: 'public'
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'biospark-health-ai'
+        }
+      }
+    });
 
-  async getUserAssessments(userId: string) {
-    const { data, error } = await supabase
-      .from('health_assessments')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
-    return data
-  },
-
-  // Health insights and recommendations
-  async saveInsight(assessmentId: string, insight: any) {
-    const { data, error } = await supabase
-      .from('health_insights')
-      .insert({
-        assessment_id: assessmentId,
-        ...insight,
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single()
-
-    if (error) throw error
-    return data
-  },
-
-  // User progress tracking
-  async trackProgress(userId: string, metrics: any) {
-    const { data, error } = await supabase
-      .from('user_progress')
-      .insert({
-        user_id: userId,
-        metrics,
-        recorded_at: new Date().toISOString(),
-      })
-      .select()
-      .single()
-
-    if (error) throw error
-    return data
-  },
+    console.log('Supabase client initialized successfully');
+    return supabaseClient;
+  } catch (error) {
+    console.error('Failed to initialize Supabase client:', error);
+    return null;
+  }
 }
+
+export async function testSupabaseConnection(): Promise<boolean> {
+  try {
+    const client = getSupabaseClient();
+    if (!client) {
+      console.log('Supabase client not available');
+      return false;
+    }
+
+    // Test connection with a simple query
+    const { data, error } = await client
+      .from('_health_check')
+      .select('*')
+      .limit(1);
+
+    if (error) {
+      // If health check table doesn't exist, that's okay
+      if (error.code === 'PGRST116' || error.message.includes('does not exist')) {
+        console.log('Supabase connection successful (health check table not found, but connection works)');
+        return true;
+      }
+      console.error('Supabase connection test failed:', error.message);
+      return false;
+    }
+
+    console.log('Supabase connection test successful');
+    return true;
+  } catch (error) {
+    console.error('Supabase connection test exception:', error);
+    return false;
+  }
+}
+
+// Export the client getter as default
+export default getSupabaseClient;

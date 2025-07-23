@@ -1,196 +1,207 @@
 
-// Redis Caching Layer for Performance Optimization
-// Phase 1D: Implement caching for frequent operations
+// In-Memory Caching Layer for Performance Optimization
+// Phase 1D: Lightweight caching without external dependencies
 
-import Redis from 'ioredis';
+interface CacheItem<T> {
+  data: T;
+  expiry: number;
+}
 
 class CacheManager {
-  private redis: Redis | null = null;
-  private isConnected = false;
+  private cache = new Map<string, CacheItem<any>>();
+  private cleanupInterval: NodeJS.Timeout;
 
   constructor() {
-    this.initializeRedis();
+    // Clean up expired items every 5 minutes
+    this.cleanupInterval = setInterval(() => {
+      this.cleanup();
+    }, 5 * 60 * 1000);
   }
 
-  private async initializeRedis() {
-    try {
-      // Use local Redis for development, Redis Cloud for production
-      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-      
-      this.redis = new Redis(redisUrl, {
-        retryDelayOnFailover: 100,
-        maxRetriesPerRequest: 3,
-        lazyConnect: true,
-        keepAlive: 30000,
-        connectTimeout: 10000,
-        commandTimeout: 5000,
-      });
-
-      this.redis.on('connect', () => {
-        console.log('Redis connected successfully');
-        this.isConnected = true;
-      });
-
-      this.redis.on('error', (err) => {
-        console.error('Redis connection error:', err);
-        this.isConnected = false;
-      });
-
-      await this.redis.connect();
-    } catch (error) {
-      console.error('Failed to initialize Redis:', error);
-      this.redis = null;
+  private cleanup() {
+    const now = Date.now();
+    for (const [key, item] of this.cache.entries()) {
+      if (now > item.expiry) {
+        this.cache.delete(key);
+      }
     }
+  }
+
+  private isExpired(item: CacheItem<any>): boolean {
+    return Date.now() > item.expiry;
   }
 
   // Cache user data for frequent lookups
-  async cacheUser(userId: string, userData: any, ttl: number = 3600) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  async cacheUser(userId: string, userData: any, ttl: number = 3600): Promise<boolean> {
     try {
-      const key = `user:${userId}`;
-      await this.redis.setex(key, ttl, JSON.stringify(userData));
+      const expiry = Date.now() + (ttl * 1000);
+      this.cache.set(`user:${userId}`, { data: userData, expiry });
       return true;
     } catch (error) {
-      console.error('Cache set error:', error);
+      console.error('Failed to cache user data:', error);
       return false;
     }
   }
 
-  async getCachedUser(userId: string) {
-    if (!this.redis || !this.isConnected) return null;
-    
+  async getUser(userId: string): Promise<any | null> {
     try {
-      const key = `user:${userId}`;
-      const cached = await this.redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const item = this.cache.get(`user:${userId}`);
+      if (!item || this.isExpired(item)) {
+        this.cache.delete(`user:${userId}`);
+        return null;
+      }
+      return item.data;
     } catch (error) {
-      console.error('Cache get error:', error);
+      console.error('Failed to get cached user:', error);
       return null;
     }
   }
 
-  // Cache biomarker analysis results
-  async cacheBiomarkerAnalysis(userId: string, biomarkerHash: string, analysis: any, ttl: number = 7200) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  // Cache analysis results
+  async cacheAnalysis(analysisId: string, analysis: any, ttl: number = 1800): Promise<boolean> {
     try {
-      const key = `analysis:${userId}:${biomarkerHash}`;
-      await this.redis.setex(key, ttl, JSON.stringify(analysis));
+      const expiry = Date.now() + (ttl * 1000);
+      this.cache.set(`analysis:${analysisId}`, { data: analysis, expiry });
       return true;
     } catch (error) {
-      console.error('Cache analysis error:', error);
+      console.error('Failed to cache analysis:', error);
       return false;
     }
   }
 
-  async getCachedBiomarkerAnalysis(userId: string, biomarkerHash: string) {
-    if (!this.redis || !this.isConnected) return null;
-    
+  async getAnalysis(analysisId: string): Promise<any | null> {
     try {
-      const key = `analysis:${userId}:${biomarkerHash}`;
-      const cached = await this.redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const item = this.cache.get(`analysis:${analysisId}`);
+      if (!item || this.isExpired(item)) {
+        this.cache.delete(`analysis:${analysisId}`);
+        return null;
+      }
+      return item.data;
     } catch (error) {
-      console.error('Cache get analysis error:', error);
+      console.error('Failed to get cached analysis:', error);
       return null;
     }
   }
 
-  // Cache user permissions for RBAC
-  async cacheUserPermissions(userId: string, permissions: any, ttl: number = 1800) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  // Cache user permissions
+  async cachePermissions(userId: string, permissions: any, ttl: number = 3600): Promise<boolean> {
     try {
-      const key = `permissions:${userId}`;
-      await this.redis.setex(key, ttl, JSON.stringify(permissions));
+      const expiry = Date.now() + (ttl * 1000);
+      this.cache.set(`permissions:${userId}`, { data: permissions, expiry });
       return true;
     } catch (error) {
-      console.error('Cache permissions error:', error);
+      console.error('Failed to cache permissions:', error);
       return false;
     }
   }
 
-  async getCachedUserPermissions(userId: string) {
-    if (!this.redis || !this.isConnected) return null;
-    
+  async getPermissions(userId: string): Promise<any | null> {
     try {
-      const key = `permissions:${userId}`;
-      const cached = await this.redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const item = this.cache.get(`permissions:${userId}`);
+      if (!item || this.isExpired(item)) {
+        this.cache.delete(`permissions:${userId}`);
+        return null;
+      }
+      return item.data;
     } catch (error) {
-      console.error('Cache get permissions error:', error);
+      console.error('Failed to get cached permissions:', error);
       return null;
     }
   }
 
-  // Cache health assessment results
-  async cacheHealthAssessment(assessmentId: string, assessment: any, ttl: number = 3600) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  // Cache health assessments
+  async cacheAssessment(assessmentId: string, assessment: any, ttl: number = 7200): Promise<boolean> {
     try {
-      const key = `assessment:${assessmentId}`;
-      await this.redis.setex(key, ttl, JSON.stringify(assessment));
+      const expiry = Date.now() + (ttl * 1000);
+      this.cache.set(`assessment:${assessmentId}`, { data: assessment, expiry });
       return true;
     } catch (error) {
-      console.error('Cache assessment error:', error);
+      console.error('Failed to cache assessment:', error);
       return false;
     }
   }
 
-  async getCachedHealthAssessment(assessmentId: string) {
-    if (!this.redis || !this.isConnected) return null;
-    
+  async getAssessment(assessmentId: string): Promise<any | null> {
     try {
-      const key = `assessment:${assessmentId}`;
-      const cached = await this.redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const item = this.cache.get(`assessment:${assessmentId}`);
+      if (!item || this.isExpired(item)) {
+        this.cache.delete(`assessment:${assessmentId}`);
+        return null;
+      }
+      return item.data;
     } catch (error) {
-      console.error('Cache get assessment error:', error);
+      console.error('Failed to get cached assessment:', error);
       return null;
     }
   }
 
-  // Invalidate cache patterns
-  async invalidateUserCache(userId: string) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  // Clear cache by pattern
+  async clearCache(pattern: string): Promise<boolean> {
     try {
-      const patterns = [
-        `user:${userId}`,
-        `analysis:${userId}:*`,
-        `permissions:${userId}`,
-        `assessment:*:${userId}`
-      ];
-      
-      for (const pattern of patterns) {
-        const keys = await this.redis.keys(pattern);
-        if (keys.length > 0) {
-          await this.redis.del(...keys);
+      const keysToDelete: string[] = [];
+      for (const key of this.cache.keys()) {
+        if (key.includes(pattern)) {
+          keysToDelete.push(key);
         }
       }
+      
+      for (const key of keysToDelete) {
+        this.cache.delete(key);
+      }
+      
       return true;
     } catch (error) {
-      console.error('Cache invalidation error:', error);
+      console.error('Failed to clear cache:', error);
       return false;
     }
   }
 
-  // Performance monitoring
-  async getCacheStats() {
-    if (!this.redis || !this.isConnected) return null;
-    
+  // Get cache statistics
+  async getCacheStats(): Promise<any | null> {
     try {
-      const info = await this.redis.info('stats');
+      const now = Date.now();
+      let activeItems = 0;
+      let expiredItems = 0;
+      
+      for (const item of this.cache.values()) {
+        if (now > item.expiry) {
+          expiredItems++;
+        } else {
+          activeItems++;
+        }
+      }
+      
       return {
-        connected: this.isConnected,
-        info: info
+        totalItems: this.cache.size,
+        activeItems,
+        expiredItems,
+        memoryUsage: process.memoryUsage()
       };
     } catch (error) {
-      console.error('Cache stats error:', error);
+      console.error('Failed to get cache stats:', error);
       return null;
     }
+  }
+
+  // Cleanup method for graceful shutdown
+  destroy() {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+    }
+    this.cache.clear();
   }
 }
 
+// Export singleton instance
 export const cacheManager = new CacheManager();
+
+// Graceful shutdown cleanup
+if (typeof process !== 'undefined') {
+  process.on('SIGTERM', () => {
+    cacheManager.destroy();
+  });
+  
+  process.on('SIGINT', () => {
+    cacheManager.destroy();
+  });
+}

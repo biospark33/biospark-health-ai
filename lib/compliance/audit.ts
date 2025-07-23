@@ -4,7 +4,7 @@
  * Tracks all PHI access and system events for compliance
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export interface AuditEvent {
   id?: string;
@@ -23,14 +23,16 @@ export class AuditLogger {
   private supabase;
 
   constructor() {
-    this.supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    this.supabase = getSupabaseClient();
   }
 
   async logEvent(event: AuditEvent): Promise<void> {
     try {
+      if (!this.supabase) {
+        console.warn('Supabase not available - audit logging skipped');
+        return;
+      }
+
       const auditRecord = {
         ...event,
         timestamp: new Date().toISOString(),
