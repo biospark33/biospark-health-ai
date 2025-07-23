@@ -1,5 +1,3 @@
-
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Temporarily disable TypeScript checking for clean deployment
@@ -105,10 +103,7 @@ const nextConfig = {
     }
     
     return config;
-  },
-  
-  // Output optimization
-  output: 'standalone',
+  }
 };
 
 module.exports = nextConfig;
