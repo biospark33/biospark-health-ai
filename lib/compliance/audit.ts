@@ -2,6 +2,7 @@
 /**
  * HIPAA Compliance Audit System
  * Tracks all PHI access and system events for compliance
+ * Enhanced with graceful fallback handling
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -20,13 +21,44 @@ export interface AuditEvent {
 }
 
 export class AuditLogger {
-  private supabase;
+  private supabase: any = null;
+  private isEnabled: boolean = false;
 
   constructor() {
-    this.supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    // Check if Supabase is properly configured
+    if (!supabaseUrl || 
+        !supabaseServiceKey || 
+        supabaseUrl.includes('your-supabase-url') ||
+        supabaseServiceKey.includes('your-service-role-key')) {
+      console.warn('⚠️ Supabase not configured for audit logging, using console fallback');
+      this.isEnabled = false;
+      
+      // Create mock client for graceful degradation
+      this.supabase = {
+        from: () => ({
+          insert: () => Promise.resolve({ error: null })
+        })
+      };
+    } else {
+      try {
+        this.supabase = createClient(supabaseUrl, supabaseServiceKey);
+        this.isEnabled = true;
+        console.log('✅ Audit logger initialized with Supabase');
+      } catch (error) {
+        console.warn('⚠️ Failed to initialize audit logger:', error instanceof Error ? error.message : 'Unknown error');
+        this.isEnabled = false;
+        
+        // Create mock client for graceful degradation
+        this.supabase = {
+          from: () => ({
+            insert: () => Promise.resolve({ error: null })
+          })
+        };
+      }
+    }
   }
 
   async logEvent(event: AuditEvent): Promise<void> {
@@ -37,16 +69,24 @@ export class AuditLogger {
         created_at: new Date().toISOString()
       };
 
+      if (!this.isEnabled) {
+        // Fallback to console logging when Supabase is not available
+        console.log('📋 AUDIT LOG:', JSON.stringify(auditRecord, null, 2));
+        return;
+      }
+
       const { error } = await this.supabase
         .from('hipaa_audit_log')
         .insert([auditRecord]);
 
       if (error) {
-        console.error('Audit logging failed:', error);
+        console.warn('⚠️ Audit logging failed, falling back to console:', error.message);
+        console.log('📋 AUDIT LOG (FALLBACK):', JSON.stringify(auditRecord, null, 2));
         // In production, this should trigger alerts
       }
     } catch (error) {
-      console.error('Audit system error:', error);
+      console.warn('⚠️ Audit system error, falling back to console:', error instanceof Error ? error.message : 'Unknown error');
+      console.log('📋 AUDIT LOG (ERROR FALLBACK):', JSON.stringify(event, null, 2));
     }
   }
 

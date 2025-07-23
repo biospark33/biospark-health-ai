@@ -1,0 +1,46 @@
+
+> labinsight-ai-complete@1.0.0 build
+> prisma generate && next build
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 438ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+  ▲ Next.js 14.2.30
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+Error: ZEP_API_KEY environment variable is required
+    at 97827 (/home/ubuntu/workspace/biospark-health-ai/.next/server/chunks/95.js:5:565)
+    at t (/home/ubuntu/workspace/biospark-health-ai/.next/server/webpack-runtime.js:1:143)
+    at 9742 (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/comprehensive-analysis/route.js:1:3070)
+    at t (/home/ubuntu/workspace/biospark-health-ai/.next/server/webpack-runtime.js:1:143)
+    at i (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/comprehensive-analysis/route.js:36:5047)
+    at /home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/comprehensive-analysis/route.js:36:5089
+    at t.X (/home/ubuntu/workspace/biospark-health-ai/.next/server/webpack-runtime.js:1:1285)
+    at /home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/comprehensive-analysis/route.js:36:5060
+    at Object.<anonymous> (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/comprehensive-analysis/route.js:36:5116)
+    at Module._compile (node:internal/modules/cjs/loader:1554:14)
+
+> Build error occurred
+Error: Failed to collect page data for /api/comprehensive-analysis
+    at /home/ubuntu/workspace/biospark-health-ai/node_modules/next/dist/build/utils.js:1269:15
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  type: 'Error'
+}

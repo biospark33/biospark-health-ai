@@ -1,0 +1,57 @@
+
+> labinsight-ai-complete@1.0.0 build
+> prisma generate && next build
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 458ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+
+┌─────────────────────────────────────────────────────────┐
+│  Update available 5.22.0 -> 6.12.0                      │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+  ▲ Next.js 14.2.30
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PrismaClientConstructorValidationError: Invalid value undefined for datasource "db" provided to PrismaClient constructor.
+It should have this form: { url: "CONNECTION_STRING" }
+Read more at https://pris.ly/d/client-constructor
+    at Object.datasources (/home/ubuntu/workspace/biospark-health-ai/node_modules/@prisma/client/runtime/library.js:124:86)
+    at Gl (/home/ubuntu/workspace/biospark-health-ai/node_modules/@prisma/client/runtime/library.js:126:2527)
+    at new t (/home/ubuntu/workspace/biospark-health-ai/node_modules/@prisma/client/runtime/library.js:130:748)
+    at 81183 (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/health/route.js:1:1067)
+    at t (/home/ubuntu/workspace/biospark-health-ai/.next/server/webpack-runtime.js:1:143)
+    at r (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/health/route.js:1:6379)
+    at /home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/health/route.js:1:6414
+    at t.X (/home/ubuntu/workspace/biospark-health-ai/.next/server/webpack-runtime.js:1:1285)
+    at /home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/health/route.js:1:6392
+    at Object.<anonymous> (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/health/route.js:1:6442)
+
+> Build error occurred
+Error: Failed to collect page data for /api/health
+    at /home/ubuntu/workspace/biospark-health-ai/node_modules/next/dist/build/utils.js:1269:15
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  type: 'Error'
+}

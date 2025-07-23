@@ -1,185 +1,252 @@
 
 // Redis Caching Layer for Performance Optimization
-// Phase 1D: Implement caching for frequent operations
+// Enhanced with robust error handling and fallback mechanisms
 
 import Redis from 'ioredis';
 
 class CacheManager {
   private redis: Redis | null = null;
-  private isConnected = false;
+  private isConnected: boolean = false;
+  private connectionAttempted: boolean = false;
 
   constructor() {
-    this.initializeRedis();
+    // Don't initialize Redis immediately to prevent build-time errors
+    // Initialize only when first used
   }
 
   private async initializeRedis() {
+    if (this.connectionAttempted) {
+      return;
+    }
+
+    this.connectionAttempted = true;
+
     try {
-      // Use local Redis for development, Redis Cloud for production
-      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+      // Validate Redis URL before attempting connection
+      const redisUrl = process.env.REDIS_URL;
       
+      if (!redisUrl || redisUrl.includes('hostname') || redisUrl.includes('username:password')) {
+        console.warn('⚠️ Redis URL not configured or contains placeholder values. Caching disabled.');
+        return;
+      }
+
+      // Use local Redis for development, Redis Cloud for production
       this.redis = new Redis(redisUrl, {
         retryDelayOnFailover: 100,
+        enableReadyCheck: false,
         maxRetriesPerRequest: 3,
         lazyConnect: true,
-        keepAlive: 30000,
-        connectTimeout: 10000,
-        commandTimeout: 5000,
+        connectTimeout: 5000,
+        commandTimeout: 3000,
+        // Graceful error handling
+        retryDelayOnClusterDown: 300,
+        retryDelayOnFailover: 100,
+        maxRetriesPerRequest: 1
       });
 
       this.redis.on('connect', () => {
-        console.log('Redis connected successfully');
+        console.log('✅ Redis connected successfully');
         this.isConnected = true;
       });
 
       this.redis.on('error', (err) => {
-        console.error('Redis connection error:', err);
+        console.warn('⚠️ Redis connection error (caching disabled):', err.message);
         this.isConnected = false;
       });
 
-      await this.redis.connect();
+      this.redis.on('close', () => {
+        console.warn('⚠️ Redis connection closed');
+        this.isConnected = false;
+      });
+
+      // Attempt connection with timeout
+      await Promise.race([
+        this.redis.connect(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Redis connection timeout')), 5000)
+        )
+      ]);
+
     } catch (error) {
-      console.error('Failed to initialize Redis:', error);
+      console.warn('⚠️ Failed to initialize Redis (caching disabled):', error instanceof Error ? error.message : 'Unknown error');
       this.redis = null;
+      this.isConnected = false;
     }
   }
 
-  // Cache user data for frequent lookups
-  async cacheUser(userId: string, userData: any, ttl: number = 3600) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  private async ensureConnection(): Promise<boolean> {
+    if (!this.connectionAttempted) {
+      await this.initializeRedis();
+    }
+    return this.isConnected && this.redis !== null;
+  }
+
+  async setUserData(userId: string, userData: any, ttl: number = 3600): Promise<boolean> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      console.warn('⚠️ Redis not available, skipping cache set for user data');
+      return false;
+    }
+
     try {
       const key = `user:${userId}`;
       await this.redis.setex(key, ttl, JSON.stringify(userData));
       return true;
     } catch (error) {
-      console.error('Cache set error:', error);
+      console.warn('⚠️ Failed to cache user data:', error instanceof Error ? error.message : 'Unknown error');
       return false;
     }
   }
 
-  async getCachedUser(userId: string) {
-    if (!this.redis || !this.isConnected) return null;
-    
+  async getUserData(userId: string): Promise<any | null> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      return null;
+    }
+
     try {
       const key = `user:${userId}`;
       const cached = await this.redis.get(key);
       return cached ? JSON.parse(cached) : null;
     } catch (error) {
-      console.error('Cache get error:', error);
+      console.warn('⚠️ Failed to retrieve cached user data:', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }
 
-  // Cache biomarker analysis results
-  async cacheBiomarkerAnalysis(userId: string, biomarkerHash: string, analysis: any, ttl: number = 7200) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  async setAnalysisResult(analysisId: string, analysis: any, ttl: number = 7200): Promise<boolean> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      console.warn('⚠️ Redis not available, skipping cache set for analysis');
+      return false;
+    }
+
     try {
-      const key = `analysis:${userId}:${biomarkerHash}`;
+      const key = `analysis:${analysisId}`;
       await this.redis.setex(key, ttl, JSON.stringify(analysis));
       return true;
     } catch (error) {
-      console.error('Cache analysis error:', error);
+      console.warn('⚠️ Failed to cache analysis result:', error instanceof Error ? error.message : 'Unknown error');
       return false;
     }
   }
 
-  async getCachedBiomarkerAnalysis(userId: string, biomarkerHash: string) {
-    if (!this.redis || !this.isConnected) return null;
-    
+  async getAnalysisResult(analysisId: string): Promise<any | null> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      return null;
+    }
+
     try {
-      const key = `analysis:${userId}:${biomarkerHash}`;
+      const key = `analysis:${analysisId}`;
       const cached = await this.redis.get(key);
       return cached ? JSON.parse(cached) : null;
     } catch (error) {
-      console.error('Cache get analysis error:', error);
+      console.warn('⚠️ Failed to retrieve cached analysis:', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }
 
-  // Cache user permissions for RBAC
-  async cacheUserPermissions(userId: string, permissions: any, ttl: number = 1800) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  async setUserPermissions(userId: string, permissions: any, ttl: number = 1800): Promise<boolean> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      console.warn('⚠️ Redis not available, skipping cache set for permissions');
+      return false;
+    }
+
     try {
       const key = `permissions:${userId}`;
       await this.redis.setex(key, ttl, JSON.stringify(permissions));
       return true;
     } catch (error) {
-      console.error('Cache permissions error:', error);
+      console.warn('⚠️ Failed to cache user permissions:', error instanceof Error ? error.message : 'Unknown error');
       return false;
     }
   }
 
-  async getCachedUserPermissions(userId: string) {
-    if (!this.redis || !this.isConnected) return null;
-    
+  async getUserPermissions(userId: string): Promise<any | null> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      return null;
+    }
+
     try {
       const key = `permissions:${userId}`;
       const cached = await this.redis.get(key);
       return cached ? JSON.parse(cached) : null;
     } catch (error) {
-      console.error('Cache get permissions error:', error);
+      console.warn('⚠️ Failed to retrieve cached permissions:', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }
 
-  // Cache health assessment results
-  async cacheHealthAssessment(assessmentId: string, assessment: any, ttl: number = 3600) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  async setAssessmentData(assessmentId: string, assessment: any, ttl: number = 3600): Promise<boolean> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      console.warn('⚠️ Redis not available, skipping cache set for assessment');
+      return false;
+    }
+
     try {
       const key = `assessment:${assessmentId}`;
       await this.redis.setex(key, ttl, JSON.stringify(assessment));
       return true;
     } catch (error) {
-      console.error('Cache assessment error:', error);
+      console.warn('⚠️ Failed to cache assessment data:', error instanceof Error ? error.message : 'Unknown error');
       return false;
     }
   }
 
-  async getCachedHealthAssessment(assessmentId: string) {
-    if (!this.redis || !this.isConnected) return null;
-    
+  async getAssessmentData(assessmentId: string): Promise<any | null> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      return null;
+    }
+
     try {
       const key = `assessment:${assessmentId}`;
       const cached = await this.redis.get(key);
       return cached ? JSON.parse(cached) : null;
     } catch (error) {
-      console.error('Cache get assessment error:', error);
+      console.warn('⚠️ Failed to retrieve cached assessment:', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }
 
-  // Invalidate cache patterns
-  async invalidateUserCache(userId: string) {
-    if (!this.redis || !this.isConnected) return false;
-    
+  async invalidateUserCache(userId: string): Promise<boolean> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      return false;
+    }
+
     try {
       const patterns = [
         `user:${userId}`,
-        `analysis:${userId}:*`,
         `permissions:${userId}`,
-        `assessment:*:${userId}`
+        `analysis:${userId}:*`,
+        `assessment:${userId}:*`
       ];
-      
+
       for (const pattern of patterns) {
         const keys = await this.redis.keys(pattern);
         if (keys.length > 0) {
           await this.redis.del(...keys);
         }
       }
+
       return true;
     } catch (error) {
-      console.error('Cache invalidation error:', error);
+      console.warn('⚠️ Failed to invalidate user cache:', error instanceof Error ? error.message : 'Unknown error');
       return false;
     }
   }
 
-  // Performance monitoring
-  async getCacheStats() {
-    if (!this.redis || !this.isConnected) return null;
-    
+  async getStats(): Promise<any | null> {
+    const isConnected = await this.ensureConnection();
+    if (!isConnected || !this.redis) {
+      return null;
+    }
+
     try {
       const info = await this.redis.info('stats');
       return {
@@ -187,10 +254,24 @@ class CacheManager {
         info: info
       };
     } catch (error) {
-      console.error('Cache stats error:', error);
+      console.warn('⚠️ Failed to get Redis stats:', error instanceof Error ? error.message : 'Unknown error');
       return null;
+    }
+  }
+
+  // Graceful shutdown
+  async disconnect(): Promise<void> {
+    if (this.redis) {
+      try {
+        await this.redis.quit();
+        console.log('✅ Redis connection closed gracefully');
+      } catch (error) {
+        console.warn('⚠️ Error during Redis disconnect:', error instanceof Error ? error.message : 'Unknown error');
+      }
     }
   }
 }
 
+// Export singleton instance
 export const cacheManager = new CacheManager();
+export default cacheManager;

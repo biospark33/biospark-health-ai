@@ -1,0 +1,99 @@
+./lib/cache.ts:2:// Redis Caching Layer for Performance Optimization
+./lib/cache.ts:5:import Redis from 'ioredis';
+./lib/cache.ts:8:  private redis: Redis | null = null;
+./lib/cache.ts:12:    this.initializeRedis();
+./lib/cache.ts:15:  private async initializeRedis() {
+./lib/cache.ts:17:      // Use local Redis for development, Redis Cloud for production
+./lib/cache.ts:18:      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+./lib/cache.ts:20:      this.redis = new Redis(redisUrl, {
+./lib/cache.ts:29:      this.redis.on('connect', () => {
+./lib/cache.ts:30:        console.log('Redis connected successfully');
+./lib/cache.ts:34:      this.redis.on('error', (err) => {
+./lib/cache.ts:35:        console.error('Redis connection error:', err);
+./lib/cache.ts:39:      await this.redis.connect();
+./lib/cache.ts:41:      console.error('Failed to initialize Redis:', error);
+./lib/cache.ts:42:      this.redis = null;
+./lib/cache.ts:48:    if (!this.redis || !this.isConnected) return false;
+./lib/cache.ts:52:      await this.redis.setex(key, ttl, JSON.stringify(userData));
+./lib/cache.ts:61:    if (!this.redis || !this.isConnected) return null;
+./lib/cache.ts:65:      const cached = await this.redis.get(key);
+./lib/cache.ts:75:    if (!this.redis || !this.isConnected) return false;
+./lib/cache.ts:79:      await this.redis.setex(key, ttl, JSON.stringify(analysis));
+./lib/cache.ts:88:    if (!this.redis || !this.isConnected) return null;
+./lib/cache.ts:92:      const cached = await this.redis.get(key);
+./lib/cache.ts:102:    if (!this.redis || !this.isConnected) return false;
+./lib/cache.ts:106:      await this.redis.setex(key, ttl, JSON.stringify(permissions));
+./lib/cache.ts:115:    if (!this.redis || !this.isConnected) return null;
+./lib/cache.ts:119:      const cached = await this.redis.get(key);
+./lib/cache.ts:129:    if (!this.redis || !this.isConnected) return false;
+./lib/cache.ts:133:      await this.redis.setex(key, ttl, JSON.stringify(assessment));
+./lib/cache.ts:142:    if (!this.redis || !this.isConnected) return null;
+./lib/cache.ts:146:      const cached = await this.redis.get(key);
+./lib/cache.ts:156:    if (!this.redis || !this.isConnected) return false;
+./lib/cache.ts:167:        const keys = await this.redis.keys(pattern);
+./lib/cache.ts:169:          await this.redis.del(...keys);
+./lib/cache.ts:181:    if (!this.redis || !this.isConnected) return null;
+./lib/cache.ts:184:      const info = await this.redis.info('stats');
+./docs/architecture/zep-integration-architecture.md:139:- **Caching Layer**: Redis cache for frequently accessed memories
+./docs/phase2b/Infrastructure_Analysis.md:252:1. **Caching Layer:** Implement Redis for vector search results
+./docs/phase2b/RayPeat_Integration_Strategy.md:349:  ensureDisclaimer: (content: string) => boolean;
+./VERCEL_DEPLOYMENT_FIXES.md:154:REDIS_URL="..."
+./VERCEL_DEPLOYMENT_FIXES.md:163:- [ ] Redis instance configured and accessible
+./execute_architect_agent.py:195:- **Caching Layer**: Redis cache for frequently accessed memories
+./execute_architect_agent.py:535:  // L2 Cache: Redis cache for frequently accessed memories
+./execute_architect_agent.py:536:  redisCache: RedisCache;
+./execute_architect_agent.py:550:    // Check L2 cache (Redis)
+./execute_architect_agent.py:551:    const redisKey = `memory:${sessionKey}`;
+./execute_architect_agent.py:552:    const cached = await this.redisCache.get(redisKey);
+./package-lock.json:42:        "ioredis": "^5.3.2",
+./package-lock.json:52:        "redis": "^4.6.13",
+./package-lock.json:63:        "@types/redis": "^4.0.11",
+./package-lock.json:899:    "node_modules/@ioredis/commands": {
+./package-lock.json:901:      "resolved": "https://registry.npmjs.org/@ioredis/commands/-/commands-1.2.0.tgz",
+./package-lock.json:2582:    "node_modules/@redis/bloom": {
+./package-lock.json:2584:      "resolved": "https://registry.npmjs.org/@redis/bloom/-/bloom-1.2.0.tgz",
+./package-lock.json:2588:        "@redis/client": "^1.0.0"
+./package-lock.json:2591:    "node_modules/@redis/client": {
+./package-lock.json:2593:      "resolved": "https://registry.npmjs.org/@redis/client/-/client-1.6.1.tgz",
+./package-lock.json:2605:    "node_modules/@redis/client/node_modules/yallist": {
+./package-lock.json:2611:    "node_modules/@redis/graph": {
+./package-lock.json:2613:      "resolved": "https://registry.npmjs.org/@redis/graph/-/graph-1.1.1.tgz",
+./package-lock.json:2617:        "@redis/client": "^1.0.0"
+./package-lock.json:2620:    "node_modules/@redis/json": {
+./package-lock.json:2622:      "resolved": "https://registry.npmjs.org/@redis/json/-/json-1.0.7.tgz",
+./package-lock.json:2626:        "@redis/client": "^1.0.0"
+./package-lock.json:2629:    "node_modules/@redis/search": {
+./package-lock.json:2631:      "resolved": "https://registry.npmjs.org/@redis/search/-/search-1.2.0.tgz",
+./package-lock.json:2635:        "@redis/client": "^1.0.0"
+./package-lock.json:2638:    "node_modules/@redis/time-series": {
+./package-lock.json:2640:      "resolved": "https://registry.npmjs.org/@redis/time-series/-/time-series-1.1.0.tgz",
+./package-lock.json:2644:        "@redis/client": "^1.0.0"
+./package-lock.json:3249:    "node_modules/@types/redis": {
+./package-lock.json:3251:      "resolved": "https://registry.npmjs.org/@types/redis/-/redis-4.0.11.tgz",
+./package-lock.json:3253:      "deprecated": "This is a stub types definition. redis provides its own type definitions, so you do not need this installed.",
+./package-lock.json:3257:        "redis": "*"
+./package-lock.json:7236:    "node_modules/ioredis": {
+./package-lock.json:7238:      "resolved": "https://registry.npmjs.org/ioredis/-/ioredis-5.6.1.tgz",
+./package-lock.json:7242:        "@ioredis/commands": "^1.1.1",
+./package-lock.json:7248:        "redis-errors": "^1.2.0",
+./package-lock.json:7249:        "redis-parser": "^3.0.0",
+./package-lock.json:7257:        "url": "https://opencollective.com/ioredis"
+./package-lock.json:7260:    "node_modules/ioredis/node_modules/debug": {
+./package-lock.json:7277:    "node_modules/ioredis/node_modules/ms": {
+./package-lock.json:10533:    "node_modules/redis": {
+./package-lock.json:10535:      "resolved": "https://registry.npmjs.org/redis/-/redis-4.7.1.tgz",
+./package-lock.json:10542:        "@redis/bloom": "1.2.0",
+./package-lock.json:10543:        "@redis/client": "1.6.1",
+./package-lock.json:10544:        "@redis/graph": "1.1.1",
+./package-lock.json:10545:        "@redis/json": "1.0.7",
+./package-lock.json:10546:        "@redis/search": "1.2.0",
+./package-lock.json:10547:        "@redis/time-series": "1.1.0"
+./package-lock.json:10550:    "node_modules/redis-errors": {
+./package-lock.json:10552:      "resolved": "https://registry.npmjs.org/redis-errors/-/redis-errors-1.2.0.tgz",
+./package-lock.json:10559:    "node_modules/redis-parser": {
+./package-lock.json:10561:      "resolved": "https://registry.npmjs.org/redis-parser/-/redis-parser-3.0.0.tgz",
+./package-lock.json:10565:        "redis-errors": "^1.0.0"
+./redis_hits.txt:1:No Redis hits found
+./package.json:53:    "ioredis": "^5.3.2",
+./package.json:63:    "redis": "^4.6.13",
+./package.json:74:    "@types/redis": "^4.0.11",

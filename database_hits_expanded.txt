@@ -1,0 +1,365 @@
+./bmad_qa_remediation.py:360:### Database Integration
+./bmad_qa_remediation.py:382:- **Connection Pooling**: Optimized database connection pooling
+./bmad_qa_remediation.py:454:import { PrismaClient } from '@prisma/client';
+./bmad_qa_remediation.py:468:  private prisma: PrismaClient;
+./bmad_qa_remediation.py:472:    this.prisma = new PrismaClient();
+./bmad_qa_remediation.py:506:      const session = await this.prisma.zepSession.create({
+./bmad_qa_remediation.py:557:      const session = await this.prisma.zepSession.findUnique({
+./bmad_qa_remediation.py:590:      await this.prisma.zepSession.update({
+./bmad_qa_remediation.py:665:      await this.prisma.memoryAuditLog.create({
+./bmad_qa_remediation.py:699:      await this.prisma.memoryAuditLog.create({
+./bmad_qa_remediation.py:732:      const session = await this.prisma.zepSession.update({
+./prisma/schema.prisma:1:// Health AI System Database Schema
+./prisma/schema.prisma:3:    provider = "prisma-client-js"
+./prisma/schema.prisma:9:    url      = env("DATABASE_URL")
+./prisma/migrations/performance_optimization.sql:3:-- Phase 1D: Database indexes and connection pooling
+./prisma/migrations/performance_optimization.sql:42:-- Optimize database settings for performance
+./CHANGELOG.md:17:- **Prisma ORM** with PostgreSQL/Supabase integration
+./CHANGELOG.md:23:- **Database Schema** - Complete health data models with relationships
+./CHANGELOG.md:53:- **Database Migrations** - Prisma migration management
+./CHANGELOG.md:72:- Database migrations will run automatically on first deployment
+./lib/consent.ts:99:    // In production, save to database
+./lib/consent.ts:109:    // In production, query database for latest consent record
+./lib/consent.ts:118:    // In production, query database
+./lib/consent.ts:152:    // In production, save to database
+./lib/consent.ts:165:    // In production, query database
+./lib/db.ts:2:// Database connection with HIPAA compliance logging
+./lib/db.ts:3:import { PrismaClient } from '@prisma/client'
+./lib/db.ts:5:const globalForPrisma = globalThis as unknown as {
+./lib/db.ts:6:  prisma: PrismaClient | undefined
+./lib/db.ts:9:export const prisma = globalForPrisma.prisma ?? new PrismaClient({
+./lib/db.ts:13:if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+./lib/db-optimized.ts:2:// Optimized Database Connection with Connection Pooling
+./lib/db-optimized.ts:3:// Phase 1D: Enhanced database performance
+./lib/db-optimized.ts:5:import { PrismaClient } from '@prisma/client'
+./lib/db-optimized.ts:7:const globalForPrisma = globalThis as unknown as {
+./lib/db-optimized.ts:8:  prisma: PrismaClient | undefined
+./lib/db-optimized.ts:11:export const prisma = globalForPrisma.prisma ?? new PrismaClient({
+./lib/db-optimized.ts:15:      url: process.env.DATABASE_URL
+./lib/db-optimized.ts:37:    return await prisma.user.findUnique({
+./lib/db-optimized.ts:59:    return await prisma.biomarker.findMany({
+./lib/db-optimized.ts:80:    return await prisma.healthAssessment.findMany({
+./lib/db-optimized.ts:99:    return await prisma.analysis.findMany({
+./lib/db-optimized.ts:115:    return await prisma.biomarker.createMany({
+./lib/db-optimized.ts:125:    return await prisma.auditLog.findMany({
+./lib/db-optimized.ts:143:if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+./lib/db-optimized.ts:146:export async function checkDatabaseHealth() {
+./lib/db-optimized.ts:148:    await prisma.$queryRaw`SELECT 1`;
+./lib/rbac.ts:5:// Define enums locally to avoid Prisma client dependency issues
+./lib/supabase.ts:34:// Health AI specific database operations
+./lib/session-manager.ts:17:import { PrismaClient } from '@prisma/client';
+./lib/session-manager.ts:31:  private prisma: PrismaClient;
+./lib/session-manager.ts:35:    this.prisma = new PrismaClient();
+./lib/session-manager.ts:69:      const session = await this.prisma.zepSession.create({
+./lib/session-manager.ts:120:      const session = await this.prisma.zepSession.findUnique({
+./lib/session-manager.ts:153:      await this.prisma.zepSession.update({
+./lib/session-manager.ts:228:      await this.prisma.memoryAuditLog.create({
+./lib/session-manager.ts:262:      await this.prisma.memoryAuditLog.create({
+./lib/session-manager.ts:295:      const session = await this.prisma.zepSession.update({
+./lib/memory-manager.ts:2:import { prisma } from './prisma';
+./lib/memory-manager.ts:66:      // Store session reference in database
+./lib/memory-manager.ts:98:      // Get user preferences from database
+./lib/memory-manager.ts:124:      const existingSession = await prisma.zepSession.findFirst({
+./lib/memory-manager.ts:140:      // Store session in database
+./lib/memory-manager.ts:141:      await prisma.zepSession.create({
+./lib/memory-manager.ts:176:      // Update database
+./lib/memory-manager.ts:177:      await prisma.user.update({
+./lib/memory-manager.ts:224:      // Get expired sessions from database
+./lib/memory-manager.ts:225:      const expiredSessions = await prisma.zepSession.findMany({
+./lib/memory-manager.ts:231:      // Delete from Zep and database
+./lib/memory-manager.ts:239:        await prisma.zepSession.delete({
+./lib/memory-manager.ts:283:   * Store session reference in database
+./lib/memory-manager.ts:287:      await prisma.zepSession.upsert({
+./lib/memory-manager.ts:313:   * Get user preferences from database
+./lib/memory-manager.ts:317:      const user = await prisma.user.findUnique({
+./lib/memory-manager.ts:350:      await prisma.memoryAuditLog.create({
+./lib/audit.ts:105:   * Log audit event to database
+./lib/audit.ts:123:      // In a real implementation, this would save to database
+./lib/audit.ts:284:    // In production, this would query the database
+./BMAD_PHASE2A_SUCCESS_SUMMARY.md:74:   - Database integration with Prisma ORM
+./BMAD_PHASE2A_SUCCESS_SUMMARY.md:94:- **SessionManager**: User session lifecycle with database persistence
+./BMAD_PHASE2A_SUCCESS_SUMMARY.md:97:### Database Integration
+./BMAD_PHASE2A_SUCCESS_SUMMARY.md:123:- **Database**: Prisma schema updated with Zep models
+./BMAD_PHASE2A_SUCCESS_SUMMARY.md:149:- ✅ Database schema updated and validated
+./update_zep_integration.py:327:    # Test 1: Database Connection
+./update_zep_integration.py:339:        print(f"✅ Database connection: {version[:50]}...")
+./update_zep_integration.py:342:        print(f"❌ Database connection failed: {e}")
+./supabase_migration_orchestrator.py:64:        """Setup database and API connections"""
+./supabase_migration_orchestrator.py:70:            # Extract database URL from Supabase URL
+./supabase_migration_orchestrator.py:82:            logger.info("✅ Database and API connections established")
+./supabase_migration_orchestrator.py:89:        """Test Supabase database connection"""
+./tests/zep-integration-validation.md:74:3. **Session Management** - Secure session handling with database integration
+./tests/zep-integration-validation.md:76:5. **Database Schema Updates** - Prisma models for Zep integration
+./tests/zep-integration-validation.md:105:- ✅ Database schema updated
+./execute_developer_agent.py:397:import { prisma } from './prisma';
+./execute_developer_agent.py:461:      // Store session reference in database
+./execute_developer_agent.py:493:      // Get user preferences from database
+./execute_developer_agent.py:519:      const existingSession = await prisma.zepSession.findFirst({
+./execute_developer_agent.py:535:      // Store session in database
+./execute_developer_agent.py:536:      await prisma.zepSession.create({
+./execute_developer_agent.py:571:      // Update database
+./execute_developer_agent.py:572:      await prisma.user.update({
+./execute_developer_agent.py:619:      // Get expired sessions from database
+./execute_developer_agent.py:620:      const expiredSessions = await prisma.zepSession.findMany({
+./execute_developer_agent.py:626:      // Delete from Zep and database
+./execute_developer_agent.py:634:        await prisma.zepSession.delete({
+./execute_developer_agent.py:678:   * Store session reference in database
+./execute_developer_agent.py:682:      await prisma.zepSession.upsert({
+./execute_developer_agent.py:708:   * Get user preferences from database
+./execute_developer_agent.py:712:      const user = await prisma.user.findUnique({
+./execute_developer_agent.py:745:      await prisma.memoryAuditLog.create({
+./execute_developer_agent.py:780:import { prisma } from './prisma';
+./execute_developer_agent.py:807:      // Store session in database
+./execute_developer_agent.py:808:      const session = await prisma.zepSession.create({
+./execute_developer_agent.py:836:      const session = await prisma.zepSession.findFirst({
+./execute_developer_agent.py:889:      // Validate session in database
+./execute_developer_agent.py:890:      const session = await prisma.zepSession.findUnique({
+./execute_developer_agent.py:915:      // Update in database
+./execute_developer_agent.py:916:      await prisma.zepSession.update({
+./execute_developer_agent.py:944:      await prisma.zepSession.update({
+./execute_developer_agent.py:967:      // Delete from database
+./execute_developer_agent.py:968:      await prisma.zepSession.delete({
+./execute_developer_agent.py:984:      const sessions = await prisma.zepSession.findMany({
+./execute_developer_agent.py:1002:      const expiredSessions = await prisma.zepSession.findMany({
+./execute_developer_agent.py:1032:      const stats = await prisma.zepSession.aggregate({
+./execute_developer_agent.py:1039:      const totalSessions = await prisma.zepSession.count();
+./execute_developer_agent.py:1508:    def update_prisma_schema(self):
+./execute_developer_agent.py:1509:        """Update Prisma schema for Zep integration"""
+./execute_developer_agent.py:1510:        print("🗄️ UPDATING PRISMA SCHEMA...")
+./execute_developer_agent.py:1513:        schema_file = self.project_root / "prisma" / "schema.prisma"
+./execute_developer_agent.py:1515:            print("⚠️ Prisma schema not found, skipping schema update")
+./execute_developer_agent.py:1558:            print("✅ Prisma schema updated with Zep models")
+./execute_developer_agent.py:1560:            # Generate Prisma client
+./execute_developer_agent.py:1563:                    "npx", "prisma", "generate"
+./execute_developer_agent.py:1565:                print("✅ Prisma client regenerated")
+./execute_developer_agent.py:1567:                print(f"⚠️ Failed to regenerate Prisma client: {e}")
+./execute_developer_agent.py:1569:            print("ℹ️ Zep models already present in Prisma schema")
+./execute_developer_agent.py:1604:        self.update_prisma_schema()
+./execute_developer_agent.py:1618:6. ✅ Prisma Schema Updated (`prisma/schema.prisma`)
+./execute_developer_agent.py:1623:- **Session Management**: Secure session handling with database integration
+./execute_developer_agent.py:1627:- **Database Integration**: Prisma models for session and audit tracking
+./execute_developer_agent.py:1632:- ✅ User session management with database persistence
+./README.md:15:- **Prisma ORM** with PostgreSQL/Supabase integration
+./README.md:47:# Database
+./README.md:48:DATABASE_URL="your_postgresql_connection_string"
+./README.md:49:DIRECT_URL="your_direct_database_connection"
+./README.md:92:- ✅ **Database Optimization** - Prisma with connection pooling
+./README.md:117:# Database operations
+./bmad_orchestrator_phase2a.py:107:            "technical_stack": ["Next.js", "TypeScript", "Prisma", "PostgreSQL"],
+./bmad_orchestrator_phase2a.py:287:- Must integrate with existing Next.js/TypeScript/Prisma stack
+./bmad_orchestrator_phase2a.py:325:- Integration with existing Prisma database
+./BMAD_PHASE2B_EXECUTIVE_SUMMARY.md:54:- **Comprehensive technical specifications** with database schemas
+./BMAD_PHASE2B_EXECUTIVE_SUMMARY.md:113:- Database schemas and API designs complete
+./BMAD_PHASE2B_EXECUTIVE_SUMMARY.md:134:2. **Set up RAG database schema**
+./BMAD_PHASE2B_EXECUTIVE_SUMMARY.md:139:- Complete vector database setup
+./BMAD_PHASE2B_EXECUTIVE_SUMMARY.md:200:### **Technical Specifications:** Complete database schemas, API designs, testing frameworks
+./HIPAA_COMPLIANCE_SUMMARY.md:52:### Database Schema Extensions
+./HIPAA_COMPLIANCE_SUMMARY.md:53:- Added 8 new HIPAA compliance tables to Prisma schema
+./HIPAA_COMPLIANCE_SUMMARY.md:133:- Database query optimization
+./execute_qa_agent.py:219:        # Check Prisma schema for audit logging
+./execute_qa_agent.py:220:        schema_file = self.project_root / "prisma" / "schema.prisma"
+./execute_qa_agent.py:443:3. **Session Management** - Secure session handling with database integration
+./execute_qa_agent.py:445:5. **Database Schema Updates** - Prisma models for Zep integration
+./execute_qa_agent.py:474:- ✅ Database schema updated
+./docs/phase2a_completion_report.md:49:   - Database integration with Prisma
+./docs/phase2a_completion_report.md:88:- Prisma Schema Updates
+./docs/phase2a_completion_report.md:94:- Database integration with audit logging
+./docs/phase2a_completion_report.md:163:### Database Integration
+./docs/phase2a_completion_report.md:198:- Database schema updated
+./app/api/compliance/audit-logs/route.ts:47:    const totalCount = logs.length // In production, get actual count from database
+./app/api/compliance/metrics/route.ts:240:    // In production, save settings to database
+./app/api/health/route.ts:6:import { checkDatabaseHealth } from '@/lib/db-optimized';
+./app/api/health/route.ts:16:      checkDatabaseHealth(),
+./app/api/health/route.ts:27:        database: dbHealth,
+./app/api/comprehensive-analysis/route.ts:3:import { prisma } from '@/lib/db';
+./app/api/comprehensive-analysis/route.ts:38:    let user = await prisma.user.findUnique({
+./app/api/comprehensive-analysis/route.ts:129:      user = await prisma.user.create({
+./app/api/comprehensive-analysis/route.ts:140:      await prisma.userStats.create({
+./app/api/comprehensive-analysis/route.ts:147:      await prisma.userRole_Assignment.create({
+./app/api/comprehensive-analysis/route.ts:160:    const analysis = await prisma.analysis.create({
+./app/api/comprehensive-analysis/route.ts:187:    await prisma.encryptedPHI.create({
+./app/api/comprehensive-analysis/route.ts:201:    await prisma.userStats.update({
+./app/api/comprehensive-analysis/route.ts:337:      const user = await prisma.user.findUnique({ where: { email } });
+./app/api/auth/[...nextauth]/route.ts:4:import { PrismaAdapter } from '@next-auth/prisma-adapter';
+./app/api/auth/[...nextauth]/route.ts:5:import { prisma } from '@/lib/db';
+./app/api/auth/[...nextauth]/route.ts:9:  adapter: PrismaAdapter(prisma),
+./app/api/auth/[...nextauth]/route.ts:22:        const user = await prisma.user.findUnique({
+./app/api/auth/signup/route.ts:3:import { prisma } from '@/lib/db';
+./app/api/auth/signup/route.ts:21:    const existingUser = await prisma.user.findUnique({
+./app/api/auth/signup/route.ts:39:    const user = await prisma.user.create({
+./app/api/auth/signup/route.ts:47:    // Note: Role assignment would be handled in production with proper database schema
+./app/api/auth/signup/route.ts:48:    // await prisma.userRole_Assignment.create({
+./app/api/auth/signup/route.ts:58:    await prisma.userStats.create({
+./app/api/analysis/[id]/route.ts:3:import { prisma } from '@/lib/db';
+./app/api/analysis/[id]/route.ts:21:    const analysis = await prisma.analysis.findUnique({
+./docs/agent_instructions/architect_instructions.md:26:- Must integrate with existing Next.js/TypeScript/Prisma stack
+./docs/agent_instructions/developer_instructions.md:29:- Integration with existing Prisma database
+./docs/architecture/memory-storage-design.md:166:### Database Integration
+./docs/architecture/memory-storage-design.md:188:- **Connection Pooling**: Optimized database connection pooling
+./docs/architecture/zep-integration-architecture.md:90:##### 4.3 Database Integration
+./docs/architecture/zep-integration-architecture.md:92:-- Additional Prisma schema for Zep integration
+./docs/architecture/zep-integration-architecture.md:175:- Database integration testing
+./docs/architecture/hipaa-compliance-design.md:81:  encryptionScope: 'field-level' | 'record-level' | 'database-level';
+./docs/architect_phase_summary.md:14:- **Integration Points**: Health analysis, session management, database integration
+./docs/bmad_final_coordination_summary.md:25:4. ✅ **Create user session management** - Database-integrated session handling
+./docs/bmad_final_coordination_summary.md:40:- Database integration with Prisma
+./docs/bmad_final_coordination_summary.md:54:✅ **Session Management**: Secure session handling with database persistence  
+./docs/bmad_final_coordination_summary.md:55:✅ **Database Integration**: Prisma models for Zep sessions and audit logs  
+./docs/bmad_final_coordination_summary.md:67:- Database schema updated
+./docs/phase2b/Infrastructure_Analysis.md:10:2. [Database Schema Analysis](#database-schema-analysis)
+./docs/phase2b/Infrastructure_Analysis.md:21:## Database Schema Analysis
+./docs/phase2b/Infrastructure_Analysis.md:22:[Review of Prisma schema, existing tables, missing RAG components]
+./docs/phase2b/Infrastructure_Analysis.md:50:- **Backend:** Supabase PostgreSQL with Prisma ORM for type-safe database operations
+./docs/phase2b/Infrastructure_Analysis.md:55:**RAG Readiness Assessment:** The existing infrastructure provides excellent foundations for RAG implementation, with robust security, scalable database architecture, and established memory management through Zep.
+./docs/phase2b/Infrastructure_Analysis.md:57:### Database Schema Analysis
+./docs/phase2b/Infrastructure_Analysis.md:60:The current Prisma schema demonstrates sophisticated health data modeling:
+./docs/phase2b/Infrastructure_Analysis.md:109:#### 1. Vector Database Infrastructure
+./docs/phase2b/Infrastructure_Analysis.md:177:- Database query response: 50-150ms average
+./docs/phase2b/Infrastructure_Analysis.md:184:- Prisma connection pooling configured for optimal performance
+./docs/phase2b/Infrastructure_Analysis.md:233:#### 1. Database Schema Extensions (Priority: Critical)
+./docs/phase2b/Infrastructure_Analysis.md:255:4. **Connection Pooling:** Optimize database connections for vector operations
+./docs/phase2b/Infrastructure_Analysis.md:266:- ⚠️ Missing vector database and Ray Peat corpus integration
+./docs/phase2b/Enhanced_Logic_Architecture.md:766:  databaseCluster: DatabaseCluster;
+./docs/phase2b/Implementation_Roadmap.md:12:4. [Database Schema Extensions](#database-schema-extensions)
+./docs/phase2b/Implementation_Roadmap.md:31:## Database Schema Extensions
+./docs/phase2b/Implementation_Roadmap.md:81:- Ray Peat embeddings database schema implemented
+./docs/phase2b/Implementation_Roadmap.md:132:### Phase 1: Database and Infrastructure Setup (Weeks 1-2)
+./docs/phase2b/Implementation_Roadmap.md:253:        // 5. Store in database
+./docs/phase2b/Implementation_Roadmap.md:599:## Database Schema Extensions
+./docs/phase2b/Implementation_Roadmap.md:655:#### Prisma Schema Extensions
+./docs/phase2b/Implementation_Roadmap.md:656:```prisma
+./docs/phase2b/Implementation_Roadmap.md:657:// Add to existing schema.prisma
+./docs/phase2b/Implementation_Roadmap.md:1123:  database: {
+./docs/phase2b/Implementation_Roadmap.md:1165:      'Vector database optimization',
+./docs/phase2a_briefing.json:20:    "Prisma",
+./docs/developer_phase_summary.md:11:6. ✅ Prisma Schema Updated (`prisma/schema.prisma`)
+./docs/developer_phase_summary.md:16:- **Session Management**: Secure session handling with database integration
+./docs/developer_phase_summary.md:20:- **Database Integration**: Prisma models for session and audit tracking
+./docs/developer_phase_summary.md:25:- ✅ User session management with database persistence
+./docs/DEPLOYMENT.md:11:- [ ] Database (PostgreSQL/Supabase) provisioned
+./docs/DEPLOYMENT.md:18:- [ ] Database schema migrations ready
+./docs/DEPLOYMENT.md:32:# Database Configuration
+./docs/DEPLOYMENT.md:33:DATABASE_URL=postgresql://user:password@host:port/database
+./docs/DEPLOYMENT.md:34:DIRECT_URL=postgresql://user:password@host:port/database
+./docs/DEPLOYMENT.md:67:vercel env add DATABASE_URL
+./docs/DEPLOYMENT.md:110:# Verify database connectivity
+./docs/DEPLOYMENT.md:121:- Database query performance optimized
+./docs/DEPLOYMENT.md:170:**Database Connection Issues:**
+./docs/DEPLOYMENT.md:172:# Test database connectivity
+./docs/DEPLOYMENT.md:173:npx prisma db push
+./docs/DEPLOYMENT.md:174:npx prisma generate
+./docs/DEPLOYMENT.md:177:npx prisma migrate deploy
+./docs/DEPLOYMENT.md:210:#### Database Optimization
+./docs/DEPLOYMENT.md:211:- **Connection Pooling:** Prisma connection management
+./docs/DEPLOYMENT.md:212:- **Query Optimization:** Efficient database queries
+./docs/DEPLOYMENT.md:213:- **Index Strategy:** Proper database indexing
+./docs/DEPLOYMENT.md:221:- ✅ Database connectivity established
+./tools/run_tests.sh:223:# Test database connectivity
+./tools/run_tests.sh:224:echo "Testing database connectivity..."
+./tools/summarize.py:304:                    endpoint = line.split('|')[0].replace('ENDPOINT:', '').replace('DB_TEST', 'Database')
+./tools/summarize.py:309:                    endpoint = line.split('|')[0].replace('ENDPOINT:', '').replace('DB_TEST', 'Database')
+./db_performance_test.js:12:  // Test health endpoint (database connectivity)
+./middleware/rbac.ts:123:    // 2. Query database for user roles and permissions
+./middleware/rbac.ts:137:      roles: [UserRole.PATIENT], // Query from database
+./validate_credentials.py:58:    # Test database connection
+./validate_credentials.py:60:        print("\n🧪 Testing database connection...")
+./validate_credentials.py:66:            print(f"Database URL pattern: postgresql://postgres:[PASSWORD]@db.{project_id}.supabase.co:5432/postgres")
+./validate_credentials.py:67:            print("⚠️ You'll need to provide the database password for full connection test")
+./validate_credentials.py:73:        print(f"❌ Database connection test failed: {e}")
+./execute_architect_agent.py:146:##### 4.3 Database Integration
+./execute_architect_agent.py:148:-- Additional Prisma schema for Zep integration
+./execute_architect_agent.py:231:- Database integration testing
+./execute_architect_agent.py:502:    // Store session in database
+./execute_architect_agent.py:503:    const dbSession = await this.prisma.zepSession.create({
+./execute_architect_agent.py:516:    return await this.prisma.zepSession.findFirst({
+./execute_architect_agent.py:538:  // L3 Cache: Database cache for user preferences
+./execute_architect_agent.py:539:  dbCache: DatabaseCache;
+./execute_architect_agent.py:710:  encryptionScope: 'field-level' | 'record-level' | 'database-level';
+./execute_architect_agent.py:1070:- **Integration Points**: Health analysis, session management, database integration
+./VERCEL_DEPLOYMENT_FIXES.md:8:### 1. Primary Issue: Prisma Client Generation
+./VERCEL_DEPLOYMENT_FIXES.md:9:**Problem**: Vercel caches dependencies between builds, causing Prisma Client to become outdated and fail initialization.
+./VERCEL_DEPLOYMENT_FIXES.md:13:Prisma has detected that this project was built on Vercel, which caches dependencies. This leads to an outdated Prisma Client because Prisma's auto-generation isn't triggered.
+./VERCEL_DEPLOYMENT_FIXES.md:17:- Added `"postinstall": "prisma generate"` to package.json scripts
+./VERCEL_DEPLOYMENT_FIXES.md:18:- Modified build script to include `"build": "prisma generate && next build"`
+./VERCEL_DEPLOYMENT_FIXES.md:19:- This ensures Prisma Client is regenerated on every build, regardless of Vercel's caching
+./VERCEL_DEPLOYMENT_FIXES.md:73:    "build": "prisma generate && next build",
+./VERCEL_DEPLOYMENT_FIXES.md:74:    "postinstall": "prisma generate",
+./VERCEL_DEPLOYMENT_FIXES.md:103:1. ✅ `npm ci` - Dependencies install successfully with Prisma generation
+./VERCEL_DEPLOYMENT_FIXES.md:110:2. **Build Phase**: `npm run build` will run `prisma generate && next build`
+./VERCEL_DEPLOYMENT_FIXES.md:111:3. **Result**: Fresh Prisma Client generated on every deployment, preventing cache-related issues
+./VERCEL_DEPLOYMENT_FIXES.md:115:### 1. Prisma + Vercel
+./VERCEL_DEPLOYMENT_FIXES.md:116:- Always regenerate Prisma Client during build process
+./VERCEL_DEPLOYMENT_FIXES.md:118:- Ensure `prisma` is in dependencies (not just devDependencies)
+./VERCEL_DEPLOYMENT_FIXES.md:135:# Database
+./VERCEL_DEPLOYMENT_FIXES.md:136:DATABASE_URL="postgresql://..."
+./VERCEL_DEPLOYMENT_FIXES.md:162:- [ ] Database accessible from Vercel's deployment regions
+./VERCEL_DEPLOYMENT_FIXES.md:169:### If Prisma Issues Persist
+./VERCEL_DEPLOYMENT_FIXES.md:170:1. Check that `DATABASE_URL` is correctly set in Vercel environment variables
+./VERCEL_DEPLOYMENT_FIXES.md:171:2. Verify database is accessible from Vercel's deployment regions
+./VERCEL_DEPLOYMENT_FIXES.md:172:3. Check Vercel build logs for specific Prisma error messages
+./next.config.js:13:    serverComponentsExternalPackages: ['@prisma/client'],
+./database_hits.txt:1:No DATABASE_URL hits found
+./package-lock.json:13:        "@next-auth/prisma-adapter": "^1.0.7",
+./package-lock.json:14:        "@prisma/client": "^5.7.1",
+./package-lock.json:48:        "prisma": "^5.7.1",
+./package-lock.json:1462:    "node_modules/@next-auth/prisma-adapter": {
+./package-lock.json:1464:      "resolved": "https://registry.npmjs.org/@next-auth/prisma-adapter/-/prisma-adapter-1.0.7.tgz",
+./package-lock.json:1468:        "@prisma/client": ">=2.26.0 || >=3",
+./package-lock.json:1694:    "node_modules/@prisma/client": {
+./package-lock.json:1696:      "resolved": "https://registry.npmjs.org/@prisma/client/-/client-5.22.0.tgz",
+./package-lock.json:1704:        "prisma": "*"
+./package-lock.json:1707:        "prisma": {
+./package-lock.json:1712:    "node_modules/@prisma/debug": {
+./package-lock.json:1714:      "resolved": "https://registry.npmjs.org/@prisma/debug/-/debug-5.22.0.tgz",
+./package-lock.json:1718:    "node_modules/@prisma/engines": {
+./package-lock.json:1720:      "resolved": "https://registry.npmjs.org/@prisma/engines/-/engines-5.22.0.tgz",
+./package-lock.json:1725:        "@prisma/debug": "5.22.0",
+./package-lock.json:1726:        "@prisma/engines-version": "5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2",
+./package-lock.json:1727:        "@prisma/fetch-engine": "5.22.0",
+./package-lock.json:1728:        "@prisma/get-platform": "5.22.0"
+./package-lock.json:1731:    "node_modules/@prisma/engines-version": {
+./package-lock.json:1733:      "resolved": "https://registry.npmjs.org/@prisma/engines-version/-/engines-version-5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2.tgz",
+./package-lock.json:1737:    "node_modules/@prisma/fetch-engine": {
+./package-lock.json:1739:      "resolved": "https://registry.npmjs.org/@prisma/fetch-engine/-/fetch-engine-5.22.0.tgz",
+./package-lock.json:1743:        "@prisma/debug": "5.22.0",
+./package-lock.json:1744:        "@prisma/engines-version": "5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2",
+./package-lock.json:1745:        "@prisma/get-platform": "5.22.0"
+./package-lock.json:1748:    "node_modules/@prisma/get-platform": {
+./package-lock.json:1750:      "resolved": "https://registry.npmjs.org/@prisma/get-platform/-/get-platform-5.22.0.tgz",
+./package-lock.json:1754:        "@prisma/debug": "5.22.0"
+./package-lock.json:10211:    "node_modules/prisma": {
+./package-lock.json:10213:      "resolved": "https://registry.npmjs.org/prisma/-/prisma-5.22.0.tgz",
+./package-lock.json:10218:        "@prisma/engines": "5.22.0"
+./package-lock.json:10221:        "prisma": "build/index.js"
+./results/BMAD_Phase1E_Final_Validation_Report.md:69:- ✅ document.getElementById('auto-redirect-backup').style.visibility='hidden';});})();</script>Database (0.075943s)
+./validate-zep-implementation.js:112:    // Check 5: Verify Prisma schema updates
+./validate-zep-implementation.js:113:    console.log("\n🗄️ Checking Prisma schema updates...");
+./validate-zep-implementation.js:115:        const schemaContent = fs.readFileSync('prisma/schema.prisma', 'utf8');
+./validate-zep-implementation.js:141:        console.log("❌ Failed to read Prisma schema");
+./validate-zep-implementation.js:142:        results.errors.push("Prisma schema not readable");
+./validate-zep-implementation.js:223:        console.log("✅ Database Schema Updated");
+./package.json:8:    "build": "prisma generate && next build",
+./package.json:14:    "postinstall": "prisma generate",
+./package.json:15:    "db:generate": "prisma generate",
+./package.json:16:    "db:push": "prisma db push",
+./package.json:17:    "db:migrate": "prisma migrate dev",
+./package.json:18:    "db:studio": "prisma studio",
+./package.json:24:    "@next-auth/prisma-adapter": "^1.0.7",
+./package.json:25:    "@prisma/client": "^5.7.1",
+./package.json:59:    "prisma": "^5.7.1",
+./final_orchestrator_coordination.py:171:   - Database integration with Prisma
+./final_orchestrator_coordination.py:210:- Prisma Schema Updates
+./final_orchestrator_coordination.py:216:- Database integration with audit logging
+./final_orchestrator_coordination.py:285:### Database Integration
+./final_orchestrator_coordination.py:320:- Database schema updated
+./final_orchestrator_coordination.py:462:4. ✅ **Create user session management** - Database-integrated session handling
+./final_orchestrator_coordination.py:477:- Database integration with Prisma
+./final_orchestrator_coordination.py:491:✅ **Session Management**: Secure session handling with database persistence  
+./final_orchestrator_coordination.py:492:✅ **Database Integration**: Prisma models for Zep sessions and audit logs  
+./final_orchestrator_coordination.py:504:- Database schema updated
+./scripts/init-hipaa-compliance.ts:5:import { PrismaClient } from '@prisma/client'
+./scripts/init-hipaa-compliance.ts:8:const prisma = new PrismaClient()
+./scripts/init-hipaa-compliance.ts:29:    await prisma.$disconnect()
+./scripts/init-hipaa-compliance.ts:71:    await prisma.rolePermission.upsert({
+./scripts/init-hipaa-compliance.ts:147:    await prisma.complianceMetric.create({
+./scripts/test_supabase.js:3:// Tests database connectivity with real production credentials

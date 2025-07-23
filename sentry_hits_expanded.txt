@@ -1,0 +1,54 @@
+./CHANGELOG.md:10:- **Sentry Integration** - Complete error tracking and performance monitoring
+./CHANGELOG.md:30:- **Sentry Error Tracking** - Complete setup with custom error boundaries
+./CHANGELOG.md:57:- Sentry integration guide and configuration
+./CHANGELOG.md:66:- **Error Tracking:** 100% coverage with Sentry integration
+./CHANGELOG.md:73:- Sentry DSN configuration required for monitoring
+./sentry.client.config.ts:2:import * as Sentry from "@sentry/nextjs";
+./sentry.client.config.ts:4:Sentry.init({
+./sentry.client.config.ts:5:  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+./sentry.client.config.ts:7:    Sentry.replayIntegration({
+./sentry.server.config.ts:2:import * as Sentry from "@sentry/nextjs";
+./sentry.server.config.ts:4:Sentry.init({
+./sentry.server.config.ts:5:  dsn: process.env.SENTRY_DSN,
+./README.md:10:Biospark Health AI is a comprehensive healthcare analytics platform built using the **BMAD (Breakthrough Method of Agile AI-driven Development)** methodology. This system features complete Sentry integration for production monitoring, advanced analytics, and enterprise-grade security.
+./README.md:16:- **Sentry** complete error tracking and performance monitoring
+./README.md:51:# Sentry Monitoring
+./README.md:52:SENTRY_DSN="your_sentry_dsn"
+./README.md:53:SENTRY_ORG="your_sentry_org"
+./README.md:54:SENTRY_PROJECT="your_sentry_project"
+./README.md:55:SENTRY_AUTH_TOKEN="your_sentry_auth_token"
+./README.md:83:- **Sentry Integration:** Complete error tracking and performance monitoring
+./README.md:90:- ✅ **Sentry Error Tracking** - Complete monitoring setup
+./README.md:101:- [SENTRY_INTEGRATION.md](docs/SENTRY_INTEGRATION.md) - Complete Sentry setup guide
+./docs/SENTRY_INTEGRATION.md:1:# 🔑 SENTRY INTEGRATION COMPLETE - BMAD PHASE 1
+./docs/SENTRY_INTEGRATION.md:12:- ✅ DSN Successfully Extracted via Sentry API
+./docs/SENTRY_INTEGRATION.md:14:- ✅ Sentry Configuration Files Created
+./docs/SENTRY_INTEGRATION.md:20:sentry.client.config.ts    # Client-side Sentry configuration
+./docs/SENTRY_INTEGRATION.md:21:sentry.server.config.ts    # Server-side Sentry configuration
+./docs/SENTRY_INTEGRATION.md:22:sentry.edge.config.ts      # Edge runtime Sentry configuration
+./docs/SENTRY_INTEGRATION.md:27:SENTRY_DSN=https://bd28a4f9ea4d5ff5e5e2fbd9c9396df0@o4509668938285056.ingest.us.sentry.io/4509668942348288
+./docs/SENTRY_INTEGRATION.md:28:SENTRY_ORG=biospark-health
+./docs/SENTRY_INTEGRATION.md:29:SENTRY_PROJECT=lablens_ai
+./docs/SENTRY_INTEGRATION.md:30:NEXT_PUBLIC_SENTRY_DSN=https://bd28a4f9ea4d5ff5e5e2fbd9c9396df0@o4509668938285056.ingest.us.sentry.io/4509668942348288
+./docs/SENTRY_INTEGRATION.md:34:The application is now fully configured with Sentry monitoring:
+./docs/SENTRY_INTEGRATION.md:46:### 🔗 SENTRY DASHBOARD
+./docs/SENTRY_INTEGRATION.md:47:Access your Sentry dashboard at:
+./docs/SENTRY_INTEGRATION.md:48:https://biospark-health.sentry.io/projects/lablens_ai/
+./docs/SENTRY_INTEGRATION.md:51:**BMAD Phase 1 Orchestration Complete with Full Sentry Integration! 🎉**
+./docs/DEPLOYMENT.md:12:- [ ] Sentry project created and DSN obtained
+./docs/DEPLOYMENT.md:19:- [ ] Sentry integration tested locally
+./docs/DEPLOYMENT.md:36:# Sentry Monitoring (CRITICAL for production)
+./docs/DEPLOYMENT.md:37:SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+./docs/DEPLOYMENT.md:38:SENTRY_ORG=your-sentry-organization
+./docs/DEPLOYMENT.md:39:SENTRY_PROJECT=your-sentry-project
+./docs/DEPLOYMENT.md:40:SENTRY_AUTH_TOKEN=your-sentry-auth-token
+./docs/DEPLOYMENT.md:66:vercel env add SENTRY_DSN
+./docs/DEPLOYMENT.md:113:# Check Sentry integration
+./docs/DEPLOYMENT.md:114:curl https://your-domain.vercel.app/api/sentry/test
+./docs/DEPLOYMENT.md:131:#### Sentry Configuration
+./docs/DEPLOYMENT.md:222:- ✅ Sentry monitoring active
+./docs/DEPLOYMENT.md:242:- [Sentry Integration Guide](./SENTRY_INTEGRATION.md)
+./sentry.edge.config.ts:2:import * as Sentry from "@sentry/nextjs";
+./sentry.edge.config.ts:4:Sentry.init({
+./sentry.edge.config.ts:5:  dsn: process.env.SENTRY_DSN,
+./sentry_hits.txt:1:No Sentry DSN hits found

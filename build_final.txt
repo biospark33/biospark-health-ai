@@ -1,0 +1,53 @@
+
+> labinsight-ai-complete@1.0.0 build
+> prisma generate && next build
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 453ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want real-time updates to your database without manual polling? Discover how with Pulse: https://pris.ly/tip-0-pulse
+
+  ▲ Next.js 14.2.30
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+Error: supabaseUrl is required.
+    at new a$ (/home/ubuntu/workspace/biospark-health-ai/.next/server/chunks/438.js:6:79587)
+    at aU (/home/ubuntu/workspace/biospark-health-ai/.next/server/chunks/438.js:6:83833)
+    at new i (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/memory/history/route.js:1:4356)
+    at 40650 (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/memory/history/route.js:1:5063)
+    at t (/home/ubuntu/workspace/biospark-health-ai/.next/server/webpack-runtime.js:1:143)
+    at 86527 (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/memory/history/route.js:1:1700)
+    at t (/home/ubuntu/workspace/biospark-health-ai/.next/server/webpack-runtime.js:1:143)
+    at r (/home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/memory/history/route.js:1:6227)
+    at /home/ubuntu/workspace/biospark-health-ai/.next/server/app/api/memory/history/route.js:1:6273
+    at t.X (/home/ubuntu/workspace/biospark-health-ai/.next/server/webpack-runtime.js:1:1285)
+
+> Build error occurred
+Error: Failed to collect page data for /api/memory/history
+    at /home/ubuntu/workspace/biospark-health-ai/node_modules/next/dist/build/utils.js:1269:15
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  type: 'Error'
+}

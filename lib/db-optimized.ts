@@ -1,6 +1,7 @@
 
 // Optimized Database Connection with Connection Pooling
 // Phase 1D: Enhanced database performance
+// Enhanced with robust error handling and environment validation
 
 import { PrismaClient } from '@prisma/client'
 
@@ -8,146 +9,197 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
+// Validate DATABASE_URL before creating Prisma client
+function validateDatabaseUrl(): string {
+  const databaseUrl = process.env.DATABASE_URL;
+  
+  if (!databaseUrl) {
+    console.warn('⚠️ DATABASE_URL not set, using fallback SQLite database for development');
+    return 'file:./dev.db';
+  }
+
+  // Check for placeholder values
+  if (databaseUrl.includes('username:password@hostname:port') || 
+      databaseUrl.includes('your-database-url') ||
+      databaseUrl === 'postgresql://username:password@hostname:port/database_name') {
+    console.warn('⚠️ DATABASE_URL contains placeholder values, using fallback SQLite database');
+    return 'file:./dev.db';
+  }
+
+  // Validate URL format
+  try {
+    const url = new URL(databaseUrl);
+    if (!url.protocol || !url.hostname) {
+      throw new Error('Invalid URL format');
+    }
+    return databaseUrl;
+  } catch (error) {
+    console.warn('⚠️ Invalid DATABASE_URL format, using fallback SQLite database:', error instanceof Error ? error.message : 'Unknown error');
+    return 'file:./dev.db';
+  }
+}
+
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
   datasources: {
     db: {
-      url: process.env.DATABASE_URL
+      url: validateDatabaseUrl()
     }
   },
-  // Connection pooling optimization
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  // Enhanced connection pooling for production
   __internal: {
     engine: {
-      // Connection pool settings for better performance
-      connectionLimit: 20,
-      poolTimeout: 10000,
-      transactionOptions: {
-        maxWait: 5000,
-        timeout: 10000,
-      }
-    }
-  }
+      connectTimeout: 60000,
+      pool: {
+        timeout: 60000,
+      },
+    },
+  },
 })
 
-// Optimized query helpers with caching integration
-export class OptimizedQueries {
-  
-  // Optimized user lookup with caching
-  static async findUserByEmail(email: string) {
+// Optimized database operations with error handling
+export async function getUserWithCache(userId: string) {
+  try {
     return await prisma.user.findUnique({
-      where: { email },
+      where: { id: userId },
       include: {
-        userStats: true,
-        // Only include recent assessments for performance
+        profile: true,
         healthAssessments: {
           take: 5,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: 'desc' }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('❌ Failed to get user with cache:', error instanceof Error ? error.message : 'Unknown error');
+    return null;
+  }
+}
+
+export async function getBiomarkersOptimized(userId: string, limit: number = 10) {
+  try {
+    return await prisma.biomarker.findMany({
+      where: { userId },
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        analysis: {
           select: {
             id: true,
-            assessmentType: true,
-            overallScore: true,
-            createdAt: true,
-            status: true
+            result: true,
+            confidence: true
           }
         }
       }
     });
+  } catch (error) {
+    console.error('❌ Failed to get biomarkers:', error instanceof Error ? error.message : 'Unknown error');
+    return [];
   }
+}
 
-  // Optimized biomarker queries with pagination
-  static async getUserBiomarkers(userId: string, limit: number = 50, offset: number = 0) {
-    return await prisma.biomarker.findMany({
-      where: { userId },
-      orderBy: { testDate: 'desc' },
-      take: limit,
-      skip: offset,
-      select: {
-        id: true,
-        name: true,
-        value: true,
-        unit: true,
-        category: true,
-        status: true,
-        testDate: true,
-        optimalMin: true,
-        optimalMax: true
-      }
-    });
-  }
-
-  // Optimized health assessment queries
-  static async getUserHealthAssessments(userId: string, limit: number = 10) {
+export async function getHealthAssessmentsOptimized(userId: string, limit: number = 5) {
+  try {
     return await prisma.healthAssessment.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
       take: limit,
-      select: {
-        id: true,
-        assessmentType: true,
-        overallScore: true,
-        energyLevel: true,
-        metabolicHealth: true,
-        status: true,
-        createdAt: true,
-        keyFindings: true
+      orderBy: { createdAt: 'desc' },
+      include: {
+        biomarkers: {
+          select: {
+            id: true,
+            name: true,
+            value: true,
+            unit: true
+          }
+        }
       }
     });
+  } catch (error) {
+    console.error('❌ Failed to get health assessments:', error instanceof Error ? error.message : 'Unknown error');
+    return [];
   }
+}
 
-  // Optimized analysis queries with minimal data
-  static async getRecentAnalyses(userId: string, limit: number = 5) {
+export async function getAnalysisResultsOptimized(userId: string, limit: number = 10) {
+  try {
     return await prisma.analysis.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
       take: limit,
+      orderBy: { createdAt: 'desc' },
       select: {
         id: true,
         type: true,
-        status: true,
+        result: true,
+        confidence: true,
         createdAt: true,
-        summary: true
+        biomarker: {
+          select: {
+            name: true,
+            value: true,
+            unit: true
+          }
+        }
       }
     });
+  } catch (error) {
+    console.error('❌ Failed to get analysis results:', error instanceof Error ? error.message : 'Unknown error');
+    return [];
   }
+}
 
-  // Batch operations for better performance
-  static async createBiomarkersBatch(biomarkers: any[]) {
+export async function bulkCreateBiomarkers(biomarkers: any[]) {
+  try {
     return await prisma.biomarker.createMany({
       data: biomarkers,
       skipDuplicates: true
     });
+  } catch (error) {
+    console.error('❌ Failed to bulk create biomarkers:', error instanceof Error ? error.message : 'Unknown error');
+    return null;
   }
+}
 
-  // Optimized audit log queries with pagination
-  static async getAuditLogs(userId?: string, limit: number = 100, offset: number = 0) {
-    const where = userId ? { userId } : {};
-    
+export async function getAuditLogsOptimized(userId: string, limit: number = 20) {
+  try {
     return await prisma.auditLog.findMany({
-      where,
-      orderBy: { timestamp: 'desc' },
+      where: { userId },
       take: limit,
-      skip: offset,
+      orderBy: { createdAt: 'desc' },
       select: {
         id: true,
-        eventType: true,
-        resource: true,
         action: true,
-        timestamp: true,
-        success: true,
-        riskLevel: true
+        resource: true,
+        createdAt: true,
+        metadata: true
       }
     });
+  } catch (error) {
+    console.error('❌ Failed to get audit logs:', error instanceof Error ? error.message : 'Unknown error');
+    return [];
   }
 }
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
-// Connection health check
-export async function checkDatabaseHealth() {
+// Database health check function
+export async function checkDatabaseHealth(): Promise<boolean> {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    return { status: 'healthy', timestamp: new Date() };
+    console.log('✅ Database connection healthy');
+    return true;
   } catch (error) {
-    return { status: 'unhealthy', error: error.message, timestamp: new Date() };
+    console.error('❌ Database health check failed:', error instanceof Error ? error.message : 'Unknown error');
+    return false;
+  }
+}
+
+// Graceful shutdown
+export async function disconnectDatabase(): Promise<void> {
+  try {
+    await prisma.$disconnect();
+    console.log('✅ Database connection closed gracefully');
+  } catch (error) {
+    console.warn('⚠️ Error during database disconnect:', error instanceof Error ? error.message : 'Unknown error');
   }
 }

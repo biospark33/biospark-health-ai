@@ -1,0 +1,114 @@
+
+> labinsight-ai-complete@1.0.0 build
+> prisma generate && next build
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 445ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+
+  ▲ Next.js 14.2.30
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ Supabase not configured for audit logging, using console fallback
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ Supabase not configured for audit logging, using console fallback
+⚠️ Supabase not configured for audit logging, using console fallback
+⚠️ Supabase not configured for audit logging, using console fallback
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+⚠️ Supabase not configured for audit logging, using console fallback
+⚠️ Supabase not configured for audit logging, using console fallback
+⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled
+⚠️ Supabase not configured for audit logging, using console fallback
+   Generating static pages (0/16) ...
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+⚠️ DATABASE_URL not set, using fallback SQLite database for development
+   Generating static pages (4/16) 
+   Generating static pages (8/16) 
+prisma:error 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+error: Error validating datasource `db`: the URL must start with the protocol `postgresql://` or `postgres://`.
+  -->  schema.prisma:9
+   | 
+ 8 |   provider = "postgresql"
+ 9 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+❌ Database health check failed: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+error: Error validating datasource `db`: the URL must start with the protocol `postgresql://` or `postgres://`.
+  -->  schema.prisma:9
+   | 
+ 8 |   provider = "postgresql"
+ 9 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+   Generating static pages (12/16) 
+ ✓ Generating static pages (16/16)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    12 kB          99.4 kB
+├ ○ /_not-found                          876 B          88.3 kB
+├ ○ /admin/compliance                    9.12 kB         104 kB
+├ ƒ /api/analysis/[id]                   0 B                0 B
+├ ƒ /api/auth/[...nextauth]              0 B                0 B
+├ ƒ /api/auth/signup                     0 B                0 B
+├ ƒ /api/chat/memory-enhanced            0 B                0 B
+├ ƒ /api/compliance/audit-logs           0 B                0 B
+├ ƒ /api/compliance/metrics              0 B                0 B
+├ ƒ /api/comprehensive-analysis          0 B                0 B
+├ ƒ /api/consent                         0 B                0 B
+├ ƒ /api/consent/validate                0 B                0 B
+├ ƒ /api/health                          0 B                0 B
+├ ƒ /api/memory/cleanup                  0 B                0 B
+├ ƒ /api/memory/context                  0 B                0 B
+├ ƒ /api/memory/history                  0 B                0 B
+├ ƒ /api/memory/insights                 0 B                0 B
+├ ƒ /api/memory/preferences              0 B                0 B
+├ ƒ /api/memory/trends                   0 B                0 B
+├ ƒ /api/performance/metrics             0 B                0 B
+└ ○ /dashboard                           154 kB          249 kB
++ First Load JS shared by all            87.4 kB
+  ├ chunks/117-0a578e1a30a55183.js       31.8 kB
+  ├ chunks/fd9d1056-7e4a82da41bc71ce.js  53.6 kB
+  └ other shared chunks (total)          2 kB
+
+
+ƒ Middleware                             29.5 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
