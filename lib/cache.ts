@@ -1,96 +1,49 @@
 
-// Redis Caching Layer for Performance Optimization
-// Enhanced with robust error handling and fallback mechanisms
+/**
+ * Simple In-Memory Cache Manager
+ * Lightweight caching without external dependencies
+ * Replaces Redis-based caching with memory-based solution
+ */
 
-import Redis from 'ioredis';
+interface CacheItem {
+  data: any;
+  expiry: number;
+}
 
-class CacheManager {
-  private redis: Redis | null = null;
-  private isConnected: boolean = false;
-  private connectionAttempted: boolean = false;
+class InMemoryCacheManager {
+  private cache: Map<string, CacheItem> = new Map();
+  private cleanupInterval: NodeJS.Timeout | null = null;
 
   constructor() {
-    // Don't initialize Redis immediately to prevent build-time errors
-    // Initialize only when first used
+    // Start cleanup interval to remove expired items
+    this.startCleanup();
   }
 
-  private async initializeRedis() {
-    if (this.connectionAttempted) {
-      return;
-    }
+  private startCleanup(): void {
+    // Clean up expired items every 5 minutes
+    this.cleanupInterval = setInterval(() => {
+      this.cleanup();
+    }, 5 * 60 * 1000);
+  }
 
-    this.connectionAttempted = true;
-
-    try {
-      // Validate Redis URL before attempting connection
-      const redisUrl = process.env.REDIS_URL;
-      
-      if (!redisUrl || redisUrl.includes('hostname') || redisUrl.includes('username:password')) {
-        console.warn('⚠️ Redis URL not configured or contains placeholder values. Caching disabled.');
-        return;
+  private cleanup(): void {
+    const now = Date.now();
+    for (const [key, item] of this.cache.entries()) {
+      if (now > item.expiry) {
+        this.cache.delete(key);
       }
-
-      // Use local Redis for development, Redis Cloud for production
-      this.redis = new Redis(redisUrl, {
-        retryDelayOnFailover: 100,
-        enableReadyCheck: false,
-        maxRetriesPerRequest: 3,
-        lazyConnect: true,
-        connectTimeout: 5000,
-        commandTimeout: 3000,
-        // Graceful error handling
-        retryDelayOnClusterDown: 300,
-        retryDelayOnFailover: 100,
-        maxRetriesPerRequest: 1
-      });
-
-      this.redis.on('connect', () => {
-        console.log('✅ Redis connected successfully');
-        this.isConnected = true;
-      });
-
-      this.redis.on('error', (err) => {
-        console.warn('⚠️ Redis connection error (caching disabled):', err.message);
-        this.isConnected = false;
-      });
-
-      this.redis.on('close', () => {
-        console.warn('⚠️ Redis connection closed');
-        this.isConnected = false;
-      });
-
-      // Attempt connection with timeout
-      await Promise.race([
-        this.redis.connect(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Redis connection timeout')), 5000)
-        )
-      ]);
-
-    } catch (error) {
-      console.warn('⚠️ Failed to initialize Redis (caching disabled):', error instanceof Error ? error.message : 'Unknown error');
-      this.redis = null;
-      this.isConnected = false;
     }
   }
 
-  private async ensureConnection(): Promise<boolean> {
-    if (!this.connectionAttempted) {
-      await this.initializeRedis();
-    }
-    return this.isConnected && this.redis !== null;
+  private isExpired(item: CacheItem): boolean {
+    return Date.now() > item.expiry;
   }
 
   async setUserData(userId: string, userData: any, ttl: number = 3600): Promise<boolean> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      console.warn('⚠️ Redis not available, skipping cache set for user data');
-      return false;
-    }
-
     try {
       const key = `user:${userId}`;
-      await this.redis.setex(key, ttl, JSON.stringify(userData));
+      const expiry = Date.now() + (ttl * 1000);
+      this.cache.set(key, { data: userData, expiry });
       return true;
     } catch (error) {
       console.warn('⚠️ Failed to cache user data:', error instanceof Error ? error.message : 'Unknown error');
@@ -99,15 +52,20 @@ class CacheManager {
   }
 
   async getUserData(userId: string): Promise<any | null> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      return null;
-    }
-
     try {
       const key = `user:${userId}`;
-      const cached = await this.redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const item = this.cache.get(key);
+      
+      if (!item) {
+        return null;
+      }
+      
+      if (this.isExpired(item)) {
+        this.cache.delete(key);
+        return null;
+      }
+      
+      return item.data;
     } catch (error) {
       console.warn('⚠️ Failed to retrieve cached user data:', error instanceof Error ? error.message : 'Unknown error');
       return null;
@@ -115,15 +73,10 @@ class CacheManager {
   }
 
   async setAnalysisResult(analysisId: string, analysis: any, ttl: number = 7200): Promise<boolean> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      console.warn('⚠️ Redis not available, skipping cache set for analysis');
-      return false;
-    }
-
     try {
       const key = `analysis:${analysisId}`;
-      await this.redis.setex(key, ttl, JSON.stringify(analysis));
+      const expiry = Date.now() + (ttl * 1000);
+      this.cache.set(key, { data: analysis, expiry });
       return true;
     } catch (error) {
       console.warn('⚠️ Failed to cache analysis result:', error instanceof Error ? error.message : 'Unknown error');
@@ -132,15 +85,20 @@ class CacheManager {
   }
 
   async getAnalysisResult(analysisId: string): Promise<any | null> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      return null;
-    }
-
     try {
       const key = `analysis:${analysisId}`;
-      const cached = await this.redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const item = this.cache.get(key);
+      
+      if (!item) {
+        return null;
+      }
+      
+      if (this.isExpired(item)) {
+        this.cache.delete(key);
+        return null;
+      }
+      
+      return item.data;
     } catch (error) {
       console.warn('⚠️ Failed to retrieve cached analysis:', error instanceof Error ? error.message : 'Unknown error');
       return null;
@@ -148,15 +106,10 @@ class CacheManager {
   }
 
   async setUserPermissions(userId: string, permissions: any, ttl: number = 1800): Promise<boolean> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      console.warn('⚠️ Redis not available, skipping cache set for permissions');
-      return false;
-    }
-
     try {
       const key = `permissions:${userId}`;
-      await this.redis.setex(key, ttl, JSON.stringify(permissions));
+      const expiry = Date.now() + (ttl * 1000);
+      this.cache.set(key, { data: permissions, expiry });
       return true;
     } catch (error) {
       console.warn('⚠️ Failed to cache user permissions:', error instanceof Error ? error.message : 'Unknown error');
@@ -165,15 +118,20 @@ class CacheManager {
   }
 
   async getUserPermissions(userId: string): Promise<any | null> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      return null;
-    }
-
     try {
       const key = `permissions:${userId}`;
-      const cached = await this.redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const item = this.cache.get(key);
+      
+      if (!item) {
+        return null;
+      }
+      
+      if (this.isExpired(item)) {
+        this.cache.delete(key);
+        return null;
+      }
+      
+      return item.data;
     } catch (error) {
       console.warn('⚠️ Failed to retrieve cached permissions:', error instanceof Error ? error.message : 'Unknown error');
       return null;
@@ -181,15 +139,10 @@ class CacheManager {
   }
 
   async setAssessmentData(assessmentId: string, assessment: any, ttl: number = 3600): Promise<boolean> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      console.warn('⚠️ Redis not available, skipping cache set for assessment');
-      return false;
-    }
-
     try {
       const key = `assessment:${assessmentId}`;
-      await this.redis.setex(key, ttl, JSON.stringify(assessment));
+      const expiry = Date.now() + (ttl * 1000);
+      this.cache.set(key, { data: assessment, expiry });
       return true;
     } catch (error) {
       console.warn('⚠️ Failed to cache assessment data:', error instanceof Error ? error.message : 'Unknown error');
@@ -198,15 +151,20 @@ class CacheManager {
   }
 
   async getAssessmentData(assessmentId: string): Promise<any | null> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      return null;
-    }
-
     try {
       const key = `assessment:${assessmentId}`;
-      const cached = await this.redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const item = this.cache.get(key);
+      
+      if (!item) {
+        return null;
+      }
+      
+      if (this.isExpired(item)) {
+        this.cache.delete(key);
+        return null;
+      }
+      
+      return item.data;
     } catch (error) {
       console.warn('⚠️ Failed to retrieve cached assessment:', error instanceof Error ? error.message : 'Unknown error');
       return null;
@@ -214,23 +172,19 @@ class CacheManager {
   }
 
   async invalidateUserCache(userId: string): Promise<boolean> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      return false;
-    }
-
     try {
       const patterns = [
         `user:${userId}`,
         `permissions:${userId}`,
-        `analysis:${userId}:*`,
-        `assessment:${userId}:*`
+        `analysis:${userId}:`,
+        `assessment:${userId}:`
       ];
 
-      for (const pattern of patterns) {
-        const keys = await this.redis.keys(pattern);
-        if (keys.length > 0) {
-          await this.redis.del(...keys);
+      for (const [key] of this.cache.entries()) {
+        for (const pattern of patterns) {
+          if (key.startsWith(pattern)) {
+            this.cache.delete(key);
+          }
         }
       }
 
@@ -242,36 +196,30 @@ class CacheManager {
   }
 
   async getStats(): Promise<any | null> {
-    const isConnected = await this.ensureConnection();
-    if (!isConnected || !this.redis) {
-      return null;
-    }
-
     try {
-      const info = await this.redis.info('stats');
       return {
-        connected: this.isConnected,
-        info: info
+        connected: true,
+        type: 'in-memory',
+        size: this.cache.size,
+        info: `In-memory cache with ${this.cache.size} items`
       };
     } catch (error) {
-      console.warn('⚠️ Failed to get Redis stats:', error instanceof Error ? error.message : 'Unknown error');
+      console.warn('⚠️ Failed to get cache stats:', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }
 
   // Graceful shutdown
   async disconnect(): Promise<void> {
-    if (this.redis) {
-      try {
-        await this.redis.quit();
-        console.log('✅ Redis connection closed gracefully');
-      } catch (error) {
-        console.warn('⚠️ Error during Redis disconnect:', error instanceof Error ? error.message : 'Unknown error');
-      }
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
     }
+    this.cache.clear();
+    console.log('✅ In-memory cache cleared');
   }
 }
 
 // Export singleton instance
-export const cacheManager = new CacheManager();
+export const cacheManager = new InMemoryCacheManager();
 export default cacheManager;

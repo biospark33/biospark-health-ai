@@ -36,6 +36,7 @@ export class LabInsightZepClient {
   private config: ZepClientConfig;
   private encryptionKey: string;
   private isInitialized: boolean = false;
+  private initializationPromise: Promise<void> | null = null;
 
   constructor(config: ZepClientConfig) {
     this.config = config;
@@ -45,16 +46,24 @@ export class LabInsightZepClient {
   }
 
   /**
-   * Initialize ZepClient using the new recommended method
+   * Initialize ZepClient with proper error handling
    */
   private async initializeClient(): Promise<void> {
     if (this.isInitialized && this.client) {
       return;
     }
 
+    // Check if API key is valid
+    if (!this.config.apiKey || this.config.apiKey === 'your-zep-api-key' || this.config.apiKey.includes('your-')) {
+      console.warn('⚠️ ZEP_API_KEY not set or contains placeholder value, Zep memory features disabled');
+      this.client = null;
+      this.isInitialized = false;
+      return;
+    }
+
     try {
-      // Use ZepClient.init() instead of constructor - fixes deprecation warning
-      this.client = await ZepClient.init({
+      // Use proper ZepClient constructor with object parameter
+      this.client = new ZepClient({
         apiKey: this.config.apiKey,
         baseURL: this.config.baseURL || "https://api.getzep.com"
       });
@@ -62,7 +71,7 @@ export class LabInsightZepClient {
       this.isInitialized = true;
       console.log("✅ ZepClient initialized successfully");
     } catch (error) {
-      console.error("❌ Failed to initialize ZepClient:", error);
+      console.warn("⚠️ Failed to initialize ZepClient (memory features disabled):", error instanceof Error ? error.message : 'Unknown error');
       // Graceful fallback - don't throw error to prevent build failures
       this.client = null;
       this.isInitialized = false;
@@ -73,10 +82,12 @@ export class LabInsightZepClient {
    * Ensure client is initialized before any operation
    */
   private async ensureInitialized(): Promise<boolean> {
-    if (!this.isInitialized || !this.client) {
-      await this.initializeClient();
+    if (!this.initializationPromise) {
+      this.initializationPromise = this.initializeClient();
     }
-    return this.client !== null;
+    
+    await this.initializationPromise;
+    return this.client !== null && this.isInitialized;
   }
 
   /**
@@ -108,7 +119,7 @@ export class LabInsightZepClient {
       console.log(`✅ Zep session created: ${sessionId}`);
       return sessionId;
     } catch (error) {
-      console.error("❌ Failed to create Zep session:", error);
+      console.warn("⚠️ Failed to create Zep session:", error instanceof Error ? error.message : 'Unknown error');
       // Return session ID anyway for graceful degradation
       return sessionId;
     }
@@ -153,7 +164,7 @@ export class LabInsightZepClient {
 
       console.log(`✅ Health analysis memory stored for session: ${sessionId}`);
     } catch (error) {
-      console.error("❌ Failed to store health analysis memory:", error);
+      console.warn("⚠️ Failed to store health analysis memory:", error instanceof Error ? error.message : 'Unknown error');
       // Don't throw error to prevent application crashes
     }
   }
@@ -198,7 +209,7 @@ export class LabInsightZepClient {
       console.log(`✅ Retrieved ${decryptedResults.length} relevant memories`);
       return decryptedResults;
     } catch (error) {
-      console.error("❌ Failed to retrieve memory context:", error);
+      console.warn("⚠️ Failed to retrieve memory context:", error instanceof Error ? error.message : 'Unknown error');
       return [];
     }
   }
@@ -234,7 +245,7 @@ export class LabInsightZepClient {
       console.log(`✅ Retrieved conversation history: ${messages.length} messages`);
       return messages;
     } catch (error) {
-      console.error("❌ Failed to get conversation history:", error);
+      console.warn("⚠️ Failed to get conversation history:", error instanceof Error ? error.message : 'Unknown error');
       return [];
     }
   }
@@ -259,7 +270,7 @@ export class LabInsightZepClient {
 
       console.log(`✅ Session metadata updated: ${sessionId}`);
     } catch (error) {
-      console.error("❌ Failed to update session metadata:", error);
+      console.warn("⚠️ Failed to update session metadata:", error instanceof Error ? error.message : 'Unknown error');
     }
   }
 
@@ -277,7 +288,7 @@ export class LabInsightZepClient {
       await this.client.user.delete(sessionId);
       console.log(`✅ Session deleted: ${sessionId}`);
     } catch (error) {
-      console.error("❌ Failed to delete session:", error);
+      console.warn("⚠️ Failed to delete session:", error instanceof Error ? error.message : 'Unknown error');
     }
   }
 
@@ -299,7 +310,7 @@ export class LabInsightZepClient {
       const jsonString = decrypted.toString(CryptoJS.enc.Utf8);
       return JSON.parse(jsonString);
     } catch (error) {
-      console.error("❌ Failed to decrypt PHI data:", error);
+      console.warn("⚠️ Failed to decrypt PHI data:", error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }
@@ -330,7 +341,7 @@ export class LabInsightZepClient {
       console.log("✅ Zep connection test successful");
       return true;
     } catch (error) {
-      console.error("❌ Zep connection test failed:", error);
+      console.warn("⚠️ Zep connection test failed:", error instanceof Error ? error.message : 'Unknown error');
       return false;
     }
   }

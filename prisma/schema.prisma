@@ -1,3 +1,4 @@
+
 // Health AI System Database Schema
 generator client {
     provider = "prisma-client-js"
@@ -5,7 +6,7 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql"
+    provider = "sqlite"
     url      = env("DATABASE_URL")
 }
 
@@ -58,18 +59,18 @@ model HealthAssessment {
   inflammationLevel  Float
   
   // Analysis results
-  keyFindings      Json // Critical findings for Layer 1
-  detailedInsights Json // Contextual explanations for Layer 2
-  comprehensiveData Json // Full technical details for Layer 3
+  keyFindings      String // Critical findings for Layer 1 (JSON as string for SQLite)
+  detailedInsights String // Contextual explanations for Layer 2 (JSON as string for SQLite)
+  comprehensiveData String // Full technical details for Layer 3 (JSON as string for SQLite)
   
   // Recommendations
-  immediateActions Json // Urgent recommendations
-  recommendations  Json // Detailed recommendations
+  immediateActions String // Urgent recommendations (JSON as string for SQLite)
+  recommendations  String // Detailed recommendations (JSON as string for SQLite)
   
   // Engagement tracking
   viewCount       Int @default(0)
   timeSpent       Int @default(0) // seconds
-  layerProgress   Json // tracks which layers user explored
+  layerProgress   String // tracks which layers user explored (JSON as string for SQLite)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -182,16 +183,16 @@ model Analysis {
   age       Int
   city      String
   
-  // Analysis data
-  biomarkers        Json
+  // Analysis data (stored as JSON strings for SQLite compatibility)
+  biomarkers        String
   metabolicScore    Float
   thyroidScore      Float
-  metabolicHealth   Json
-  inflammation      Json
-  nutrients         Json
-  patterns          Json
-  criticalFindings  Json
-  recommendations   Json
+  metabolicHealth   String
+  inflammation      String
+  nutrients         String
+  patterns          String
+  criticalFindings  String
+  recommendations   String
   
   // Metadata
   analysisType      String @default("comprehensive")
@@ -248,9 +249,9 @@ model AuditLog {
   endpoint      String?
   method        String?
   
-  // Data details
-  dataAccessed  Json?    // Summary of what data was accessed
-  changes       Json?    // What was changed (before/after for updates)
+  // Data details (stored as JSON strings for SQLite compatibility)
+  dataAccessed  String?    // Summary of what data was accessed
+  changes       String?    // What was changed (before/after for updates)
   
   // Compliance fields
   timestamp     DateTime @default(now())
@@ -263,38 +264,14 @@ model AuditLog {
   
   createdAt DateTime @default(now())
   
-  @@index([userId, timestamp])
-  @@index([eventType, timestamp])
-  @@index([riskLevel, timestamp])
   @@map("audit_logs")
 }
 
 // Role-based access control
-enum UserRole {
-  PATIENT
-  HEALTHCARE_PROVIDER
-  ADMIN
-  AUDITOR
-  RESEARCHER
-}
-
-enum Permission {
-  READ_OWN_DATA
-  READ_ALL_DATA
-  WRITE_OWN_DATA
-  WRITE_ALL_DATA
-  DELETE_OWN_DATA
-  DELETE_ALL_DATA
-  EXPORT_DATA
-  MANAGE_USERS
-  VIEW_AUDIT_LOGS
-  SYSTEM_ADMIN
-}
-
 model UserRole_Assignment {
   id        String   @id @default(cuid())
   userId    String
-  role      UserRole
+  role      String   // UserRole enum as string for SQLite
   
   // Assignment details
   assignedBy String?  // userId of who assigned this role
@@ -314,12 +291,12 @@ model UserRole_Assignment {
 
 model RolePermission {
   id         String     @id @default(cuid())
-  role       UserRole
-  permission Permission
+  role       String     // UserRole enum as string for SQLite
+  permission String     // Permission enum as string for SQLite
   
   // Permission details
   granted    Boolean    @default(true)
-  conditions Json?      // Additional conditions for permission
+  conditions String?    // Additional conditions for permission (JSON as string for SQLite)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -350,7 +327,6 @@ model EncryptedPHI {
   updatedAt DateTime @updatedAt
   
   @@unique([sourceTable, sourceId, fieldName])
-  @@index([userId])
   @@map("encrypted_phi")
 }
 
@@ -377,7 +353,6 @@ model UserConsent {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  @@index([userId, consentType])
   @@map("user_consents")
 }
 
@@ -404,7 +379,6 @@ model DataRetention {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  @@index([scheduledDeletion, deleted])
   @@map("data_retention")
 }
 
@@ -422,12 +396,11 @@ model ComplianceMetric {
   periodStart   DateTime
   periodEnd     DateTime
   
-  // Details
-  details       Json?
+  // Details (stored as JSON string for SQLite compatibility)
+  details       String?
   
   createdAt DateTime @default(now())
   
-  @@index([metricType, periodStart])
   @@map("compliance_metrics")
 }
 
@@ -437,7 +410,7 @@ model ZepSession {
   userId      String
   sessionId   String   @unique
   zepUserId   String
-  metadata    Json?
+  metadata    String?  // JSON as string for SQLite compatibility
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   expiresAt   DateTime
@@ -454,7 +427,7 @@ model MemoryAuditLog {
   dataType    String
   userId      String
   timestamp   DateTime @default(now())
-  metadata    Json?
+  metadata    String?  // JSON as string for SQLite compatibility
   
   @@map("memory_audit_logs")
 }

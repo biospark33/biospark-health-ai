@@ -22,6 +22,8 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
   
+
+  
   // Headers for performance and security
   async headers() {
     const securityHeaders = [
