@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Validate package-lock.json synchronization before commit
+if [ -f package.json ] && [ -f package-lock.json ]; then
+  echo "🔍 Validating package-lock.json synchronization..."
+  npm ci --dry-run > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "❌ package-lock.json is out of sync with package.json"
+    echo "💡 Run: npm install && npm ci to fix"
+    exit 1
+  fi
+  echo "✅ package-lock.json is synchronized"
+fi
