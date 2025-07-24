@@ -1,0 +1,1899 @@
+
+> biospark-health-ai@1.0.0-phase1 test
+> jest
+
+PASS __tests__/memory/context.test.ts
+  ● Console
+
+    console.warn
+      Failed to parse user preferences from memory
+
+      60 |           context.userPreferences = JSON.parse(preferencesResult.data[0].content);
+      61 |         } catch (e) {
+    > 62 |           console.warn('Failed to parse user preferences from memory');
+         |                   ^
+      63 |         }
+      64 |       }
+      65 |     }
+
+      at warn (lib/zep/context.ts:62:19)
+      at jest.setup.js:100:14
+      at Object.<anonymous> (__tests__/memory/context.test.ts:71:22)
+
+FAIL __tests__/memory/search.test.ts
+  ● Zep Search Operations › semanticSearch › should handle search errors gracefully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      67 |       );
+      68 |
+    > 69 |       expect(result.success).toBe(false);
+         |                              ^
+      70 |       expect(result.error?.message).toContain('Semantic search failed');
+      71 |     });
+      72 |
+
+      at Object.toBe (__tests__/memory/search.test.ts:69:30)
+
+  ● Zep Search Operations › semanticSearch › should handle missing Zep client
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      81 |       const result = await searchWithoutClient(mockUserId, mockSessionId, 'test', 5);
+      82 |
+    > 83 |       expect(result.success).toBe(false);
+         |                              ^
+      84 |       expect(result.error?.code).toBe('CLIENT_NOT_AVAILABLE');
+      85 |     });
+      86 |   });
+
+      at Object.toBe (__tests__/memory/search.test.ts:83:30)
+
+  ● Zep Search Operations › searchHealthAnalyses › should search for specific analysis types
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "test-session-456", ObjectContaining {"limit": 10, "metadata": ObjectContaining {"analysisType": "comprehensive", "type": "health_analysis", "userId": "test-user-123"}, "text": "health analysis biomarkers recommendations"}
+
+    Number of calls: 0
+
+       99 |       );
+      100 |
+    > 101 |       expect(zepClient.memory.search).toHaveBeenCalledWith(
+          |                                       ^
+      102 |         mockSessionId,
+      103 |         expect.objectContaining({
+      104 |           text: 'health analysis biomarkers recommendations',
+
+      at Object.toHaveBeenCalledWith (__tests__/memory/search.test.ts:101:39)
+
+  ● Zep Search Operations › findRelevantContext › should find context for current query
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "test-session-456", ObjectContaining {"limit": 5, "metadata": ObjectContaining {"type": {"$in": ["health_analysis", "preferences", "goals"]}}, "text": "blood pressure concerns"}
+
+    Number of calls: 0
+
+      138 |
+      139 |       expect(result.success).toBe(true);
+    > 140 |       expect(zepClient.memory.search).toHaveBeenCalledWith(
+          |                                       ^
+      141 |         mockSessionId,
+      142 |         expect.objectContaining({
+      143 |           text: 'blood pressure concerns',
+
+      at Object.toHaveBeenCalledWith (__tests__/memory/search.test.ts:140:39)
+
+FAIL __tests__/memory/preferences.test.ts
+  ● Zep Preferences Management › getPersonalizedRecommendations › should provide default recommendations when no data available
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "Set up your health goals"
+    Received array: ["Set up your health goals to get personalized recommendations", "Complete a comprehensive analysis to establish your baseline", "Track your progress regularly for better insights"]
+
+      178 |
+      179 |       expect(result.success).toBe(true);
+    > 180 |       expect(result.data).toContain('Set up your health goals');
+          |                           ^
+      181 |       expect(result.data).toContain('Complete a comprehensive analysis');
+      182 |     });
+      183 |   });
+
+      at Object.toContain (__tests__/memory/preferences.test.ts:180:27)
+
+PASS tests/zep.test.ts
+  ● Console
+
+    console.log
+      Creating user session: {
+        userId: 'test_user_1753375629326',
+        sessionId: 'health_session_test_user_1753375629326_1753375629328_e119j3dmkvh',
+        metadata: { sessionType: 'health_analysis', userEmail: 'test@example.com' }
+      }
+
+      at log (lib/zep/sessions.ts:32:13)
+
+    console.log
+      Creating user session: {
+        userId: 'test_user_1753375629326_new',
+        sessionId: 'health_session_test_user_1753375629326_new_1753375629369_syxmvf7hsw',
+        metadata: {}
+      }
+
+      at log (lib/zep/sessions.ts:32:13)
+
+    console.log
+      Creating user session: {
+        userId: 'test_user_1753375629326',
+        sessionId: 'health_session_test_user_1753375629326_1753375629370_4mbv8lrxi6c',
+        metadata: {}
+      }
+
+      at log (lib/zep/sessions.ts:32:13)
+
+    console.log
+      ✅ Health analysis stored in Zep memory: {
+        userId: 'test_user_1753375629326',
+        sessionId: 'health_session_test_user_1753375629326_1753375629328_e119j3dmkvh',
+        analysisId: 'test_analysis_1753375629371',
+        severity: 'moderate'
+      }
+
+      at log (lib/zep/memory.ts:60:15)
+
+    console.warn
+      Failed to parse user preferences from memory
+
+      60 |           context.userPreferences = JSON.parse(preferencesResult.data[0].content);
+      61 |         } catch (e) {
+    > 62 |           console.warn('Failed to parse user preferences from memory');
+         |                   ^
+      63 |         }
+      64 |       }
+      65 |     }
+
+      at warn (lib/zep/context.ts:62:19)
+      at jest.setup.js:100:14
+      at withCache (lib/cache/memory-cache.ts:108:18)
+      at Object.<anonymous> (tests/zep.test.ts:79:22)
+
+    console.log
+      Test cleanup completed
+
+      at Object.log (tests/zep.test.ts:90:13)
+
+PASS __tests__/memory/performance.test.ts
+FAIL __tests__/zep-integration.test.ts
+  ● Console
+
+    console.error
+      ❌ Failed to store health analysis: TypeError: this.zepClient.storeHealthAnalysisMemory is not a function
+          at MemoryManager.storeHealthAnalysisMemory [as storeHealthAnalysis] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:56:28)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:91:7)
+
+      72 |       console.log(`✅ Health analysis stored in memory: ${analysis.sessionId}`);
+      73 |     } catch (error) {
+    > 74 |       console.error("❌ Failed to store health analysis:", error);
+         |               ^
+      75 |       throw new Error(`Failed to store health analysis: ${error}`);
+      76 |     }
+      77 |   }
+
+      at MemoryManager.error [as storeHealthAnalysis] (lib/memory-manager.ts:74:15)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:91:7)
+
+    console.error
+      ❌ Failed to get memory context: TypeError: this.zepClient.getRelevantContext is not a function
+          at MemoryManager.getRelevantContext (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:89:53)
+          at Object.getRelevantContext (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:101:43)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      111 |       return context;
+      112 |     } catch (error) {
+    > 113 |       console.error("❌ Failed to get memory context:", error);
+          |               ^
+      114 |       throw new Error(`Failed to get memory context: ${error}`);
+      115 |     }
+      116 |   }
+
+      at MemoryManager.error [as getRelevantContext] (lib/memory-manager.ts:113:15)
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:101:43)
+
+    console.error
+      ❌ Failed to create/get user session: TypeError: Cannot read properties of undefined (reading 'findFirst')
+          at MemoryManager.findFirst [as createOrGetUserSession] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:124:55)
+          at Object.createOrGetUserSession (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:113:45)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      155 |       return sessionId;
+      156 |     } catch (error) {
+    > 157 |       console.error("❌ Failed to create/get user session:", error);
+          |               ^
+      158 |       throw new Error(`Failed to create/get user session: ${error}`);
+      159 |     }
+      160 |   }
+
+      at MemoryManager.error [as createOrGetUserSession] (lib/memory-manager.ts:157:15)
+      at Object.createOrGetUserSession (__tests__/zep-integration.test.ts:113:45)
+
+    console.error
+      ❌ Failed to create/get user session: TypeError: Cannot read properties of undefined (reading 'findFirst')
+          at MemoryManager.findFirst [as createOrGetUserSession] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:124:55)
+          at MemoryManager.createOrGetUserSession [as getUserHealthJourney] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:197:36)
+          at Object.getUserHealthJourney (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:122:49)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      155 |       return sessionId;
+      156 |     } catch (error) {
+    > 157 |       console.error("❌ Failed to create/get user session:", error);
+          |               ^
+      158 |       throw new Error(`Failed to create/get user session: ${error}`);
+      159 |     }
+      160 |   }
+
+      at MemoryManager.error [as createOrGetUserSession] (lib/memory-manager.ts:157:15)
+      at MemoryManager.createOrGetUserSession [as getUserHealthJourney] (lib/memory-manager.ts:197:36)
+      at Object.getUserHealthJourney (__tests__/zep-integration.test.ts:122:49)
+
+    console.error
+      ❌ Failed to get health journey: Error: Failed to create/get user session: TypeError: Cannot read properties of undefined (reading 'findFirst')
+          at MemoryManager.createOrGetUserSession (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:158:13)
+          at MemoryManager.createOrGetUserSession [as getUserHealthJourney] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:197:36)
+          at Object.getUserHealthJourney (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:122:49)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      212 |       return healthJourney;
+      213 |     } catch (error) {
+    > 214 |       console.error("❌ Failed to get health journey:", error);
+          |               ^
+      215 |       throw new Error(`Failed to get health journey: ${error}`);
+      216 |     }
+      217 |   }
+
+      at MemoryManager.error [as getUserHealthJourney] (lib/memory-manager.ts:214:15)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:122:29)
+
+    console.error
+      ❌ Failed to store health analysis: TypeError: this.zepClient.storeHealthAnalysisMemory is not a function
+          at MemoryManager.storeHealthAnalysisMemory [as storeHealthAnalysis] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:56:28)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:215:7)
+
+      72 |       console.log(`✅ Health analysis stored in memory: ${analysis.sessionId}`);
+      73 |     } catch (error) {
+    > 74 |       console.error("❌ Failed to store health analysis:", error);
+         |               ^
+      75 |       throw new Error(`Failed to store health analysis: ${error}`);
+      76 |     }
+      77 |   }
+
+      at MemoryManager.error [as storeHealthAnalysis] (lib/memory-manager.ts:74:15)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:215:7)
+
+    console.error
+      ❌ Failed to store health analysis: Error: HIPAA Violation: Missing required identifiers
+          at MemoryManager.validateHIPAACompliance (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:257:13)
+          at MemoryManager.validateHIPAACompliance [as storeHealthAnalysis] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:53:18)
+          at Object.storeHealthAnalysis (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:227:23)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      72 |       console.log(`✅ Health analysis stored in memory: ${analysis.sessionId}`);
+      73 |     } catch (error) {
+    > 74 |       console.error("❌ Failed to store health analysis:", error);
+         |               ^
+      75 |       throw new Error(`Failed to store health analysis: ${error}`);
+      76 |     }
+      77 |   }
+
+      at MemoryManager.error [as storeHealthAnalysis] (lib/memory-manager.ts:74:15)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:226:7)
+
+    console.error
+      ❌ Failed to get memory context: TypeError: this.zepClient.getRelevantContext is not a function
+          at MemoryManager.getRelevantContext (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:89:53)
+          at Object.getRelevantContext (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:258:27)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      111 |       return context;
+      112 |     } catch (error) {
+    > 113 |       console.error("❌ Failed to get memory context:", error);
+          |               ^
+      114 |       throw new Error(`Failed to get memory context: ${error}`);
+      115 |     }
+      116 |   }
+
+      at MemoryManager.error [as getRelevantContext] (lib/memory-manager.ts:113:15)
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:258:27)
+
+  ● Zep Integration Tests › ZepClient › should create user session successfully
+
+    TypeError: zepClient.createUserSession is not a function
+
+      24 |     test('should create user session successfully', async () => {
+      25 |       const userId = 'test-user-123';
+    > 26 |       const sessionId = await zepClient.createUserSession(userId);
+         |                                         ^
+      27 |       
+      28 |       expect(sessionId).toBeDefined();
+      29 |       expect(sessionId).toContain('labinsight');
+
+      at Object.createUserSession (__tests__/zep-integration.test.ts:26:41)
+
+  ● Zep Integration Tests › ZepClient › should store health analysis memory with encryption
+
+    TypeError: zepClient.storeHealthAnalysisMemory is not a function
+
+      40 |
+      41 |       await expect(
+    > 42 |         zepClient.storeHealthAnalysisMemory(sessionId, analysisData, {
+         |                   ^
+      43 |           analysisType: 'lab_results'
+      44 |         })
+      45 |       ).resolves.not.toThrow();
+
+      at Object.storeHealthAnalysisMemory (__tests__/zep-integration.test.ts:42:19)
+
+  ● Zep Integration Tests › ZepClient › should retrieve relevant context
+
+    TypeError: zepClient.getRelevantContext is not a function
+
+      50 |       const query = 'blood pressure analysis';
+      51 |
+    > 52 |       const context = await zepClient.getRelevantContext(sessionId, query, 3);
+         |                                       ^
+      53 |       
+      54 |       expect(Array.isArray(context)).toBe(true);
+      55 |     });
+
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:52:39)
+
+  ● Zep Integration Tests › ZepClient › should test connection successfully
+
+    TypeError: zepClient.testConnection is not a function
+
+      56 |
+      57 |     test('should test connection successfully', async () => {
+    > 58 |       const connectionTest = await zepClient.testConnection();
+         |                                              ^
+      59 |       expect(typeof connectionTest).toBe('boolean');
+      60 |     });
+      61 |   });
+
+      at Object.testConnection (__tests__/zep-integration.test.ts:58:46)
+
+  ● Zep Integration Tests › MemoryManager › should store health analysis with HIPAA compliance
+
+    expect(received).resolves.not.toThrow()
+
+    Received promise rejected instead of resolved
+    Rejected to value: [Error: Failed to store health analysis: TypeError: this.zepClient.storeHealthAnalysisMemory is not a function]
+
+      89 |       };
+      90 |
+    > 91 |       await expect(
+         |             ^
+      92 |         memoryManager.storeHealthAnalysis(analysis)
+      93 |       ).resolves.not.toThrow();
+      94 |     });
+
+      at expect (node_modules/expect/build/index.js:113:15)
+      at Object.expect (__tests__/zep-integration.test.ts:91:13)
+
+  ● Zep Integration Tests › MemoryManager › should retrieve relevant memory context
+
+    Failed to get memory context: TypeError: this.zepClient.getRelevantContext is not a function
+
+      112 |     } catch (error) {
+      113 |       console.error("❌ Failed to get memory context:", error);
+    > 114 |       throw new Error(`Failed to get memory context: ${error}`);
+          |             ^
+      115 |     }
+      116 |   }
+      117 |
+
+      at MemoryManager.getRelevantContext (lib/memory-manager.ts:114:13)
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:101:43)
+
+  ● Zep Integration Tests › MemoryManager › should create or get user session
+
+    Failed to create/get user session: TypeError: Cannot read properties of undefined (reading 'findFirst')
+
+      156 |     } catch (error) {
+      157 |       console.error("❌ Failed to create/get user session:", error);
+    > 158 |       throw new Error(`Failed to create/get user session: ${error}`);
+          |             ^
+      159 |     }
+      160 |   }
+      161 |
+
+      at MemoryManager.createOrGetUserSession (lib/memory-manager.ts:158:13)
+      at Object.createOrGetUserSession (__tests__/zep-integration.test.ts:113:45)
+
+  ● Zep Integration Tests › MemoryManager › should get user health journey
+
+    Failed to get health journey: Error: Failed to create/get user session: TypeError: Cannot read properties of undefined (reading 'findFirst')
+
+      213 |     } catch (error) {
+      214 |       console.error("❌ Failed to get health journey:", error);
+    > 215 |       throw new Error(`Failed to get health journey: ${error}`);
+          |             ^
+      216 |     }
+      217 |   }
+      218 |
+
+      at MemoryManager.getUserHealthJourney (lib/memory-manager.ts:215:13)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:122:29)
+
+  ● Zep Integration Tests › SessionManager › should create user session
+
+    TypeError: sessionManager.createUserSession is not a function
+
+      131 |       const metadata = { source: 'web_app' };
+      132 |
+    > 133 |       const session = await sessionManager.createUserSession(userId, metadata);
+          |                                            ^
+      134 |       
+      135 |       expect(session).toHaveProperty('id');
+      136 |       expect(session).toHaveProperty('userId');
+
+      at Object.createUserSession (__tests__/zep-integration.test.ts:133:44)
+
+  ● Zep Integration Tests › SessionManager › should get active session
+
+    TypeError: sessionManager.getActiveSession is not a function
+
+      142 |       const userId = 'test-user-123';
+      143 |       
+    > 144 |       const session = await sessionManager.getActiveSession(userId);
+          |                                            ^
+      145 |       
+      146 |       // Should return null or a valid session object
+      147 |       if (session) {
+
+      at Object.getActiveSession (__tests__/zep-integration.test.ts:144:44)
+
+  ● Zep Integration Tests › SessionManager › should validate session
+
+    TypeError: sessionManager.validateSessionFromRequest is not a function
+
+      157 |       } as any;
+      158 |
+    > 159 |       const validation = await sessionManager.validateSessionFromRequest(mockRequest);
+          |                                               ^
+      160 |       
+      161 |       expect(validation).toHaveProperty('valid');
+      162 |       expect(typeof validation.valid).toBe('boolean');
+
+      at Object.validateSessionFromRequest (__tests__/zep-integration.test.ts:159:47)
+
+  ● Zep Integration Tests › SessionManager › should cleanup expired sessions
+
+    TypeError: sessionManager.cleanupExpiredSessions is not a function
+
+      164 |
+      165 |     test('should cleanup expired sessions', async () => {
+    > 166 |       const cleanedCount = await sessionManager.cleanupExpiredSessions();
+          |                                                 ^
+      167 |       
+      168 |       expect(typeof cleanedCount).toBe('number');
+      169 |       expect(cleanedCount).toBeGreaterThanOrEqual(0);
+
+      at Object.cleanupExpiredSessions (__tests__/zep-integration.test.ts:166:49)
+
+  ● Zep Integration Tests › SessionManager › should get session statistics
+
+    TypeError: sessionManager.getSessionStatistics is not a function
+
+      171 |
+      172 |     test('should get session statistics', async () => {
+    > 173 |       const stats = await sessionManager.getSessionStatistics();
+          |                                          ^
+      174 |       
+      175 |       expect(stats).toHaveProperty('totalSessions');
+      176 |       expect(stats).toHaveProperty('activeSessions');
+
+      at Object.getSessionStatistics (__tests__/zep-integration.test.ts:173:42)
+
+  ● Zep Integration Tests › HIPAA Compliance › should encrypt and decrypt PHI data
+
+    expect(received).resolves.not.toThrow()
+
+    Received promise rejected instead of resolved
+    Rejected to value: [Error: Failed to store health analysis: TypeError: this.zepClient.storeHealthAnalysisMemory is not a function]
+
+      213 |       };
+      214 |
+    > 215 |       await expect(
+          |             ^
+      216 |         memoryManager.storeHealthAnalysis(analysis)
+      217 |       ).resolves.not.toThrow();
+      218 |     });
+
+      at expect (node_modules/expect/build/index.js:113:15)
+      at Object.expect (__tests__/zep-integration.test.ts:215:13)
+
+  ● Zep Integration Tests › Error Handling › should handle Zep API errors gracefully
+
+    Property `createUserSession` does not exist in the provided object
+
+      234 |       // Mock API error
+      235 |       const mockError = new Error('Zep API Error');
+    > 236 |       jest.spyOn(zepClient, 'createUserSession').mockRejectedValue(mockError);
+          |            ^
+      237 |
+      238 |       await expect(
+      239 |         sessionManager.createUserSession('test-user-123')
+
+      at ModuleMocker.spyOn (node_modules/jest-mock/build/index.js:731:13)
+      at Object.spyOn (__tests__/zep-integration.test.ts:236:12)
+
+  ● Zep Integration Tests › Error Handling › should handle network timeouts
+
+    Property `getRelevantContext` does not exist in the provided object
+
+      244 |       // Mock timeout error
+      245 |       const timeoutError = new Error('Network timeout');
+    > 246 |       jest.spyOn(zepClient, 'getRelevantContext').mockRejectedValue(timeoutError);
+          |            ^
+      247 |
+      248 |       await expect(
+      249 |         memoryManager.getRelevantContext('test-session', 'test-query', 'test-user')
+
+      at ModuleMocker.spyOn (node_modules/jest-mock/build/index.js:731:13)
+      at Object.spyOn (__tests__/zep-integration.test.ts:246:12)
+
+  ● Zep Integration Tests › Performance › should handle large memory contexts efficiently
+
+    Failed to get memory context: TypeError: this.zepClient.getRelevantContext is not a function
+
+      112 |     } catch (error) {
+      113 |       console.error("❌ Failed to get memory context:", error);
+    > 114 |       throw new Error(`Failed to get memory context: ${error}`);
+          |             ^
+      115 |     }
+      116 |   }
+      117 |
+
+      at MemoryManager.getRelevantContext (lib/memory-manager.ts:114:13)
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:258:27)
+
+  ● Zep Integration Tests › Performance › should handle concurrent session operations
+
+    TypeError: sessionManager.getOrCreateSession is not a function
+
+      274 |       // Create multiple concurrent session operations
+      275 |       const operations = Array.from({ length: 5 }, (_, i) =>
+    > 276 |         sessionManager.getOrCreateSession(`${userId}-${i}`)
+          |                        ^
+      277 |       );
+      278 |
+      279 |       const results = await Promise.all(operations);
+
+      at getOrCreateSession (__tests__/zep-integration.test.ts:276:24)
+          at Function.from (<anonymous>)
+      at Object.from (__tests__/zep-integration.test.ts:275:32)
+
+  ● Full Zep Integration Workflow › should complete full health analysis memory workflow
+
+    TypeError: sessionManager.createUserSession is not a function
+
+      295 |
+      296 |     // 1. Create user session
+    > 297 |     const session = await sessionManager.createUserSession(userId, {
+          |                                          ^
+      298 |       testType: 'integration'
+      299 |     });
+      300 |
+
+      at Object.createUserSession (__tests__/zep-integration.test.ts:297:42)
+
+FAIL tests/phase1-integration.test.ts
+  ● Console
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:100:22) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5da5c970024-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=sp3GNI3V1IrUOU4JtYnskerSs2QNkIOirr37cYUn7Ks-1753375630-1.0.1.1-_lgpzJfBUNhzIXUkTafcQf2TSrBiX2ufqWDGIJxTPhBkkEwQvjHp0AkhtsefnZP_eKRFSCtwWzQkSN8T8pJmgO.NHkGaujCSBMKEA_ixgVI; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=0b3d23blztLN.otIiflVPxkRnUvT3DzCZchg8IrGkmA-1753375630489-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_ef4cb10a94d57e5bb55b55d731702d2d'
+        },
+        request_id: 'req_ef4cb10a94d57e5bb55b55d731702d2d',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:100:22)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:100:22)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:100:22)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:100:22) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5daed270024-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=TXqR4OeGF7Rly8wWphe.j3Ux0xUFT7jr3MbnXd5fjT4-1753375630-1.0.1.1-0D7BNJdiBGswIshBmsUui43MQKVJrpCo4Nl.2RA5pN2DFvhZy4JfYsu1Cw1PiBcf8dKtzoNneU6AI6U_3GxixQDbniYlIWsXE18gsGJCJtE; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=x.zzK2SIQLPfZab4kAmd_epAMJ0kXttiHF7RtM7EHhw-1753375630623-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_fee4746df753f4aebae1301caa385e02'
+        },
+        request_id: 'req_fee4746df753f4aebae1301caa385e02',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:100:22)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:139:22) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5db7dba0024-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=OleVNw0GDYM7M3.OB8AM4PGQRlAt8Vjn5lRnFGffVTM-1753375630-1.0.1.1-TC7Ro9SPeiM1uzFsk_LzG3xvGAiUhUrSx7NeNuqI.wCwa8xwejnxv17vqxCv4dKaS2naXNNClf5uVvO6lpCX0GLoy1rM2HYKi5AO90eBA7c; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=sX7g1n7w6lfcUCCYkA2soXCd.5soybqSH9KWWOXFmyE-1753375630675-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_134d100cee50b4b9e494f5042ef19b7d'
+        },
+        request_id: 'req_134d100cee50b4b9e494f5042ef19b7d',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:139:22)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:139:22)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:139:22)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:139:22) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dbce060024-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=DiO4vhKsTTMXZ2GV3eJitwm6klllNoxt2nO4BDN7F94-1753375630-1.0.1.1-mrvZxVN6cQUE0tBsdvkdtELqlHz_gYrZ.1lv9DqHffSYo.5j2vzElZarDnZDe6d18gwnv_RU95idx46b1E99cTMKVSB.MzgHxqCDZA5hofs; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=dsu028dOjv235STxbb.gap7lzD_qbu3JtqK6i5sLvHQ-1753375630734-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_f8b33fd6a81f5e4631b81768fadc286d'
+        },
+        request_id: 'req_f8b33fd6a81f5e4631b81768fadc286d',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:139:22)
+
+    console.error
+      Zep error handled: Error: Zep API unavailable
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:384:49)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      393 |         } catch (error) {
+      394 |           // Log error but don't throw
+    > 395 |           console.error('Zep error handled:', error);
+          |                   ^
+      396 |         }
+      397 |       }).not.toThrow();
+      398 |     });
+
+      at error (tests/phase1-integration.test.ts:395:19)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:409:22) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dc4eaa0024-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=7SHNVX6Ax085U7IBPLLvWcZ1hqGi.XGPszf3buH8q9o-1753375630-1.0.1.1-GVpM48pZBzGPs8wofnP4nIwn97rEjUpxiskstehU8t3.My5ZPBIGJ6Jj8QzBSyNdMX2uueKVuxNtPObc0aLQir3a7X6ky882bG6OEy6d0lE; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=xY0yo90cDtO5PqNCxoTv6nSqCFlQ_Y9XHnkhFfHFIjQ-1753375630809-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_5b31df56293b3a089cd69adfbc55d661'
+        },
+        request_id: 'req_5b31df56293b3a089cd69adfbc55d661',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:409:22)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:409:22)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:409:22)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:409:22) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dc9f100024-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=ADqgWuT1n6RKw67XVZgwNfLFfaIJ2_Q1H6W5zZloDMQ-1753375630-1.0.1.1-vc_9rDvwtvogkN2BY3R4OID2MP5Z95csv_164D4RSf5gA.4oitrf.xMDQMjwyzOByG4mq00wlFzf4fbGu6yki.u5Kgg3IGqjaVkVkiFJ7ck; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=Q_qb1p8orYNwNEmkdCHXqby0c3PhMwtz8_pY3rsO.dM-1753375630856-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_13a295a12642afc076edde5b8356ebe0'
+        },
+        request_id: 'req_13a295a12642afc076edde5b8356ebe0',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:409:22)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 2)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dd0909acc8-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=.sjvUnpkf.SS.aT6MYEhlk90apgF2W.RTmuQ1s_zkko-1753375630-1.0.1.1-UXwjDZ5f__wLM5p0H2CO1EivPD5EyYQRYuxsGCLLd5GUTWNRp.qCt3iJ1SZ1U8_p75vTc5xGMDYmk0iU3RvULBAFTLQeUgoj7eI6LvT0vEo; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=7EVqfPcQn87pLwZGqVOgf8S1kR7MeuaD0vWPQ7BH4_8-1753375630920-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_d0fcff65dcaa6df1aacf3f3f8b7051ce'
+        },
+        request_id: 'req_d0fcff65dcaa6df1aacf3f3f8b7051ce',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 2)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 2)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 2)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 3)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dd0c98a11a-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=_lRqiU_mQH_K.SEDS4HQ_Vyo6Kjs5JdGNq9CWV5siNk-1753375630-1.0.1.1-IYCy821rU1tXhI57eVYSbrlNe5NQpMo5X6KIO9ifl4iTG4CtcbxTIfDZVhDOv8LsQ0kjfIrnJvGlv4uu53sJJTgfltlfNl2EAG47oyTY09I; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=mpo4j_4knSro8DPoaMFvuKw5EMn4Gw82Joz1n2_pyQM-1753375630934-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_c4e3320048398eeb515fe2e0c2cb9278'
+        },
+        request_id: 'req_c4e3320048398eeb515fe2e0c2cb9278',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 3)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 3)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 3)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 0)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dcef560024-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=gWWVJaC.QiWfkTxjg50CRr2eaYT7M0Up2aFwrH9jxbE-1753375630-1.0.1.1-mjjJpWyJMKMBte_a.sEe_UQ.nQWP_Xae.xvrqAQ8.qEy50a8gPFC5v8xXxNkxzhrI43n4d8EW.gvCPP08tUmdGRiKoE1UU6EZLVc3nZeAFQ; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=bSJpl7ARFSJOHUaMPAtSjxKoGMp0LxQpUD6FJYnTm5k-1753375630949-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_3edf55322eaa5729e2aeafbbfc506f51'
+        },
+        request_id: 'req_3edf55322eaa5729e2aeafbbfc506f51',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 0)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 0)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 0)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 4)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dd09b320eb-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=YSwfL1pGaSoiy4RFXnBH.0dVErGVHsn8SRWC1SrOT6M-1753375630-1.0.1.1-sq.5hCdi5E9k7NdjEp6RvaJ3iPGPXVq2MTT2AweRGS9K7gZrAyh6VX5kQeS8IIkv9sYIkmvpE5_4aF58twKuWZBXP1bd_jYeIA3ad0CM5Gw; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=bH6QEQrSMElK1ARrGFU8eBDZCL_CWA8SLzqRKmwtKps-1753375630951-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_216bcc79f53ddf5c7200c0f25564891e'
+        },
+        request_id: 'req_216bcc79f53ddf5c7200c0f25564891e',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 4)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 4)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 4)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 1)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dd09cda32d-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=8Kqg6DcqqhvkoYWZj4b1.Yk0wNfAwQ.wMMr1qiJpVVU-1753375630-1.0.1.1-IG0q.x12jdHXYOPg23j_1_zPfBU2APM_X20jiO_RFUnThKJ_7k2CQ_ctWmgmM7Y8gOIUtddq5k10nCJE3wXbGnLSbI3rxLEk8WSZEpj7C3o; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=uZezYiNukG0mrQvQ2pV9QHjseH9jKlXJ9tWKwmq9oOI-1753375630956-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_1069c0ba4111911109dfad1f26af0cf0'
+        },
+        request_id: 'req_1069c0ba4111911109dfad1f26af0cf0',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 1)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 1)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 1)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+          at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+          at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 2)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dd49bdacc8-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+          date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+          'set-cookie': '__cf_bm=.gMb.gpQC0QUtUoJfNIiX9tVYnbpVEIoO_f9WP88qwA-1753375630-1.0.1.1-oZ.fUpTp92hM4BYJv2mJSxwQLgK_aPSVblF__okTf16CZyeCFdLg__V2fOY3a3QtxnEqWyagyBjsl.VxdSFAjJH3Hp3qAw7.SIgnwTCb6tI; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=WWkCZoQ149vsOKtHA.mnZhGG.JAoaVdJvS4xFXB88r4-1753375630973-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_95c5e1652a85fe28eb0e6a305927d681'
+        },
+        request_id: 'req_95c5e1652a85fe28eb0e6a305927d681',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 2)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+  ● BMAD Phase 1 Integration Tests › Memory-Enhanced Health Analysis › should generate memory-aware insights successfully
+
+    Failed to generate health insights
+
+      54 |     } catch (error) {
+      55 |       console.error('OpenAI API error:', error)
+    > 56 |       throw new Error('Failed to generate health insights')
+         |             ^
+      57 |     }
+      58 |   },
+      59 |
+
+      at Object.generateHealthInsights (lib/openai.ts:56:13)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:100:22)
+
+  ● BMAD Phase 1 Integration Tests › Memory-Enhanced Health Analysis › should handle memory retrieval failures gracefully
+
+    Failed to generate health insights
+
+      54 |     } catch (error) {
+      55 |       console.error('OpenAI API error:', error)
+    > 56 |       throw new Error('Failed to generate health insights')
+         |             ^
+      57 |     }
+      58 |   },
+      59 |
+
+      at Object.generateHealthInsights (lib/openai.ts:56:13)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:139:22)
+
+  ● BMAD Phase 1 Integration Tests › Memory-Enhanced Health Analysis › should analyze engagement patterns correctly
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 2
+
+      Array [
+    -   3,
+    -   2,
+        1,
+    +   2,
+    +   3,
+      ]
+
+      167 |       const patterns = (memoryHealthAI as any).analyzeEngagementPatterns(memories);
+      168 |
+    > 169 |       expect(patterns.preferredLayers).toEqual([3, 2, 1]);
+          |                                        ^
+      170 |       expect(patterns.averageTimeSpent).toBe(340000); // (120000 + 300000 + 600000) / 3
+      171 |       expect(patterns.completionRate).toBe(0.25); // 1 completed / 4 started
+      172 |     });
+
+      at Object.toEqual (tests/phase1-integration.test.ts:169:40)
+
+  ● BMAD Phase 1 Integration Tests › Error Handling & Resilience › should provide fallback when memory enhancement fails
+
+    Failed to generate health insights
+
+      54 |     } catch (error) {
+      55 |       console.error('OpenAI API error:', error)
+    > 56 |       throw new Error('Failed to generate health insights')
+         |             ^
+      57 |     }
+      58 |   },
+      59 |
+
+      at Object.generateHealthInsights (lib/openai.ts:56:13)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:409:22)
+
+  ● BMAD Phase 1 Integration Tests › Performance & Scalability › should handle concurrent analysis requests
+
+    Failed to generate health insights
+
+      54 |     } catch (error) {
+      55 |       console.error('OpenAI API error:', error)
+    > 56 |       throw new Error('Failed to generate health insights')
+         |             ^
+      57 |     }
+      58 |   },
+      59 |
+
+      at Object.generateHealthInsights (lib/openai.ts:56:13)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 2)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+        at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+        at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+        at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+        at processTicksAndRejections (node:internal/process/task_queues:105:5)
+        at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+        at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+        at async Promise.all (index 3) {
+      status: 401,
+      headers: {
+        'alt-svc': 'h3=":443"; ma=86400',
+        'cf-cache-status': 'DYNAMIC',
+        'cf-ray': '9644e5dd6de5a11a-PDX',
+        connection: 'keep-alive',
+        'content-length': '287',
+        'content-type': 'application/json; charset=utf-8',
+        date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+        server: 'cloudflare',
+        'set-cookie': '__cf_bm=Q_xAsvCLA4ItAi30VnacLphDd6HtA6XGlB0.pTY1X1s-1753375630-1.0.1.1-tYIosziIiPsiGMCT8ox7_100MUiQJJIH7K_2Lvca6N3FoUi5juhK5J0NiBnBaAjKF6rFibPU5a6wYlMRBPL1qhHRxnUUniTkooIrNWAMBwA; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=CSmveuXuNkF.jideJk2Z8_ERW7Ohnd_vGXSEtDREONQ-1753375630986-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+        'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+        vary: 'Origin',
+        'x-content-type-options': 'nosniff',
+        'x-request-id': 'req_a75f2141100c922b66278e57fefec595'
+      },
+      request_id: 'req_a75f2141100c922b66278e57fefec595',
+      error: {
+        message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+        type: 'invalid_request_error',
+        param: null,
+        code: 'invalid_api_key'
+      },
+      code: 'invalid_api_key',
+      param: null,
+      type: 'invalid_request_error'
+    }".
+
+      35 |       `
+      36 |
+    > 37 |       const completion = await openai.chat.completions.create({
+         |                          ^
+      38 |         model: 'gpt-4',
+      39 |         messages: [
+      40 |           {
+
+      at Function.generate (node_modules/openai/src/error.ts:76:14)
+      at OpenAI.makeStatusError (node_modules/openai/src/core.ts:462:21)
+      at OpenAI.makeRequest (node_modules/openai/src/core.ts:526:24)
+      at Object.generateHealthInsights (lib/openai.ts:37:26)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 3) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dd6de5a11a-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+      date: 'Thu, 24 Jul 2025 16:47:10 GMT',
+          server: 'cloudflare',
+      'set-cookie': '__cf_bm=Q_xAsvCLA4ItAi30VnacLphDd6HtA6XGlB0.pTY1X1s-1753375630-1.0.1.1-tYIosziIiPsiGMCT8ox7_100MUiQJJIH7K_2Lvca6N3FoUi5juhK5J0NiBnBaAjKF6rFibPU5a6wYlMRBPL1qhHRxnUUniTkooIrNWAMBwA; path=/; expires=Thu, 24-Jul-25 17:17:10 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=CSmveuXuNkF.jideJk2Z8_ERW7Ohnd_vGXSEtDREONQ-1753375630986-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_a75f2141100c922b66278e57fefec595'
+        },
+        request_id: 'req_a75f2141100c922b66278e57fefec595',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }".
+      at console.error (node_modules/@jest/console/build/BufferedConsole.js:127:10)
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 3)
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+        at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+        at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+        at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+        at processTicksAndRejections (node:internal/process/task_queues:105:5)
+        at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+        at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+        at async Promise.all (index 0) {
+      status: 401,
+      headers: {
+        'alt-svc': 'h3=":443"; ma=86400',
+        'cf-cache-status': 'DYNAMIC',
+        'cf-ray': '9644e5dd7fe90024-PDX',
+        connection: 'keep-alive',
+        'content-length': '287',
+        'content-type': 'application/json; charset=utf-8',
+        date: 'Thu, 24 Jul 2025 16:47:11 GMT',
+        server: 'cloudflare',
+        'set-cookie': '__cf_bm=nhx4iOS0Xb3IhSu.4W7EWxiL_TeXgQx5SkPf_a5iCI4-1753375631-1.0.1.1-cjkc7vrTz.WYqo6pg4osQYObFq7kMPMuOtsBmotbTLZ5HgjppAUdnXikCCe4gnzuHEPbiXWPW8ugaiz1Qr.Qy0U.bjvTCjfKHnQFEcxVBWg; path=/; expires=Thu, 24-Jul-25 17:17:11 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=R.rUxs6DZ92h9.KWD3TQITOZLJVqh0MN_Vpl38Ds8RE-1753375631003-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+        'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+        vary: 'Origin',
+        'x-content-type-options': 'nosniff',
+        'x-request-id': 'req_9c92df73c308432b76106925c48eee68'
+      },
+      request_id: 'req_9c92df73c308432b76106925c48eee68',
+      error: {
+        message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+        type: 'invalid_request_error',
+        param: null,
+        code: 'invalid_api_key'
+      },
+      code: 'invalid_api_key',
+      param: null,
+      type: 'invalid_request_error'
+    }".
+
+      35 |       `
+      36 |
+    > 37 |       const completion = await openai.chat.completions.create({
+         |                          ^
+      38 |         model: 'gpt-4',
+      39 |         messages: [
+      40 |           {
+
+      at Function.generate (node_modules/openai/src/error.ts:76:14)
+      at OpenAI.makeStatusError (node_modules/openai/src/core.ts:462:21)
+      at OpenAI.makeRequest (node_modules/openai/src/core.ts:526:24)
+      at Object.generateHealthInsights (lib/openai.ts:37:26)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 0) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dd7fe90024-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+      date: 'Thu, 24 Jul 2025 16:47:11 GMT',
+          server: 'cloudflare',
+      'set-cookie': '__cf_bm=nhx4iOS0Xb3IhSu.4W7EWxiL_TeXgQx5SkPf_a5iCI4-1753375631-1.0.1.1-cjkc7vrTz.WYqo6pg4osQYObFq7kMPMuOtsBmotbTLZ5HgjppAUdnXikCCe4gnzuHEPbiXWPW8ugaiz1Qr.Qy0U.bjvTCjfKHnQFEcxVBWg; path=/; expires=Thu, 24-Jul-25 17:17:11 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=R.rUxs6DZ92h9.KWD3TQITOZLJVqh0MN_Vpl38Ds8RE-1753375631003-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_9c92df73c308432b76106925c48eee68'
+        },
+        request_id: 'req_9c92df73c308432b76106925c48eee68',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }".
+      at console.error (node_modules/@jest/console/build/BufferedConsole.js:127:10)
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 0)
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+        at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+        at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+        at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+        at processTicksAndRejections (node:internal/process/task_queues:105:5)
+        at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+        at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+        at async Promise.all (index 4) {
+      status: 401,
+      headers: {
+        'alt-svc': 'h3=":443"; ma=86400',
+        'cf-cache-status': 'DYNAMIC',
+        'cf-ray': '9644e5dd7ae320eb-PDX',
+        connection: 'keep-alive',
+        'content-length': '287',
+        'content-type': 'application/json; charset=utf-8',
+        date: 'Thu, 24 Jul 2025 16:47:11 GMT',
+        server: 'cloudflare',
+        'set-cookie': '__cf_bm=wP9DjnaDsAp90VQPQBH7uZYYiM7sI9OZgPxUSzQ6yEM-1753375631-1.0.1.1-DoKMt7_jz.WD_V3qhkcuxag8fOnQWWoFG3QRZwI_U1UAsIKezJp221rMEP67IzQse0.LhlK0dW42ov50XQlzcEJrfKflgBl585.E3QgMt2g; path=/; expires=Thu, 24-Jul-25 17:17:11 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=1ixk8Zo50N1jtn6h4UNpv0zENsNXaIvgBBxiqGCUyWw-1753375631027-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+        'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+        vary: 'Origin',
+        'x-content-type-options': 'nosniff',
+        'x-request-id': 'req_5378c7372d021150f9b4763dbdce3942'
+      },
+      request_id: 'req_5378c7372d021150f9b4763dbdce3942',
+      error: {
+        message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+        type: 'invalid_request_error',
+        param: null,
+        code: 'invalid_api_key'
+      },
+      code: 'invalid_api_key',
+      param: null,
+      type: 'invalid_request_error'
+    }".
+
+      35 |       `
+      36 |
+    > 37 |       const completion = await openai.chat.completions.create({
+         |                          ^
+      38 |         model: 'gpt-4',
+      39 |         messages: [
+      40 |           {
+
+      at Function.generate (node_modules/openai/src/error.ts:76:14)
+      at OpenAI.makeStatusError (node_modules/openai/src/core.ts:462:21)
+      at OpenAI.makeRequest (node_modules/openai/src/core.ts:526:24)
+      at Object.generateHealthInsights (lib/openai.ts:37:26)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 4) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dd7ae320eb-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+      date: 'Thu, 24 Jul 2025 16:47:11 GMT',
+          server: 'cloudflare',
+      'set-cookie': '__cf_bm=wP9DjnaDsAp90VQPQBH7uZYYiM7sI9OZgPxUSzQ6yEM-1753375631-1.0.1.1-DoKMt7_jz.WD_V3qhkcuxag8fOnQWWoFG3QRZwI_U1UAsIKezJp221rMEP67IzQse0.LhlK0dW42ov50XQlzcEJrfKflgBl585.E3QgMt2g; path=/; expires=Thu, 24-Jul-25 17:17:11 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=1ixk8Zo50N1jtn6h4UNpv0zENsNXaIvgBBxiqGCUyWw-1753375631027-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_5378c7372d021150f9b4763dbdce3942'
+        },
+        request_id: 'req_5378c7372d021150f9b4763dbdce3942',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }".
+      at console.error (node_modules/@jest/console/build/BufferedConsole.js:127:10)
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 4)
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "OpenAI API error: AuthenticationError: 401 Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.
+        at Function.generate (/home/ubuntu/biospark-health-ai/node_modules/openai/src/error.ts:76:14)
+        at OpenAI.makeStatusError (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:462:21)
+        at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:526:24)
+        at processTicksAndRejections (node:internal/process/task_queues:105:5)
+        at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+        at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+        at async Promise.all (index 1) {
+      status: 401,
+      headers: {
+        'alt-svc': 'h3=":443"; ma=86400',
+        'cf-cache-status': 'DYNAMIC',
+        'cf-ray': '9644e5dd8b56a32d-PDX',
+        connection: 'keep-alive',
+        'content-length': '287',
+        'content-type': 'application/json; charset=utf-8',
+        date: 'Thu, 24 Jul 2025 16:47:11 GMT',
+        server: 'cloudflare',
+        'set-cookie': '__cf_bm=qgVMQbPV7lYnU.d1oYMIgc6bXA5dK2AKURoPbMbTgPg-1753375631-1.0.1.1-LYWNCOAPJKDWVUEgY6unfy8lMsmqVj33L_eaOQUdDHFB.1djBGjmdJzvCh2wx_3IOynLobKecVJlGX4E3hQJVG4t2aCC8_6OFIKMZ2aquco; path=/; expires=Thu, 24-Jul-25 17:17:11 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=vD3IjzCD4bydZMhhoEnG9o2Z3ynTc6ghMHEUWIdFnbw-1753375631049-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+        'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+        vary: 'Origin',
+        'x-content-type-options': 'nosniff',
+        'x-request-id': 'req_02ed6b817c376866c7190c457df65184'
+      },
+      request_id: 'req_02ed6b817c376866c7190c457df65184',
+      error: {
+        message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+        type: 'invalid_request_error',
+        param: null,
+        code: 'invalid_api_key'
+      },
+      code: 'invalid_api_key',
+      param: null,
+      type: 'invalid_request_error'
+    }".
+
+      35 |       `
+      36 |
+    > 37 |       const completion = await openai.chat.completions.create({
+         |                          ^
+      38 |         model: 'gpt-4',
+      39 |         messages: [
+      40 |           {
+
+      at Function.generate (node_modules/openai/src/error.ts:76:14)
+      at OpenAI.makeStatusError (node_modules/openai/src/core.ts:462:21)
+      at OpenAI.makeRequest (node_modules/openai/src/core.ts:526:24)
+      at Object.generateHealthInsights (lib/openai.ts:37:26)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 1) {
+        status: 401,
+        headers: {
+          'alt-svc': 'h3=":443"; ma=86400',
+          'cf-cache-status': 'DYNAMIC',
+          'cf-ray': '9644e5dd8b56a32d-PDX',
+          connection: 'keep-alive',
+          'content-length': '287',
+          'content-type': 'application/json; charset=utf-8',
+      date: 'Thu, 24 Jul 2025 16:47:11 GMT',
+          server: 'cloudflare',
+      'set-cookie': '__cf_bm=qgVMQbPV7lYnU.d1oYMIgc6bXA5dK2AKURoPbMbTgPg-1753375631-1.0.1.1-LYWNCOAPJKDWVUEgY6unfy8lMsmqVj33L_eaOQUdDHFB.1djBGjmdJzvCh2wx_3IOynLobKecVJlGX4E3hQJVG4t2aCC8_6OFIKMZ2aquco; path=/; expires=Thu, 24-Jul-25 17:17:11 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=vD3IjzCD4bydZMhhoEnG9o2Z3ynTc6ghMHEUWIdFnbw-1753375631049-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+          vary: 'Origin',
+          'x-content-type-options': 'nosniff',
+          'x-request-id': 'req_02ed6b817c376866c7190c457df65184'
+        },
+        request_id: 'req_02ed6b817c376866c7190c457df65184',
+        error: {
+          message: 'Incorrect API key provided: sk-test-*************************only. You can find your API key at https://platform.openai.com/account/api-keys.',
+          type: 'invalid_request_error',
+          param: null,
+          code: 'invalid_api_key'
+        },
+        code: 'invalid_api_key',
+        param: null,
+        type: 'invalid_request_error'
+      }".
+      at console.error (node_modules/@jest/console/build/BufferedConsole.js:127:10)
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 1)
+
+Test Suites: 4 failed, 3 passed, 7 total
+Tests:       29 failed, 33 passed, 62 total
+Snapshots:   0 total
+Time:        3.754 s, estimated 4 s
+Ran all test suites.
