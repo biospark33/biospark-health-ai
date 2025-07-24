@@ -181,3 +181,30 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **BioSpark Health AI** - Transforming healthcare through intelligent automation and personalized AI-driven insights.
 
 *For detailed technical specifications and implementation guidance, please refer to our [comprehensive documentation](./docs/README.md).*
+
+
+
+## BMAD Analysis Suite
+
+This repository contains comprehensive BMAD (Build, Measure, Analyze, Deploy) analysis documentation to guide development through all 4 implementation phases. These PRD-level documents provide detailed technical specifications, implementation roadmaps, and success metrics for the HealthLens AI project.
+
+### BMAD Documentation Structure
+
+The complete BMAD analysis suite is located in `/docs/BMAD/` and includes:
+
+1. **[BMAD Integration Analysis Executive Summary](docs/BMAD/BMAD_INTEGRATION_ANALYSIS_EXECUTIVE_SUMMARY.md)** - High-level overview of the BMAD integration strategy and key objectives
+2. **[BMAD Technical Architecture Specifications](docs/BMAD/BMAD_TECHNICAL_ARCHITECTURE_SPECIFICATIONS.md)** - Detailed technical architecture and system design specifications
+3. **[BMAD Implementation Roadmap](docs/BMAD/BMAD_IMPLEMENTATION_ROADMAP.md)** - Phase-by-phase implementation plan with timelines and milestones
+4. **[BMAD Component Mapping Guide](docs/BMAD/BMAD_COMPONENT_MAPPING_GUIDE.md)** - Comprehensive mapping of system components and their relationships
+5. **[BMAD Risk Mitigation & Success Metrics](docs/BMAD/BMAD_RISK_MITIGATION_SUCCESS_METRICS.md)** - Risk assessment, mitigation strategies, and success measurement criteria
+6. **[BMAD Master Orchestration Summary](docs/BMAD/BMAD_MASTER_ORCHESTRATION_SUMMARY.md)** - Master coordination document for all BMAD phases and processes
+
+### For AI Agents
+
+These documents serve as the primary reference for all AI agents working on this project. They provide:
+- Clear development guidelines for each implementation phase
+- Technical specifications and architecture decisions
+- Risk mitigation strategies and success metrics
+- Component relationships and integration patterns
+
+**Start with the Executive Summary for project overview, then reference specific documents based on your development phase and requirements.**
