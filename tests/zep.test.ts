@@ -78,7 +78,10 @@ describe('Zep Memory Integration', () => {
     if (testSessionId) {
       const result = await getHealthContext(testUserId, testSessionId, 'glucose diabetes');
       expect(result.success).toBe(true);
-      expect(Array.isArray(result.data)).toBe(true);
+      expect(result.data).toBeDefined();
+      expect(result.data?.userId).toBe(testUserId);
+      expect(result.data?.sessionId).toBe(testSessionId);
+      expect(Array.isArray(result.data?.relevantHistory)).toBe(true);
     }
   }, 10000);
 

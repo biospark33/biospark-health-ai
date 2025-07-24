@@ -1,0 +1,212 @@
+
+> biospark-health-ai@1.0.0-phase1 test:coverage
+> jest --coverage
+
+FAIL tests/phase1-integration.test.ts
+  ● Test suite failed to run
+
+    Cannot find module 'whatwg-fetch' from 'jest.setup.js'
+
+      2 |
+      3 | // Add fetch polyfill for Node.js environment
+    > 4 | require('whatwg-fetch')
+        | ^
+      5 |
+      6 | // Mock environment variables
+      7 | process.env.ZEP_API_KEY = 'test-zep-key'
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.require (jest.setup.js:4:1)
+
+FAIL __tests__/zep-integration.test.ts
+  ● Test suite failed to run
+
+    Cannot find module 'whatwg-fetch' from 'jest.setup.js'
+
+      2 |
+      3 | // Add fetch polyfill for Node.js environment
+    > 4 | require('whatwg-fetch')
+        | ^
+      5 |
+      6 | // Mock environment variables
+      7 | process.env.ZEP_API_KEY = 'test-zep-key'
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.require (jest.setup.js:4:1)
+
+FAIL tests/zep.test.ts
+  ● Test suite failed to run
+
+    Cannot find module 'whatwg-fetch' from 'jest.setup.js'
+
+      2 |
+      3 | // Add fetch polyfill for Node.js environment
+    > 4 | require('whatwg-fetch')
+        | ^
+      5 |
+      6 | // Mock environment variables
+      7 | process.env.ZEP_API_KEY = 'test-zep-key'
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.require (jest.setup.js:4:1)
+
+FAIL __tests__/memory/preferences.test.ts
+  ● Test suite failed to run
+
+    Cannot find module 'whatwg-fetch' from 'jest.setup.js'
+
+      2 |
+      3 | // Add fetch polyfill for Node.js environment
+    > 4 | require('whatwg-fetch')
+        | ^
+      5 |
+      6 | // Mock environment variables
+      7 | process.env.ZEP_API_KEY = 'test-zep-key'
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.require (jest.setup.js:4:1)
+
+FAIL __tests__/memory/context.test.ts
+  ● Test suite failed to run
+
+    Cannot find module 'whatwg-fetch' from 'jest.setup.js'
+
+      2 |
+      3 | // Add fetch polyfill for Node.js environment
+    > 4 | require('whatwg-fetch')
+        | ^
+      5 |
+      6 | // Mock environment variables
+      7 | process.env.ZEP_API_KEY = 'test-zep-key'
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.require (jest.setup.js:4:1)
+
+FAIL __tests__/memory/performance.test.ts
+  ● Test suite failed to run
+
+    Cannot find module 'whatwg-fetch' from 'jest.setup.js'
+
+      2 |
+      3 | // Add fetch polyfill for Node.js environment
+    > 4 | require('whatwg-fetch')
+        | ^
+      5 |
+      6 | // Mock environment variables
+      7 | process.env.ZEP_API_KEY = 'test-zep-key'
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.require (jest.setup.js:4:1)
+
+FAIL __tests__/memory/search.test.ts
+  ● Test suite failed to run
+
+    Cannot find module 'whatwg-fetch' from 'jest.setup.js'
+
+      2 |
+      3 | // Add fetch polyfill for Node.js environment
+    > 4 | require('whatwg-fetch')
+        | ^
+      5 |
+      6 | // Mock environment variables
+      7 | process.env.ZEP_API_KEY = 'test-zep-key'
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.require (jest.setup.js:4:1)
+
+-----------------------------------------|---------|----------|---------|---------|-------------------
+File                                     | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-----------------------------------------|---------|----------|---------|---------|-------------------
+All files                                |       0 |        0 |       0 |       0 |                   
+ app                                     |       0 |      100 |       0 |       0 |                   
+  layout.tsx                             |       0 |      100 |       0 |       0 | 1-7               
+  page.tsx                               |       0 |      100 |       0 |       0 | 5-196             
+ app/admin/compliance                    |       0 |        0 |       0 |       0 |                   
+  page.tsx                               |       0 |        0 |       0 |       0 | 7-442             
+ app/api/analysis/[id]                   |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 2-66              
+ app/api/auth/[...nextauth]              |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 2-75              
+ app/api/auth/signup                     |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 2-105             
+ app/api/chat/memory-enhanced            |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 6-196             
+ app/api/compliance/audit-logs           |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 5-174             
+ app/api/compliance/metrics              |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 5-259             
+ app/api/comprehensive-analysis          |       0 |        0 |       0 |       0 |                   
+  route-optimized.ts                     |       0 |        0 |       0 |       0 | 5-180             
+  route.ts                               |       0 |        0 |       0 |       0 | 2-398             
+ app/api/consent                         |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 5-229             
+ app/api/consent/validate                |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 5-78              
+ app/api/health                          |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 5-46              
+ app/api/health/engagement-tracking      |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 5-284             
+ app/api/health/memory-enhanced-analysis |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 5-199             
+ app/api/memory/cleanup                  |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 7-80              
+ app/api/memory/context                  |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 7-69              
+ app/api/memory/history                  |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 7-77              
+ app/api/memory/insights                 |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 7-75              
+ app/api/memory/preferences              |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 7-95              
+ app/api/memory/trends                   |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 7-85              
+ app/api/performance/metrics             |       0 |        0 |       0 |       0 |                   
+  route.ts                               |       0 |        0 |       0 |       0 | 5-42              
+ app/dashboard                           |       0 |      100 |       0 |       0 |                   
+  page.tsx                               |       0 |      100 |       0 |       0 | 4-329             
+ lib                                     |       0 |        0 |       0 |       0 |                   
+  abacus.ts                              |       0 |        0 |       0 |       0 | 14-195            
+  audit.ts                               |       0 |        0 |       0 |       0 | 6-368             
+  auth.ts                                |       0 |        0 |       0 |       0 | 6-68              
+  biomarker-analysis.ts                  |       0 |        0 |       0 |       0 | 5-486             
+  cache.ts                               |       0 |        0 |       0 |       0 | 11-205            
+  consent.ts                             |       0 |        0 |       0 |       0 | 28-312            
+  crypto.ts                              |       0 |        0 |       0 |       0 | 7-421             
+  db-optimized.ts                        |       0 |        0 |       0 |       0 | 5-192             
+  db.ts                                  |       0 |        0 |     100 |       0 | 3-13              
+  enhanced-biomarker-analysis.ts         |       0 |        0 |       0 |       0 | 7-284             
+  environment-validator.ts               |       0 |        0 |       0 |       0 | 42-258            
+  input-validation.ts                    |       0 |        0 |       0 |       0 | 13-201            
+  memory-enhanced-health-ai.ts           |       0 |        0 |       0 |       0 | 5-379             
+  memory-manager.ts                      |       0 |        0 |       0 |       0 | 1-370             
+  openai.ts                              |       0 |        0 |       0 |       0 | 5-182             
+  prisma.ts                              |       0 |        0 |       0 |       0 | 2-24              
+  ray-peat-integration.ts                |       0 |        0 |       0 |       0 | 10-292            
+  rbac.ts                                |       0 |        0 |       0 |       0 | 6-278             
+  session-manager.ts                     |       0 |        0 |       0 |       0 | 17-351            
+  supabase.ts                            |       0 |        0 |       0 |       0 | 5-86              
+  utils.ts                               |       0 |      100 |       0 |       0 | 1-13              
+  zep-client.ts                          |       0 |        0 |       0 |       0 | 6-338             
+ lib/cache                               |       0 |        0 |       0 |       0 |                   
+  memory-cache.ts                        |       0 |        0 |       0 |       0 | 14-132            
+ lib/compliance                          |       0 |        0 |       0 |       0 |                   
+  audit.ts                               |       0 |        0 |       0 |       0 | 7-88              
+  hipaa.ts                               |       0 |        0 |       0 |       0 | 7-108             
+  index.ts                               |       0 |      100 |     100 |       0 | 7-8               
+ lib/zep                                 |       0 |        0 |       0 |       0 |                   
+  analytics.ts                           |       0 |        0 |       0 |       0 | 7-214             
+  client.ts                              |       0 |        0 |       0 |       0 | 9-76              
+  context.ts                             |       0 |        0 |       0 |       0 | 7-155             
+  index.ts                               |       0 |      100 |     100 |       0 | 8-43              
+  memory.ts                              |       0 |        0 |       0 |       0 | 7-381             
+  preferences.ts                         |       0 |        0 |       0 |       0 | 7-218             
+  search.ts                              |       0 |        0 |       0 |       0 | 7-90              
+  sessions.ts                            |       0 |        0 |       0 |       0 | 7-144             
+  summarize.ts                           |       0 |        0 |       0 |       0 | 7-184             
+  utils.ts                               |       0 |        0 |       0 |       0 | 10-181            
+-----------------------------------------|---------|----------|---------|---------|-------------------
+Test Suites: 7 failed, 7 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        8.341 s
+Ran all test suites.

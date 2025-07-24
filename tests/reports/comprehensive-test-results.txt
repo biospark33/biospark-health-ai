@@ -1,0 +1,1618 @@
+
+> biospark-health-ai@1.0.0-phase1 test:coverage
+> jest --coverage
+
+PASS __tests__/memory/performance.test.ts
+FAIL __tests__/memory/search.test.ts
+  ● Zep Search Operations › semanticSearch › should perform semantic search successfully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      50 |       );
+      51 |
+    > 52 |       expect(result.success).toBe(true);
+         |                              ^
+      53 |       expect(result.data).toHaveLength(1);
+      54 |       expect(result.data[0].content).toBe('Health analysis showing improved biomarkers');
+      55 |       expect(result.data[0].score).toBe(0.95);
+
+      at Object.toBe (__tests__/memory/search.test.ts:52:30)
+
+  ● Zep Search Operations › semanticSearch › should handle search errors gracefully
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Semantic search failed"
+    Received string:    "Zep client not initialized"
+
+      68 |
+      69 |       expect(result.success).toBe(false);
+    > 70 |       expect(result.error?.message).toContain('Semantic search failed');
+         |                                     ^
+      71 |     });
+      72 |
+      73 |     it('should handle missing Zep client', async () => {
+
+      at Object.toContain (__tests__/memory/search.test.ts:70:37)
+
+  ● Zep Search Operations › searchHealthAnalyses › should search for specific analysis types
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "test-session-456", ObjectContaining {"limit": 10, "metadata": ObjectContaining {"analysisType": "comprehensive", "type": "health_analysis", "userId": "test-user-123"}, "text": "health analysis biomarkers recommendations"}
+
+    Number of calls: 0
+
+       99 |       );
+      100 |
+    > 101 |       expect(zepClient.memory.search).toHaveBeenCalledWith(
+          |                                       ^
+      102 |         mockSessionId,
+      103 |         expect.objectContaining({
+      104 |           text: 'health analysis biomarkers recommendations',
+
+      at Object.toHaveBeenCalledWith (__tests__/memory/search.test.ts:101:39)
+
+  ● Zep Search Operations › findRelevantContext › should find context for current query
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      137 |       );
+      138 |
+    > 139 |       expect(result.success).toBe(true);
+          |                              ^
+      140 |       expect(zepClient.memory.search).toHaveBeenCalledWith(
+      141 |         mockSessionId,
+      142 |         expect.objectContaining({
+
+      at Object.toBe (__tests__/memory/search.test.ts:139:30)
+
+FAIL __tests__/memory/preferences.test.ts
+  ● Zep Preferences Management › storePreferences › should store user preferences successfully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      49 |       const result = await storePreferences(mockUserId, mockSessionId, preferences);
+      50 |
+    > 51 |       expect(result.success).toBe(true);
+         |                              ^
+      52 |       expect(zepClient.memory.add).toHaveBeenCalledWith(
+      53 |         mockSessionId,
+      54 |         expect.objectContaining({
+
+      at Object.toBe (__tests__/memory/preferences.test.ts:51:30)
+
+  ● Zep Preferences Management › getPreferences › should retrieve user preferences successfully
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"communicationStyle": "concise", "focusAreas": ["thyroid"], "healthGoals": ["energy_improvement"]}
+    Received: null
+
+      89 |
+      90 |       expect(result.success).toBe(true);
+    > 91 |       expect(result.data).toEqual(mockPreferences);
+         |                           ^
+      92 |     });
+      93 |
+      94 |     it('should return null when no preferences found', async () => {
+
+      at Object.toEqual (__tests__/memory/preferences.test.ts:91:27)
+
+  ● Zep Preferences Management › implicitLearn › should learn from positive user interactions
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "test-session-456", ObjectContaining {"messages": ArrayContaining [ObjectContaining {"metadata": ObjectContaining {"action": "view_analysis", "response": "positive", "type": "implicit_learning"}}]}
+
+    Number of calls: 0
+
+      125 |
+      126 |       expect(result.success).toBe(true);
+    > 127 |       expect(zepClient.memory.add).toHaveBeenCalledWith(
+          |                                    ^
+      128 |         mockSessionId,
+      129 |         expect.objectContaining({
+      130 |           messages: expect.arrayContaining([
+
+      at Object.toHaveBeenCalledWith (__tests__/memory/preferences.test.ts:127:36)
+
+  ● Zep Preferences Management › getPersonalizedRecommendations › should generate recommendations based on preferences and learning
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "Continue focusing on thyroid based on your preferences"
+    Received array: ["Set up your health goals to get personalized recommendations", "Complete a comprehensive analysis to establish your baseline", "Track your progress regularly for better insights"]
+
+      167 |
+      168 |       expect(result.success).toBe(true);
+    > 169 |       expect(result.data).toContain('Continue focusing on thyroid based on your preferences');
+          |                           ^
+      170 |       expect(result.data).toContain('Continue focusing on metabolic based on your preferences');
+      171 |     });
+      172 |
+
+      at Object.toContain (__tests__/memory/preferences.test.ts:169:27)
+
+  ● Zep Preferences Management › getPersonalizedRecommendations › should provide default recommendations when no data available
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "Set up your health goals"
+    Received array: ["Set up your health goals to get personalized recommendations", "Complete a comprehensive analysis to establish your baseline", "Track your progress regularly for better insights"]
+
+      178 |
+      179 |       expect(result.success).toBe(true);
+    > 180 |       expect(result.data).toContain('Set up your health goals');
+          |                           ^
+      181 |       expect(result.data).toContain('Complete a comprehensive analysis');
+      182 |     });
+      183 |   });
+
+      at Object.toContain (__tests__/memory/preferences.test.ts:180:27)
+
+FAIL __tests__/memory/context.test.ts
+  ● Zep Context Management › getIntelligentContext › should retrieve comprehensive health context
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      52 |       expect(result.success).toBe(true);
+      53 |       expect(result.data?.userId).toBe(mockUserId);
+    > 54 |       expect(result.data?.relevantHistory).toHaveLength(1);
+         |                                            ^
+      55 |       expect(result.data?.userPreferences.focusAreas).toContain('cardiovascular');
+      56 |       expect(result.data?.healthGoals).toContain('Improve heart health');
+      57 |     });
+
+      at Object.toHaveLength (__tests__/memory/context.test.ts:54:44)
+
+  ● Zep Context Management › getIntelligentContext › should handle context summarization for long content
+
+    expect(jest.fn()).toHaveBeenCalled()
+
+    Expected number of calls: >= 1
+    Received number of calls:    0
+
+      76 |       );
+      77 |
+    > 78 |       expect(summarizeMemory).toHaveBeenCalled();
+         |                               ^
+      79 |       expect(result.data?.conversationSummary).toBe('Summarized content');
+      80 |     });
+      81 |   });
+
+      at Object.toHaveBeenCalled (__tests__/memory/context.test.ts:78:31)
+
+  ● Zep Context Management › updateConversationContext › should store conversation messages successfully
+
+    TypeError: Cannot read properties of null (reading 'memory')
+
+      84 |     it('should store conversation messages successfully', async () => {
+      85 |       const { zepClient } = require('@/lib/zep/client');
+    > 86 |       zepClient.memory.add = jest.fn().mockResolvedValue(true);
+         |                 ^
+      87 |
+      88 |       const result = await updateConversationContext(
+      89 |         mockUserId,
+
+      at Object.memory (__tests__/memory/context.test.ts:86:17)
+
+FAIL tests/zep.test.ts
+  ● Console
+
+    console.warn
+      Zep client not available, generating session ID only
+
+      21 | ): Promise<ZepOperationResult<string>> {
+      22 |   if (!zepClient) {
+    > 23 |     console.warn('Zep client not available, generating session ID only');
+         |             ^
+      24 |     const sessionId = generateSessionId(userId);
+      25 |     return { success: true, data: sessionId };
+      26 |   }
+
+      at warn (lib/zep/sessions.ts:23:13)
+      at Object.<anonymous> (tests/zep.test.ts:18:50)
+
+    console.error
+      Zep client not initialized
+
+      42 | export async function testZepConnection(): Promise<boolean> {
+      43 |   if (!zepClient) {
+    > 44 |     console.error('Zep client not initialized');
+         |             ^
+      45 |     return false;
+      46 |   }
+      47 |
+
+      at error (lib/zep/client.ts:44:13)
+      at Object.<anonymous> (tests/zep.test.ts:29:48)
+
+    console.warn
+      Zep client not available, generating session ID only
+
+      21 | ): Promise<ZepOperationResult<string>> {
+      22 |   if (!zepClient) {
+    > 23 |     console.warn('Zep client not available, generating session ID only');
+         |             ^
+      24 |     const sessionId = generateSessionId(userId);
+      25 |     return { success: true, data: sessionId };
+      26 |   }
+
+      at warn (lib/zep/sessions.ts:23:13)
+      at Object.<anonymous> (tests/zep.test.ts:34:43)
+
+    console.error
+      Zep operation failed: TypeError: Cannot read properties of null (reading 'memory')
+          at memory (/home/ubuntu/biospark-health-ai/lib/zep/sessions.ts:48:38)
+          at operation (/home/ubuntu/biospark-health-ai/lib/zep/client.ts:66:18)
+          at getUserSession (/home/ubuntu/biospark-health-ai/lib/zep/sessions.ts:46:30)
+          at getUserSession (/home/ubuntu/biospark-health-ai/lib/zep/sessions.ts:71:33)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/zep.test.ts:41:48)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      66 |     return await operation();
+      67 |   } catch (error) {
+    > 68 |     console.error('Zep operation failed:', error);
+         |             ^
+      69 |     if (fallback !== undefined) {
+      70 |       return fallback;
+      71 |     }
+
+      at error (lib/zep/client.ts:68:13)
+
+    console.warn
+      Zep client not available, skipping memory storage
+
+      29 | ): Promise<ZepOperationResult<boolean>> {
+      30 |   if (!zepClient) {
+    > 31 |     console.warn('Zep client not available, skipping memory storage');
+         |             ^
+      32 |     return { success: false, error: { code: 'CLIENT_NOT_AVAILABLE', message: 'Zep client not initialized', timestamp: new Date() } };
+      33 |   }
+      34 |
+
+      at warn (lib/zep/memory.ts:31:13)
+      at Object.<anonymous> (tests/zep.test.ts:72:47)
+
+    console.log
+      Test cleanup completed
+
+      at Object.log (tests/zep.test.ts:87:13)
+
+  ● Zep Memory Integration › Zep API connectivity
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      28 |   test('Zep API connectivity', async () => {
+      29 |     const isConnected = await testZepConnection();
+    > 30 |     expect(isConnected).toBe(true);
+         |                         ^
+      31 |   }, 10000);
+      32 |
+      33 |   test('Create user session', async () => {
+
+      at Object.toBe (tests/zep.test.ts:30:25)
+
+  ● Zep Memory Integration › Get or create user session
+
+    TypeError: Cannot read properties of null (reading 'success')
+
+      71 |   const existingSession = await getUserSession(userId);
+      72 |   
+    > 73 |   if (existingSession.success && existingSession.data) {
+         |                       ^
+      74 |     return { success: true, data: existingSession.data };
+      75 |   }
+      76 |
+
+      at success (lib/zep/sessions.ts:73:23)
+      at Object.<anonymous> (tests/zep.test.ts:41:20)
+
+  ● Zep Memory Integration › Store health analysis in memory
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      71 |     if (testSessionId) {
+      72 |       const result = await storeHealthAnalysis(testUserId, testSessionId, mockAnalysis);
+    > 73 |       expect(result.success).toBe(true);
+         |                              ^
+      74 |     }
+      75 |   }, 15000);
+      76 |
+
+      at Object.toBe (tests/zep.test.ts:73:30)
+
+  ● Zep Memory Integration › Retrieve health context from memory
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      79 |       const result = await getHealthContext(testUserId, testSessionId, 'glucose diabetes');
+      80 |       expect(result.success).toBe(true);
+    > 81 |       expect(Array.isArray(result.data)).toBe(true);
+         |                                          ^
+      82 |     }
+      83 |   }, 10000);
+      84 |
+
+      at Object.toBe (tests/zep.test.ts:81:42)
+
+FAIL __tests__/zep-integration.test.ts
+  ● Console
+
+    console.error
+      ❌ Failed to store health analysis: TypeError: this.zepClient.storeHealthAnalysisMemory is not a function
+          at MemoryManager.storeHealthAnalysisMemory [as storeHealthAnalysis] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:56:28)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:91:7)
+
+      72 |       console.log(`✅ Health analysis stored in memory: ${analysis.sessionId}`);
+      73 |     } catch (error) {
+    > 74 |       console.error("❌ Failed to store health analysis:", error);
+         |               ^
+      75 |       throw new Error(`Failed to store health analysis: ${error}`);
+      76 |     }
+      77 |   }
+
+      at MemoryManager.error [as storeHealthAnalysis] (lib/memory-manager.ts:74:15)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:91:7)
+
+    console.error
+      ❌ Failed to get memory context: TypeError: this.zepClient.getRelevantContext is not a function
+          at MemoryManager.getRelevantContext (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:89:53)
+          at Object.getRelevantContext (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:101:43)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      111 |       return context;
+      112 |     } catch (error) {
+    > 113 |       console.error("❌ Failed to get memory context:", error);
+          |               ^
+      114 |       throw new Error(`Failed to get memory context: ${error}`);
+      115 |     }
+      116 |   }
+
+      at MemoryManager.error [as getRelevantContext] (lib/memory-manager.ts:113:15)
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:101:43)
+
+    console.error
+      ❌ Failed to create/get user session: Error: PrismaClient is unable to run in this browser environment, or has been bundled for the browser (running in `Node.js`).
+      If this is unexpected, please open an issue: https://pris.ly/prisma-prisma-bug-report
+          at Object.get (/home/ubuntu/biospark-health-ai/node_modules/.prisma/client/index-browser.js:468:15)
+          at MemoryManager.zepSession [as createOrGetUserSession] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:124:44)
+          at Object.createOrGetUserSession (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:113:45)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      155 |       return sessionId;
+      156 |     } catch (error) {
+    > 157 |       console.error("❌ Failed to create/get user session:", error);
+          |               ^
+      158 |       throw new Error(`Failed to create/get user session: ${error}`);
+      159 |     }
+      160 |   }
+
+      at MemoryManager.error [as createOrGetUserSession] (lib/memory-manager.ts:157:15)
+      at Object.createOrGetUserSession (__tests__/zep-integration.test.ts:113:45)
+
+    console.error
+      ❌ Failed to create/get user session: Error: PrismaClient is unable to run in this browser environment, or has been bundled for the browser (running in `Node.js`).
+      If this is unexpected, please open an issue: https://pris.ly/prisma-prisma-bug-report
+          at Object.get (/home/ubuntu/biospark-health-ai/node_modules/.prisma/client/index-browser.js:468:15)
+          at MemoryManager.zepSession [as createOrGetUserSession] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:124:44)
+          at MemoryManager.createOrGetUserSession [as getUserHealthJourney] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:197:36)
+          at Object.getUserHealthJourney (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:122:49)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      155 |       return sessionId;
+      156 |     } catch (error) {
+    > 157 |       console.error("❌ Failed to create/get user session:", error);
+          |               ^
+      158 |       throw new Error(`Failed to create/get user session: ${error}`);
+      159 |     }
+      160 |   }
+
+      at MemoryManager.error [as createOrGetUserSession] (lib/memory-manager.ts:157:15)
+      at MemoryManager.createOrGetUserSession [as getUserHealthJourney] (lib/memory-manager.ts:197:36)
+      at Object.getUserHealthJourney (__tests__/zep-integration.test.ts:122:49)
+
+    console.error
+      ❌ Failed to get health journey: Error: Failed to create/get user session: Error: PrismaClient is unable to run in this browser environment, or has been bundled for the browser (running in `Node.js`).
+      If this is unexpected, please open an issue: https://pris.ly/prisma-prisma-bug-report
+          at MemoryManager.createOrGetUserSession (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:158:13)
+          at MemoryManager.createOrGetUserSession [as getUserHealthJourney] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:197:36)
+          at Object.getUserHealthJourney (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:122:49)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      212 |       return healthJourney;
+      213 |     } catch (error) {
+    > 214 |       console.error("❌ Failed to get health journey:", error);
+          |               ^
+      215 |       throw new Error(`Failed to get health journey: ${error}`);
+      216 |     }
+      217 |   }
+
+      at MemoryManager.error [as getUserHealthJourney] (lib/memory-manager.ts:214:15)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:122:29)
+
+    console.error
+      ❌ Failed to store health analysis: TypeError: this.zepClient.storeHealthAnalysisMemory is not a function
+          at MemoryManager.storeHealthAnalysisMemory [as storeHealthAnalysis] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:56:28)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:215:7)
+
+      72 |       console.log(`✅ Health analysis stored in memory: ${analysis.sessionId}`);
+      73 |     } catch (error) {
+    > 74 |       console.error("❌ Failed to store health analysis:", error);
+         |               ^
+      75 |       throw new Error(`Failed to store health analysis: ${error}`);
+      76 |     }
+      77 |   }
+
+      at MemoryManager.error [as storeHealthAnalysis] (lib/memory-manager.ts:74:15)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:215:7)
+
+    console.error
+      ❌ Failed to store health analysis: Error: HIPAA Violation: Missing required identifiers
+          at MemoryManager.validateHIPAACompliance (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:257:13)
+          at MemoryManager.validateHIPAACompliance [as storeHealthAnalysis] (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:53:18)
+          at Object.storeHealthAnalysis (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:227:23)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      72 |       console.log(`✅ Health analysis stored in memory: ${analysis.sessionId}`);
+      73 |     } catch (error) {
+    > 74 |       console.error("❌ Failed to store health analysis:", error);
+         |               ^
+      75 |       throw new Error(`Failed to store health analysis: ${error}`);
+      76 |     }
+      77 |   }
+
+      at MemoryManager.error [as storeHealthAnalysis] (lib/memory-manager.ts:74:15)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:226:7)
+
+    console.error
+      ❌ Failed to get memory context: TypeError: this.zepClient.getRelevantContext is not a function
+          at MemoryManager.getRelevantContext (/home/ubuntu/biospark-health-ai/lib/memory-manager.ts:89:53)
+          at Object.getRelevantContext (/home/ubuntu/biospark-health-ai/__tests__/zep-integration.test.ts:258:27)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      111 |       return context;
+      112 |     } catch (error) {
+    > 113 |       console.error("❌ Failed to get memory context:", error);
+          |               ^
+      114 |       throw new Error(`Failed to get memory context: ${error}`);
+      115 |     }
+      116 |   }
+
+      at MemoryManager.error [as getRelevantContext] (lib/memory-manager.ts:113:15)
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:258:27)
+
+  ● Zep Integration Tests › ZepClient › should create user session successfully
+
+    TypeError: zepClient.createUserSession is not a function
+
+      24 |     test('should create user session successfully', async () => {
+      25 |       const userId = 'test-user-123';
+    > 26 |       const sessionId = await zepClient.createUserSession(userId);
+         |                                         ^
+      27 |       
+      28 |       expect(sessionId).toBeDefined();
+      29 |       expect(sessionId).toContain('labinsight');
+
+      at Object.createUserSession (__tests__/zep-integration.test.ts:26:41)
+
+  ● Zep Integration Tests › ZepClient › should store health analysis memory with encryption
+
+    TypeError: zepClient.storeHealthAnalysisMemory is not a function
+
+      40 |
+      41 |       await expect(
+    > 42 |         zepClient.storeHealthAnalysisMemory(sessionId, analysisData, {
+         |                   ^
+      43 |           analysisType: 'lab_results'
+      44 |         })
+      45 |       ).resolves.not.toThrow();
+
+      at Object.storeHealthAnalysisMemory (__tests__/zep-integration.test.ts:42:19)
+
+  ● Zep Integration Tests › ZepClient › should retrieve relevant context
+
+    TypeError: zepClient.getRelevantContext is not a function
+
+      50 |       const query = 'blood pressure analysis';
+      51 |
+    > 52 |       const context = await zepClient.getRelevantContext(sessionId, query, 3);
+         |                                       ^
+      53 |       
+      54 |       expect(Array.isArray(context)).toBe(true);
+      55 |     });
+
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:52:39)
+
+  ● Zep Integration Tests › ZepClient › should test connection successfully
+
+    TypeError: zepClient.testConnection is not a function
+
+      56 |
+      57 |     test('should test connection successfully', async () => {
+    > 58 |       const connectionTest = await zepClient.testConnection();
+         |                                              ^
+      59 |       expect(typeof connectionTest).toBe('boolean');
+      60 |     });
+      61 |   });
+
+      at Object.testConnection (__tests__/zep-integration.test.ts:58:46)
+
+  ● Zep Integration Tests › MemoryManager › should store health analysis with HIPAA compliance
+
+    expect(received).resolves.not.toThrow()
+
+    Received promise rejected instead of resolved
+    Rejected to value: [Error: Failed to store health analysis: TypeError: this.zepClient.storeHealthAnalysisMemory is not a function]
+
+      89 |       };
+      90 |
+    > 91 |       await expect(
+         |             ^
+      92 |         memoryManager.storeHealthAnalysis(analysis)
+      93 |       ).resolves.not.toThrow();
+      94 |     });
+
+      at expect (node_modules/expect/build/index.js:113:15)
+      at Object.expect (__tests__/zep-integration.test.ts:91:13)
+
+  ● Zep Integration Tests › MemoryManager › should retrieve relevant memory context
+
+    Failed to get memory context: TypeError: this.zepClient.getRelevantContext is not a function
+
+      112 |     } catch (error) {
+      113 |       console.error("❌ Failed to get memory context:", error);
+    > 114 |       throw new Error(`Failed to get memory context: ${error}`);
+          |             ^
+      115 |     }
+      116 |   }
+      117 |
+
+      at MemoryManager.getRelevantContext (lib/memory-manager.ts:114:13)
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:101:43)
+
+  ● Zep Integration Tests › MemoryManager › should create or get user session
+
+    Failed to create/get user session: Error: PrismaClient is unable to run in this browser environment, or has been bundled for the browser (running in `Node.js`).
+    If this is unexpected, please open an issue: https://pris.ly/prisma-prisma-bug-report
+
+      156 |     } catch (error) {
+      157 |       console.error("❌ Failed to create/get user session:", error);
+    > 158 |       throw new Error(`Failed to create/get user session: ${error}`);
+          |             ^
+      159 |     }
+      160 |   }
+      161 |
+
+      at MemoryManager.createOrGetUserSession (lib/memory-manager.ts:158:13)
+      at Object.createOrGetUserSession (__tests__/zep-integration.test.ts:113:45)
+
+  ● Zep Integration Tests › MemoryManager › should get user health journey
+
+    Failed to get health journey: Error: Failed to create/get user session: Error: PrismaClient is unable to run in this browser environment, or has been bundled for the browser (running in `Node.js`).
+    If this is unexpected, please open an issue: https://pris.ly/prisma-prisma-bug-report
+
+      213 |     } catch (error) {
+      214 |       console.error("❌ Failed to get health journey:", error);
+    > 215 |       throw new Error(`Failed to get health journey: ${error}`);
+          |             ^
+      216 |     }
+      217 |   }
+      218 |
+
+      at MemoryManager.getUserHealthJourney (lib/memory-manager.ts:215:13)
+      at Object.<anonymous> (__tests__/zep-integration.test.ts:122:29)
+
+  ● Zep Integration Tests › SessionManager › should create user session
+
+    TypeError: sessionManager.createUserSession is not a function
+
+      131 |       const metadata = { source: 'web_app' };
+      132 |
+    > 133 |       const session = await sessionManager.createUserSession(userId, metadata);
+          |                                            ^
+      134 |       
+      135 |       expect(session).toHaveProperty('id');
+      136 |       expect(session).toHaveProperty('userId');
+
+      at Object.createUserSession (__tests__/zep-integration.test.ts:133:44)
+
+  ● Zep Integration Tests › SessionManager › should get active session
+
+    TypeError: sessionManager.getActiveSession is not a function
+
+      142 |       const userId = 'test-user-123';
+      143 |       
+    > 144 |       const session = await sessionManager.getActiveSession(userId);
+          |                                            ^
+      145 |       
+      146 |       // Should return null or a valid session object
+      147 |       if (session) {
+
+      at Object.getActiveSession (__tests__/zep-integration.test.ts:144:44)
+
+  ● Zep Integration Tests › SessionManager › should validate session
+
+    TypeError: sessionManager.validateSessionFromRequest is not a function
+
+      157 |       } as any;
+      158 |
+    > 159 |       const validation = await sessionManager.validateSessionFromRequest(mockRequest);
+          |                                               ^
+      160 |       
+      161 |       expect(validation).toHaveProperty('valid');
+      162 |       expect(typeof validation.valid).toBe('boolean');
+
+      at Object.validateSessionFromRequest (__tests__/zep-integration.test.ts:159:47)
+
+  ● Zep Integration Tests › SessionManager › should cleanup expired sessions
+
+    TypeError: sessionManager.cleanupExpiredSessions is not a function
+
+      164 |
+      165 |     test('should cleanup expired sessions', async () => {
+    > 166 |       const cleanedCount = await sessionManager.cleanupExpiredSessions();
+          |                                                 ^
+      167 |       
+      168 |       expect(typeof cleanedCount).toBe('number');
+      169 |       expect(cleanedCount).toBeGreaterThanOrEqual(0);
+
+      at Object.cleanupExpiredSessions (__tests__/zep-integration.test.ts:166:49)
+
+  ● Zep Integration Tests › SessionManager › should get session statistics
+
+    TypeError: sessionManager.getSessionStatistics is not a function
+
+      171 |
+      172 |     test('should get session statistics', async () => {
+    > 173 |       const stats = await sessionManager.getSessionStatistics();
+          |                                          ^
+      174 |       
+      175 |       expect(stats).toHaveProperty('totalSessions');
+      176 |       expect(stats).toHaveProperty('activeSessions');
+
+      at Object.getSessionStatistics (__tests__/zep-integration.test.ts:173:42)
+
+  ● Zep Integration Tests › HIPAA Compliance › should encrypt and decrypt PHI data
+
+    expect(received).resolves.not.toThrow()
+
+    Received promise rejected instead of resolved
+    Rejected to value: [Error: Failed to store health analysis: TypeError: this.zepClient.storeHealthAnalysisMemory is not a function]
+
+      213 |       };
+      214 |
+    > 215 |       await expect(
+          |             ^
+      216 |         memoryManager.storeHealthAnalysis(analysis)
+      217 |       ).resolves.not.toThrow();
+      218 |     });
+
+      at expect (node_modules/expect/build/index.js:113:15)
+      at Object.expect (__tests__/zep-integration.test.ts:215:13)
+
+  ● Zep Integration Tests › Error Handling › should handle Zep API errors gracefully
+
+    Property `createUserSession` does not exist in the provided object
+
+      234 |       // Mock API error
+      235 |       const mockError = new Error('Zep API Error');
+    > 236 |       jest.spyOn(zepClient, 'createUserSession').mockRejectedValue(mockError);
+          |            ^
+      237 |
+      238 |       await expect(
+      239 |         sessionManager.createUserSession('test-user-123')
+
+      at ModuleMocker.spyOn (node_modules/jest-mock/build/index.js:731:13)
+      at Object.spyOn (__tests__/zep-integration.test.ts:236:12)
+
+  ● Zep Integration Tests › Error Handling › should handle network timeouts
+
+    Property `getRelevantContext` does not exist in the provided object
+
+      244 |       // Mock timeout error
+      245 |       const timeoutError = new Error('Network timeout');
+    > 246 |       jest.spyOn(zepClient, 'getRelevantContext').mockRejectedValue(timeoutError);
+          |            ^
+      247 |
+      248 |       await expect(
+      249 |         memoryManager.getRelevantContext('test-session', 'test-query', 'test-user')
+
+      at ModuleMocker.spyOn (node_modules/jest-mock/build/index.js:731:13)
+      at Object.spyOn (__tests__/zep-integration.test.ts:246:12)
+
+  ● Zep Integration Tests › Performance › should handle large memory contexts efficiently
+
+    Failed to get memory context: TypeError: this.zepClient.getRelevantContext is not a function
+
+      112 |     } catch (error) {
+      113 |       console.error("❌ Failed to get memory context:", error);
+    > 114 |       throw new Error(`Failed to get memory context: ${error}`);
+          |             ^
+      115 |     }
+      116 |   }
+      117 |
+
+      at MemoryManager.getRelevantContext (lib/memory-manager.ts:114:13)
+      at Object.getRelevantContext (__tests__/zep-integration.test.ts:258:27)
+
+  ● Zep Integration Tests › Performance › should handle concurrent session operations
+
+    TypeError: sessionManager.getOrCreateSession is not a function
+
+      274 |       // Create multiple concurrent session operations
+      275 |       const operations = Array.from({ length: 5 }, (_, i) =>
+    > 276 |         sessionManager.getOrCreateSession(`${userId}-${i}`)
+          |                        ^
+      277 |       );
+      278 |
+      279 |       const results = await Promise.all(operations);
+
+      at getOrCreateSession (__tests__/zep-integration.test.ts:276:24)
+          at Function.from (<anonymous>)
+      at Object.from (__tests__/zep-integration.test.ts:275:32)
+
+  ● Full Zep Integration Workflow › should complete full health analysis memory workflow
+
+    TypeError: sessionManager.createUserSession is not a function
+
+      295 |
+      296 |     // 1. Create user session
+    > 297 |     const session = await sessionManager.createUserSession(userId, {
+          |                                          ^
+      298 |       testType: 'integration'
+      299 |     });
+      300 |
+
+      at Object.createUserSession (__tests__/zep-integration.test.ts:297:42)
+
+FAIL tests/phase1-integration.test.ts
+  ● Console
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:100:22)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:100:22)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:100:22)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:100:22)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:100:22)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:100:22)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:139:22)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:139:22)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:139:22)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:139:22)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:139:22)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:139:22)
+
+    console.error
+      Zep error handled: Error: Zep API unavailable
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:384:49)
+          at Promise.then.completed (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/ubuntu/biospark-health-ai/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/ubuntu/biospark-health-ai/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      393 |         } catch (error) {
+      394 |           // Log error but don't throw
+    > 395 |           console.error('Zep error handled:', error);
+          |                   ^
+      396 |         }
+      397 |       }).not.toThrow();
+      398 |     });
+
+      at error (tests/phase1-integration.test.ts:395:19)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:409:22)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:409:22)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:409:22)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:409:22)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:409:22)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:409:22)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 0)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 0)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 1)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 1)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 2)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 2)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 3)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 3)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 4)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 4)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 0)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 0)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 1)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 1)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 2)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 2)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 3)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 3)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      Memory-enhanced analysis failed: Error: Failed to generate health insights
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:56:13)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:38:32)
+          at async Promise.all (index 4)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      77 |       };
+      78 |     } catch (error) {
+    > 79 |       console.error('Memory-enhanced analysis failed:', error);
+         |               ^
+      80 |       // Fallback to standard analysis
+      81 |       const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      82 |       return {
+
+      at MemoryEnhancedHealthAI.error [as generateMemoryAwareInsights] (lib/memory-enhanced-health-ai.ts:79:15)
+          at async Promise.all (index 4)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 0)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 0)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 1)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 1)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 2)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 2)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 3)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 3)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+    console.error
+      OpenAI API error: TypeError: Cannot read properties of undefined (reading 'entries')
+          at createResponseHeaders (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:810:15)
+          at OpenAI.makeRequest (/home/ubuntu/biospark-health-ai/node_modules/openai/src/core.ts:510:50)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at Object.generateHealthInsights (/home/ubuntu/biospark-health-ai/lib/openai.ts:37:26)
+          at MemoryEnhancedHealthAI.generateMemoryAwareInsights (/home/ubuntu/biospark-health-ai/lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 4)
+          at Object.<anonymous> (/home/ubuntu/biospark-health-ai/tests/phase1-integration.test.ts:440:23)
+
+      53 |       return completion.choices[0]?.message?.content
+      54 |     } catch (error) {
+    > 55 |       console.error('OpenAI API error:', error)
+         |               ^
+      56 |       throw new Error('Failed to generate health insights')
+      57 |     }
+      58 |   },
+
+      at Object.error [as generateHealthInsights] (lib/openai.ts:55:15)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 4)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+  ● BMAD Phase 1 Integration Tests › Memory-Enhanced Health Analysis › should generate memory-aware insights successfully
+
+    Failed to generate health insights
+
+      54 |     } catch (error) {
+      55 |       console.error('OpenAI API error:', error)
+    > 56 |       throw new Error('Failed to generate health insights')
+         |             ^
+      57 |     }
+      58 |   },
+      59 |
+
+      at Object.generateHealthInsights (lib/openai.ts:56:13)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:100:22)
+
+  ● BMAD Phase 1 Integration Tests › Memory-Enhanced Health Analysis › should handle memory retrieval failures gracefully
+
+    Failed to generate health insights
+
+      54 |     } catch (error) {
+      55 |       console.error('OpenAI API error:', error)
+    > 56 |       throw new Error('Failed to generate health insights')
+         |             ^
+      57 |     }
+      58 |   },
+      59 |
+
+      at Object.generateHealthInsights (lib/openai.ts:56:13)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:139:22)
+
+  ● BMAD Phase 1 Integration Tests › Memory-Enhanced Health Analysis › should analyze engagement patterns correctly
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 2
+
+      Array [
+    -   3,
+    -   2,
+        1,
+    +   2,
+    +   3,
+      ]
+
+      167 |       const patterns = (memoryHealthAI as any).analyzeEngagementPatterns(memories);
+      168 |
+    > 169 |       expect(patterns.preferredLayers).toEqual([3, 2, 1]);
+          |                                        ^
+      170 |       expect(patterns.averageTimeSpent).toBe(340000); // (120000 + 300000 + 600000) / 3
+      171 |       expect(patterns.completionRate).toBe(0.25); // 1 completed / 4 started
+      172 |     });
+
+      at Object.toEqual (tests/phase1-integration.test.ts:169:40)
+
+  ● BMAD Phase 1 Integration Tests › Error Handling & Resilience › should provide fallback when memory enhancement fails
+
+    Failed to generate health insights
+
+      54 |     } catch (error) {
+      55 |       console.error('OpenAI API error:', error)
+    > 56 |       throw new Error('Failed to generate health insights')
+         |             ^
+      57 |     }
+      58 |   },
+      59 |
+
+      at Object.generateHealthInsights (lib/openai.ts:56:13)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:409:22)
+
+  ● BMAD Phase 1 Integration Tests › Performance & Scalability › should handle concurrent analysis requests
+
+    Failed to generate health insights
+
+      54 |     } catch (error) {
+      55 |       console.error('OpenAI API error:', error)
+    > 56 |       throw new Error('Failed to generate health insights')
+         |             ^
+      57 |     }
+      58 |   },
+      59 |
+
+      at Object.generateHealthInsights (lib/openai.ts:56:13)
+      at MemoryEnhancedHealthAI.generateMemoryAwareInsights (lib/memory-enhanced-health-ai.ts:81:32)
+          at async Promise.all (index 0)
+      at Object.<anonymous> (tests/phase1-integration.test.ts:440:23)
+
+-----------------------------------------|---------|----------|---------|---------|----------------------------------------------------------
+File                                     | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                        
+-----------------------------------------|---------|----------|---------|---------|----------------------------------------------------------
+All files                                |    7.12 |      3.7 |    9.53 |    7.21 |                                                          
+ app                                     |       0 |      100 |       0 |       0 |                                                          
+  layout.tsx                             |       0 |      100 |       0 |       0 | 1-7                                                      
+  page.tsx                               |       0 |      100 |       0 |       0 | 5-196                                                    
+ app/admin/compliance                    |       0 |        0 |       0 |       0 |                                                          
+  page.tsx                               |       0 |        0 |       0 |       0 | 7-442                                                    
+ app/api/analysis/[id]                   |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 2-66                                                     
+ app/api/auth/[...nextauth]              |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 2-75                                                     
+ app/api/auth/signup                     |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 2-105                                                    
+ app/api/chat/memory-enhanced            |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 6-196                                                    
+ app/api/compliance/audit-logs           |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 5-174                                                    
+ app/api/compliance/metrics              |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 5-259                                                    
+ app/api/comprehensive-analysis          |       0 |        0 |       0 |       0 |                                                          
+  route-optimized.ts                     |       0 |        0 |       0 |       0 | 5-180                                                    
+  route.ts                               |       0 |        0 |       0 |       0 | 2-398                                                    
+ app/api/consent                         |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 5-229                                                    
+ app/api/consent/validate                |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 5-78                                                     
+ app/api/health                          |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 5-46                                                     
+ app/api/health/engagement-tracking      |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 5-284                                                    
+ app/api/health/memory-enhanced-analysis |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 5-199                                                    
+ app/api/memory/cleanup                  |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 7-80                                                     
+ app/api/memory/context                  |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 7-69                                                     
+ app/api/memory/history                  |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 7-77                                                     
+ app/api/memory/insights                 |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 7-75                                                     
+ app/api/memory/preferences              |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 7-95                                                     
+ app/api/memory/trends                   |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 7-85                                                     
+ app/api/performance/metrics             |       0 |        0 |       0 |       0 |                                                          
+  route.ts                               |       0 |        0 |       0 |       0 | 5-42                                                     
+ app/dashboard                           |       0 |      100 |       0 |       0 |                                                          
+  page.tsx                               |       0 |      100 |       0 |       0 | 4-329                                                    
+ lib                                     |    5.99 |     3.28 |    7.59 |    5.95 |                                                          
+  abacus.ts                              |       0 |        0 |       0 |       0 | 14-195                                                   
+  audit.ts                               |       0 |        0 |       0 |       0 | 6-368                                                    
+  auth.ts                                |       0 |        0 |       0 |       0 | 6-68                                                     
+  biomarker-analysis.ts                  |       0 |        0 |       0 |       0 | 5-486                                                    
+  cache.ts                               |       0 |        0 |       0 |       0 | 11-205                                                   
+  consent.ts                             |       0 |        0 |       0 |       0 | 28-312                                                   
+  crypto.ts                              |       0 |        0 |       0 |       0 | 7-421                                                    
+  db-optimized.ts                        |       0 |        0 |       0 |       0 | 5-192                                                    
+  db.ts                                  |       0 |        0 |     100 |       0 | 3-13                                                     
+  enhanced-biomarker-analysis.ts         |       0 |        0 |       0 |       0 | 7-284                                                    
+  environment-validator.ts               |       0 |        0 |       0 |       0 | 42-258                                                   
+  input-validation.ts                    |       0 |        0 |       0 |       0 | 13-201                                                   
+  memory-enhanced-health-ai.ts           |   30.18 |    18.91 |   52.17 |   29.59 | 41-71,82-278,292,328-374                                 
+  memory-manager.ts                      |   34.09 |    42.85 |    42.1 |   33.72 | 67-72,96-111,132-155,166-188,200-212,223-247,263,286-364 
+  openai.ts                              |   34.37 |        0 |      25 |   33.33 | 8,53,62-178                                              
+  prisma.ts                              |   72.72 |     62.5 |       0 |   77.77 | 19-20                                                    
+  ray-peat-integration.ts                |       0 |        0 |       0 |       0 | 10-292                                                   
+  rbac.ts                                |       0 |        0 |       0 |       0 | 6-278                                                    
+  session-manager.ts                     |      14 |     4.54 |   14.28 |   14.28 | 41-317                                                   
+  supabase.ts                            |       0 |        0 |       0 |       0 | 5-86                                                     
+  utils.ts                               |       0 |      100 |       0 |       0 | 1-13                                                     
+  zep-client.ts                          |    8.59 |     3.77 |       5 |       8 | 44-312,327-338                                           
+ lib/cache                               |    64.7 |    55.55 |      50 |   63.63 |                                                          
+  memory-cache.ts                        |    64.7 |    55.55 |      50 |   63.63 | 43-45,60,85-86,117-132                                   
+ lib/compliance                          |       0 |        0 |       0 |       0 |                                                          
+  audit.ts                               |       0 |        0 |       0 |       0 | 7-88                                                     
+  hipaa.ts                               |       0 |        0 |       0 |       0 | 7-108                                                    
+  index.ts                               |       0 |      100 |     100 |       0 | 7-8                                                      
+ lib/zep                                 |   19.05 |     9.81 |   19.62 |   19.63 |                                                          
+  analytics.ts                           |    1.14 |        0 |       0 |    1.23 | 13-214                                                   
+  client.ts                              |      50 |       25 |   66.66 |   48.48 | 18-30,36,48-56,70                                        
+  context.ts                             |   42.22 |    28.12 |   28.57 |   43.18 | 51,59-62,71,78-82,93-155                                 
+  index.ts                               |       0 |      100 |     100 |       0 | 8-43                                                     
+  memory.ts                              |   14.85 |     4.22 |   16.66 |   14.85 | 35-80,102-381                                            
+  preferences.ts                         |   42.37 |       25 |   46.15 |    43.1 | 22-39,55-74,114-124,129-159,192-193,199-205              
+  search.ts                              |   66.66 |       20 |      60 |      70 | 25-45                                                    
+  sessions.ts                            |   25.45 |    23.52 |   33.33 |   25.45 | 11,28-43,53-61,74-144                                    
+  summarize.ts                           |    5.33 |        0 |       0 |    5.63 | 19-74,87-143,155-184                                     
+  utils.ts                               |       0 |        0 |       0 |       0 | 10-181                                                   
+-----------------------------------------|---------|----------|---------|---------|----------------------------------------------------------
+Test Suites: 6 failed, 1 passed, 7 total
+Tests:       40 failed, 22 passed, 62 total
+Snapshots:   0 total
+Time:        7.633 s
+Ran all test suites.
