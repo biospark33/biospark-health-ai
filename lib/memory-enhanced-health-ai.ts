@@ -1,5 +1,6 @@
 
 
+
 // Memory-Enhanced Health AI
 // Phase 4 Final Optimization - Enhanced Memory Integration
 // Integrates Zep memory with health analysis for personalized insights
@@ -468,3 +469,48 @@ export class MemoryEnhancedHealthAI {
     }
   }
 }
+
+// Export the main function that was missing - CRITICAL FIX
+export async function memoryEnhancedHealthAI(
+  userId: string,
+  assessmentData: any,
+  standardInsights: any,
+  memoryManager?: MemoryManager,
+  sessionManager?: SessionManager
+): Promise<MemoryAwareInsights> {
+  try {
+    // Create default managers if not provided
+    const defaultMemoryManager = memoryManager || new MemoryManager();
+    const defaultSessionManager = sessionManager || new SessionManager();
+    
+    // Create AI instance
+    const ai = new MemoryEnhancedHealthAI(
+      defaultMemoryManager,
+      defaultSessionManager,
+      process.env.OPENAI_API_KEY
+    );
+
+    // Generate memory-aware insights
+    return await ai.generateMemoryAwareInsights(userId, assessmentData, standardInsights);
+  } catch (error) {
+    console.error('Memory-enhanced health AI failed:', error);
+    
+    // Return fallback response
+    return {
+      standardInsights,
+      personalizedInsights: null,
+      memoryContext: {
+        userId,
+        previousAssessments: [],
+        engagementPatterns: [],
+        preferences: [],
+        healthGoals: [],
+        riskFactors: [],
+        progressTracking: []
+      },
+      recommendations: null,
+      engagementScore: 0
+    };
+  }
+}
+

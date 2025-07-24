@@ -1,4 +1,5 @@
 
+
 /**
  * Zep Memory Integration - Main Export
  * Phase 2A Foundation - Centralized Exports
@@ -7,27 +8,29 @@
 // Client and core functionality
 export { zepClient, testZepConnection, withZepErrorHandling } from './client';
 
-// Session management
+// Session management - FIXED EXPORTS
 export {
   generateSessionId,
   createUserSession,
   getUserSession,
+  getOrCreateUserSession,
   updateSessionMetadata,
   deleteUserSession,
   listUserSessions,
   cleanupExpiredSessions
 } from './sessions';
 
-// Memory operations
+// Memory operations - FIXED EXPORTS
 export {
   storeHealthAnalysis,
-  storeUserPreferences,
+  getHealthAnalysis,
   getHealthContext,
+  storeUserPreferences,
   getUserAnalysisHistory,
   storeConversationContext,
   getComprehensiveHealthInsights,
   getPersonalizedGreeting,
-  getOrCreateUserSession
+  cleanupMemory
 } from './memory';
 
 // Utilities
@@ -55,3 +58,4 @@ export type {
   ZepError,
   ZepOperationResult
 } from './types';
+
