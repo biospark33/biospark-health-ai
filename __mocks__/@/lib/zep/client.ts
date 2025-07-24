@@ -13,7 +13,8 @@ export const mockZepClient = {
         score: 0.95
       }
     ]),
-    add: jest.fn().mockResolvedValue({ success: true })
+    add: jest.fn().mockResolvedValue({ success: true }),
+    getSummary: jest.fn().mockResolvedValue({ content: 'Mock summary' })
   },
   searchMemory: jest.fn().mockResolvedValue([
     {
@@ -37,12 +38,13 @@ export const mockZepClient = {
   deleteSession: jest.fn().mockResolvedValue(true)
 };
 
+// Ensure zepClient is always truthy in tests
 export const zepClient = mockZepClient;
 
-export const withZepErrorHandling = jest.fn((fn) => {
+export const withZepErrorHandling = jest.fn(async (fn, fallback) => {
   try {
-    return fn();
+    return await fn();
   } catch (error) {
-    return { success: false, error };
+    return fallback || { success: false, error };
   }
 });

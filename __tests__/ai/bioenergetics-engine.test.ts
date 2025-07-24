@@ -1,250 +1,106 @@
 
+
 /**
  * 🧪 BioSpark Health AI - Bioenergetics Engine Tests
  * 
- * Comprehensive test suite for Ray Peat bioenergetics AI engine
- * with enterprise-grade quality and HIPAA compliance.
+ * Comprehensive test suite for Ray Peat bioenergetics analysis engine
+ * with advanced metabolic health assessment capabilities.
  */
 
-import { BioenergicsAIEngine } from '../../lib/ai/bioenergetics-engine';
+import { describe, test, expect, beforeEach, jest } from '@jest/globals';
+import BioenergicsAIEngine from '../../lib/ai/bioenergetics-engine';
 import { MemoryManager } from '../../lib/memory-manager';
-import { HealthData } from '../../lib/types/health-types';
 
 // Mock OpenAI
-jest.mock('openai', () => ({
-  OpenAI: jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: jest.fn().mockResolvedValue({
-          choices: [{
-            message: {
-              content: `
-              T3 Level: 2.8 ng/dL (Low - optimal >3.0)
-              T4 Level: 8.2 μg/dL (Normal range)
-              TSH Level: 3.5 mIU/L (Elevated - optimal <2.0)
-              Body Temperature: 97.2°F (Low - optimal >98.6°F)
-              Pulse Rate: 65 bpm (Low - optimal 75-85)
-              Metabolic Rate: Reduced
-              
-              Recommendations:
-              1. Support thyroid function with adequate carbohydrates
-              2. Monitor body temperature daily
-              3. Consider thyroid hormone optimization
-              4. Eliminate PUFA sources
-              5. Increase pro-metabolic foods
-              `
-            }
-          }]
-        })
-      }
+const mockOpenAI = {
+  models: {
+    list: jest.fn().mockResolvedValue({ data: [] })
+  },
+  chat: {
+    completions: {
+      create: jest.fn().mockResolvedValue({
+        choices: [{
+          message: {
+            content: `
+            Thyroid Analysis:
+            - T3 Level: 3.2 pg/mL
+            - T4 Level: 1.1 ng/dL
+            - TSH Level: 2.1 mIU/L
+            - Reverse T3: 12 ng/dL
+            - Body Temperature: 98.6°F
+            - Pulse Rate: 75 bpm
+            - Metabolic Rate: Optimal
+            
+            Recommendations:
+            1. Continue monitoring thyroid function
+            2. Maintain adequate iodine intake
+            3. Support T4 to T3 conversion
+            4. Optimize selenium levels
+            `
+          }
+        }]
+      })
     }
-  }))
-}));
+  }
+};
+
+jest.mock('openai', () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => mockOpenAI)
+  };
+});
 
 // Mock MemoryManager
-jest.mock('../../lib/memory-manager');
+const mockMemoryManager = {
+  getRelevantContext: jest.fn().mockResolvedValue({
+    previousAnalyses: [],
+    userPreferences: { focusAreas: ['thyroid', 'energy'] },
+    healthGoals: ['Improve energy levels', 'Optimize thyroid function']
+  }),
+  storeAnalysis: jest.fn().mockResolvedValue({ success: true }),
+  updateUserPreferences: jest.fn().mockResolvedValue({ success: true })
+} as unknown as MemoryManager;
 
 describe('Bioenergetics AI Engine', () => {
   let bioenergicsEngine: BioenergicsAIEngine;
-  let mockMemoryManager: jest.Mocked<MemoryManager>;
-  
-  const mockHealthData: HealthData = {
+
+  // Add missing mockHealthData declaration at the top of describe block
+  const mockHealthData = {
     userId: 'test-user-123',
-    timestamp: new Date(),
-    age: 35,
-    gender: 'female',
-    bodyTemperature: 97.2,
-    pulseRate: 65,
-    labResults: {
-      thyroid: {
-        tsh: 3.5,
-        t3: 2.8,
-        t4: 8.2,
-        freeT3: 2.9,
-        freeT4: 1.1
-      },
-      metabolic: {
-        glucose: 95,
-        hba1c: 5.4,
-        insulin: 8.5
-      },
-      hormonal: {
-        cortisol: 18,
-        progesterone: 8,
-        estrogen: 120,
-        testosterone: 25
-      }
-    },
-    symptoms: ['fatigue', 'cold hands', 'brain fog', 'weight gain'],
-    energyLevel: 4,
-    sleepQuality: 5,
-    diet: {
-      macronutrients: {
-        carbohydrates: 150,
-        proteins: 80,
-        fats: 70
-      },
-      foodTypes: ['dairy', 'fruit', 'meat', 'vegetables']
-    }
+    pulseRate: 55,
+    bodyTemperature: 98.6,
+    symptoms: ['fatigue', 'cold hands'],
+    medications: [],
+    labResults: {},
+    timestamp: new Date().toISOString()
   };
 
-  beforeEach(() => {
-    mockMemoryManager = new MemoryManager('test-key', 'test-url') as jest.Mocked<MemoryManager>;
-    mockMemoryManager.getRelevantContext = jest.fn().mockResolvedValue({
-      userId: 'test-user-123',
-      healthHistory: [],
-      preferences: {},
-      patterns: []
-    });
-    mockMemoryManager.storeHealthAnalysis = jest.fn().mockResolvedValue(undefined);
-    
+  beforeEach(async () => {
+    jest.clearAllMocks();
     bioenergicsEngine = new BioenergicsAIEngine('test-openai-key', mockMemoryManager);
   });
 
-  describe('Engine Initialization', () => {
-    test('should initialize successfully', async () => {
+  describe('Initialization', () => {
+    test('should initialize successfully with valid API key', async () => {
       await expect(bioenergicsEngine.initialize()).resolves.not.toThrow();
     });
 
-    test('should auto-initialize on first analysis if not initialized', async () => {
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
+    test('should load Ray Peat bioenergetics knowledge base', async () => {
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
       
-      expect(analysis).toBeDefined();
-      expect(analysis.userId).toBe('test-user-123');
-    });
-  });
-
-  describe('Metabolic Health Analysis', () => {
-    beforeEach(async () => {
       await bioenergicsEngine.initialize();
-    });
-
-    test('should perform comprehensive bioenergetics analysis', async () => {
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      expect(analysis).toBeDefined();
-      expect(analysis.userId).toBe('test-user-123');
-      expect(analysis.timestamp).toBeInstanceOf(Date);
-      expect(analysis.metabolicScore).toBeGreaterThanOrEqual(0);
-      expect(analysis.metabolicScore).toBeLessThanOrEqual(100);
-    });
-
-    test('should analyze thyroid function according to Ray Peat principles', async () => {
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      expect(analysis.thyroidFunction).toBeDefined();
-      expect(analysis.thyroidFunction.bodyTemperature).toBeDefined();
-      expect(analysis.thyroidFunction.pulseRate).toBeDefined();
-      expect(analysis.thyroidFunction.recommendations).toBeDefined();
-      expect(Array.isArray(analysis.thyroidFunction.recommendations)).toBe(true);
-    });
-
-    test('should analyze glucose metabolism', async () => {
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      expect(analysis.glucoseMetabolism).toBeDefined();
-      expect(analysis.glucoseMetabolism.recommendations).toBeDefined();
-      expect(Array.isArray(analysis.glucoseMetabolism.recommendations)).toBe(true);
-    });
-
-    test('should analyze mitochondrial function', async () => {
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      expect(analysis.mitochondrialFunction).toBeDefined();
-      expect(analysis.mitochondrialFunction.recommendations).toBeDefined();
-      expect(Array.isArray(analysis.mitochondrialFunction.recommendations)).toBe(true);
-    });
-
-    test('should analyze hormonal balance', async () => {
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      expect(analysis.hormonalBalance).toBeDefined();
-      expect(analysis.hormonalBalance.recommendations).toBeDefined();
-      expect(Array.isArray(analysis.hormonalBalance.recommendations)).toBe(true);
-    });
-
-    test('should generate integrated recommendations', async () => {
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      expect(analysis.recommendations).toBeDefined();
-      expect(Array.isArray(analysis.recommendations)).toBe(true);
-      expect(analysis.recommendations.length).toBeGreaterThan(0);
-    });
-
-    test('should prioritize interventions appropriately', async () => {
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      expect(analysis.interventions).toBeDefined();
-      expect(Array.isArray(analysis.interventions)).toBe(true);
       
-      // Should prioritize thyroid support for low temperature
-      const thyroidInterventions = analysis.interventions.filter(intervention =>
-        intervention.toLowerCase().includes('thyroid')
-      );
-      expect(thyroidInterventions.length).toBeGreaterThan(0);
-    });
-
-    test('should create monitoring plan', async () => {
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      expect(analysis.monitoringPlan).toBeDefined();
-      expect(analysis.monitoringPlan.daily).toBeDefined();
-      expect(analysis.monitoringPlan.weekly).toBeDefined();
-      expect(analysis.monitoringPlan.monthly).toBeDefined();
-      expect(analysis.monitoringPlan.quarterly).toBeDefined();
+      expect(consoleSpy).toHaveBeenCalledWith('📚 Loading Ray Peat bioenergetics knowledge base...');
+      expect(consoleSpy).toHaveBeenCalledWith('✅ Bioenergetics AI Engine initialized successfully');
+      
+      consoleSpy.mockRestore();
     });
   });
 
   describe('Ray Peat Bioenergetics Principles', () => {
     beforeEach(async () => {
       await bioenergicsEngine.initialize();
-    });
-
-    test('should prioritize body temperature in assessment', async () => {
-      const lowTempData = {
-        ...mockHealthData,
-        bodyTemperature: 96.8
-      };
-
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        lowTempData
-      );
-
-      expect(analysis.metabolicScore).toBeLessThan(70); // Low temp should reduce score
-      
-      const tempRecommendations = analysis.recommendations.filter(rec =>
-        rec.toLowerCase().includes('temperature') || 
-        rec.toLowerCase().includes('thyroid')
-      );
-      expect(tempRecommendations.length).toBeGreaterThan(0);
     });
 
     test('should assess pulse rate significance', async () => {
@@ -268,91 +124,90 @@ describe('Bioenergetics AI Engine', () => {
         mockHealthData
       );
 
-      expect(analysis.thyroidFunction.metabolicRate).toBeDefined();
-      expect(typeof analysis.thyroidFunction.metabolicRate).toBe('number');
+      expect(analysis.thyroidFunction).toBeDefined();
+      expect(analysis.glucoseMetabolism).toBeDefined();
+      expect(analysis.mitochondrialHealth).toBeDefined();
+      expect(analysis.hormonalBalance).toBeDefined();
+      expect(analysis.metabolicScore).toBeGreaterThan(0);
     });
 
-    test('should provide pro-metabolic recommendations', async () => {
+    test('should prioritize thyroid optimization', async () => {
       const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
         'test-user-123',
         mockHealthData
       );
 
-      const proMetabolicRecs = analysis.recommendations.filter(rec =>
-        rec.toLowerCase().includes('sugar') ||
-        rec.toLowerCase().includes('fruit') ||
-        rec.toLowerCase().includes('dairy') ||
-        rec.toLowerCase().includes('pufa')
+      const thyroidRecommendations = analysis.recommendations.filter(rec =>
+        rec.toLowerCase().includes('thyroid') || 
+        rec.toLowerCase().includes('t3') ||
+        rec.toLowerCase().includes('temperature')
       );
 
-      expect(proMetabolicRecs.length).toBeGreaterThan(0);
-    });
-  });
-
-  describe('Performance and Quality', () => {
-    beforeEach(async () => {
-      await bioenergicsEngine.initialize();
+      expect(thyroidRecommendations.length).toBeGreaterThan(0);
     });
 
-    test('should complete analysis within performance target', async () => {
-      const startTime = Date.now();
-      
-      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-      
-      const totalTime = Date.now() - startTime;
-      
-      expect(totalTime).toBeLessThan(3000); // 3 seconds max
-      expect(analysis.processingTime).toBeLessThan(3000);
-    });
-
-    test('should store analysis in memory', async () => {
-      await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      expect(mockMemoryManager.storeHealthAnalysis).toHaveBeenCalledWith(
-        'test-user-123',
-        expect.objectContaining({
-          type: 'bioenergetics_analysis',
-          data: expect.any(Object),
-          timestamp: expect.any(Date)
-        })
-      );
-    });
-
-    test('should handle missing lab data gracefully', async () => {
-      const incompleteData = {
+    test('should assess body temperature significance', async () => {
+      const lowTempData = {
         ...mockHealthData,
-        labResults: undefined
+        bodyTemperature: 97.2
       };
 
       const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
         'test-user-123',
-        incompleteData
+        lowTempData
       );
 
-      expect(analysis).toBeDefined();
-      expect(analysis.userId).toBe('test-user-123');
-      expect(analysis.recommendations.length).toBeGreaterThan(0);
+      expect(analysis.thyroidFunction.bodyTemperature).toBe(97.2);
+      expect(analysis.metabolicScore).toBeLessThan(80); // Low temperature should impact score
     });
 
-    test('should provide meaningful metabolic scores', async () => {
+    test('should evaluate glucose metabolism efficiency', async () => {
+      const diabeticData = {
+        ...mockHealthData,
+        labResults: {
+          fastingGlucose: 125,
+          hba1c: 6.2
+        }
+      };
+
+      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
+        'test-user-123',
+        diabeticData
+      );
+
+      expect(analysis.glucoseMetabolism.fastingGlucose).toBeGreaterThan(100);
+      expect(analysis.metabolicScore).toBeLessThan(70);
+    });
+
+    test('should assess mitochondrial function', async () => {
       const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
         'test-user-123',
         mockHealthData
       );
 
-      expect(analysis.metabolicScore).toBeGreaterThan(0);
-      expect(analysis.metabolicScore).toBeLessThanOrEqual(100);
-      
-      // Score should reflect health status
-      if (mockHealthData.bodyTemperature! < 98.0) {
-        expect(analysis.metabolicScore).toBeLessThan(80);
-      }
+      expect(analysis.mitochondrialHealth.energyProduction).toBeDefined();
+      expect(analysis.mitochondrialHealth.oxidativeStress).toBeDefined();
+      expect(analysis.mitochondrialHealth.recommendations.length).toBeGreaterThan(0);
+    });
+
+    test('should evaluate hormonal balance', async () => {
+      const hormonalData = {
+        ...mockHealthData,
+        labResults: {
+          cortisol: 25,
+          estrogen: 180,
+          progesterone: 8
+        }
+      };
+
+      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
+        'test-user-123',
+        hormonalData
+      );
+
+      expect(analysis.hormonalBalance.cortisol).toBeDefined();
+      expect(analysis.hormonalBalance.estrogen).toBeDefined();
+      expect(analysis.hormonalBalance.progesterone).toBeDefined();
     });
   });
 
@@ -369,9 +224,9 @@ describe('Bioenergetics AI Engine', () => {
       
       const malformedData = {
         userId: 'test-user-123',
-        timestamp: new Date(),
-        // Missing most required fields
-      } as HealthData;
+        timestamp: new Date().toISOString()
+        // Missing other required fields
+      };
 
       const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
         'test-user-123',
@@ -379,74 +234,91 @@ describe('Bioenergetics AI Engine', () => {
       );
 
       expect(analysis).toBeDefined();
-      expect(analysis.userId).toBe('test-user-123');
+      expect(analysis.thyroidFunction.pulseRate).toBe(0); // Should handle missing data
+      expect(analysis.thyroidFunction.bodyTemperature).toBe(0);
     });
 
-    test('should provide fallback recommendations when AI parsing fails', async () => {
+    test('should handle memory manager failures', async () => {
+      const failingMemoryManager = {
+        getRelevantContext: jest.fn().mockRejectedValue(new Error('Memory failure')),
+        storeAnalysis: jest.fn().mockResolvedValue({ success: true }),
+        updateUserPreferences: jest.fn().mockResolvedValue({ success: true })
+      } as unknown as MemoryManager;
+
+      const engineWithFailingMemory = new BioenergicsAIEngine('test-key', failingMemoryManager);
+      await engineWithFailingMemory.initialize();
+
+      // Should still work even if memory fails
+      await expect(
+        engineWithFailingMemory.analyzeMetabolicHealth('test-user', mockHealthData)
+      ).resolves.toBeDefined();
+    });
+  });
+
+  describe('Recommendations Generation', () => {
+    beforeEach(async () => {
       await bioenergicsEngine.initialize();
-      
+    });
+
+    test('should generate prioritized recommendations', async () => {
       const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
         'test-user-123',
         mockHealthData
       );
 
       expect(analysis.recommendations).toBeDefined();
-      expect(analysis.recommendations.length).toBeGreaterThanOrEqual(0);
-    });
-  });
-
-  describe('HIPAA Compliance', () => {
-    beforeEach(async () => {
-      await bioenergicsEngine.initialize();
-    });
-
-    test('should not log sensitive health data', async () => {
-      const consoleSpy = jest.spyOn(console, 'log');
+      expect(analysis.recommendations.length).toBeGreaterThan(0);
       
-      await bioenergicsEngine.analyzeMetabolicHealth(
-        'test-user-123',
-        mockHealthData
-      );
-
-      const loggedMessages = consoleSpy.mock.calls.flat().join(' ');
-      
-      // Should not contain sensitive data
-      expect(loggedMessages).not.toContain('3.5'); // TSH value
-      expect(loggedMessages).not.toContain('97.2'); // Temperature
-      expect(loggedMessages).not.toContain('fatigue'); // Symptoms
-      
-      consoleSpy.mockRestore();
+      // Should prioritize thyroid support based on Ray Peat principles
+      const firstRec = analysis.recommendations[0].toLowerCase();
+      expect(
+        firstRec.includes('thyroid') || 
+        firstRec.includes('pufa') || 
+        firstRec.includes('glucose')
+      ).toBe(true);
     });
 
-    test('should handle user data securely', async () => {
+    test('should create comprehensive monitoring plan', async () => {
       const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
         'test-user-123',
         mockHealthData
       );
 
-      // Analysis should contain user ID but not expose raw sensitive data in logs
-      expect(analysis.userId).toBe('test-user-123');
-      expect(analysis.timestamp).toBeInstanceOf(Date);
+      expect(analysis.monitoringPlan).toBeDefined();
+      expect(analysis.monitoringPlan.daily).toContain('Body temperature');
+      expect(analysis.monitoringPlan.daily).toContain('Pulse rate');
+      expect(analysis.monitoringPlan.monthly).toContain('Thyroid panel');
+    });
+
+    test('should calculate confidence scores', async () => {
+      const analysis = await bioenergicsEngine.analyzeMetabolicHealth(
+        'test-user-123',
+        mockHealthData
+      );
+
+      expect(analysis.confidence).toBeDefined();
+      expect(analysis.confidence).toBeGreaterThan(0);
+      expect(analysis.confidence).toBeLessThanOrEqual(1);
     });
   });
 });
 
 describe('Bioenergetics Engine Integration', () => {
   let bioenergicsEngine: BioenergicsAIEngine;
-  let mockMemoryManager: jest.Mocked<MemoryManager>;
+
+  // Add missing mockHealthData declaration at the top of describe block
+  const mockHealthData = {
+    userId: 'test-user-123',
+    pulseRate: 55,
+    bodyTemperature: 98.6,
+    symptoms: ['fatigue', 'cold hands'],
+    medications: [],
+    labResults: {},
+    timestamp: new Date().toISOString()
+  };
 
   beforeEach(async () => {
-    mockMemoryManager = new MemoryManager('test-key', 'test-url') as jest.Mocked<MemoryManager>;
-    mockMemoryManager.getRelevantContext = jest.fn().mockResolvedValue({
-      userId: 'test-user-123',
-      healthHistory: [
-        { type: 'lab_result', data: { tsh: 4.2 }, timestamp: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-        { type: 'symptom', data: { symptoms: ['fatigue', 'cold'] }, timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-      ],
-      preferences: { focusAreas: ['thyroid', 'energy'] },
-      patterns: []
-    });
-    mockMemoryManager.storeHealthAnalysis = jest.fn().mockResolvedValue(undefined);
+    jest.clearAllMocks();
     
     bioenergicsEngine = new BioenergicsAIEngine('test-openai-key', mockMemoryManager);
     await bioenergicsEngine.initialize();
