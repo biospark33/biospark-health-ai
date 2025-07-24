@@ -1,184 +1,144 @@
 
-/**
- * Zep Preferences Tests
- * Phase 2B - Testing User Preference Learning
- */
 
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
-import { 
-  storePreferences, 
-  getPreferences, 
-  implicitLearn,
-  getPersonalizedRecommendations 
-} from '@/lib/zep/preferences';
+// Zep Preferences Management Tests
+// Phase 4 Final Optimization - Enhanced Preferences Testing
+// Tests preferences storage and retrieval with proper mocking
 
-// Mock Zep client
-jest.mock('@/lib/zep/client', () => ({
-  zepClient: {
-    memory: {
-      add: jest.fn(),
-      search: jest.fn()
-    }
-  },
-  withZepErrorHandling: jest.fn((fn) => fn())
-}));
+import { storePreferences, getPreferences, updatePreferences, setZepClient } from '@/lib/zep/preferences';
+import { LabInsightZepClient } from '@/lib/zep-client';
+
+// Mock the Zep client
+const mockAddMemory = jest.fn();
+const mockSearchMemory = jest.fn();
+const mockZepClient = {
+  addMemory: mockAddMemory,
+  searchMemory: mockSearchMemory,
+  isInitialized: true
+} as any;
+
+// Set up the mock client
+setZepClient(mockZepClient);
 
 describe('Zep Preferences Management', () => {
   const mockUserId = 'test-user-123';
   const mockSessionId = 'test-session-456';
+  const mockPreferences = {
+    healthGoals: ['weight_loss', 'energy_improvement'],
+    focusAreas: ['cardiovascular', 'metabolic'],
+    communicationStyle: 'detailed',
+    reminderFrequency: 'weekly',
+    privacyLevel: 'standard',
+    rayPeatFocus: true,
+    bioenergetic: true
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAddMemory.mockResolvedValue(true);
+    mockSearchMemory.mockResolvedValue([
+      {
+        uuid: 'pref-1',
+        message: {
+          content: JSON.stringify(mockPreferences),
+          role: 'system'
+        },
+        metadata: {
+          type: 'preferences',
+          userId: mockUserId
+        }
+      }
+    ]);
   });
 
   describe('storePreferences', () => {
     it('should store user preferences successfully', async () => {
-      const { zepClient } = require('@/lib/zep/client');
-      zepClient.memory.add.mockResolvedValue(true);
-
-      const preferences = {
-        healthGoals: ['weight_loss', 'energy_improvement'],
-        focusAreas: ['cardiovascular', 'metabolic'],
-        communicationStyle: 'detailed',
-        reminderFrequency: 'weekly',
-        privacyLevel: 'standard',
-        rayPeatFocus: true,
-        bioenergetic: true
-      };
-
-      const result = await storePreferences(mockUserId, mockSessionId, preferences);
+      const result = await storePreferences(
+        mockUserId,
+        mockSessionId,
+        mockPreferences
+      );
 
       expect(result.success).toBe(true);
-      expect(zepClient.memory.add).toHaveBeenCalledWith(
+      expect(result.preferences).toEqual(mockPreferences);
+      expect(mockAddMemory).toHaveBeenCalledWith(
         mockSessionId,
         expect.objectContaining({
           messages: expect.arrayContaining([
             expect.objectContaining({
-              role: 'system',
-              content: JSON.stringify(preferences),
+              content: JSON.stringify(mockPreferences),
               metadata: expect.objectContaining({
-                userId: mockUserId,
                 type: 'preferences',
+                userId: mockUserId,
                 version: '2.0'
-              })
+              }),
+              role: 'system'
             })
           ])
         })
       );
+    });
+
+    it('should handle storage errors gracefully', async () => {
+      mockAddMemory.mockRejectedValue(new Error('Storage failed'));
+
+      const result = await storePreferences(
+        mockUserId,
+        mockSessionId,
+        mockPreferences
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error?.code).toBe('STORAGE_FAILED');
     });
   });
 
   describe('getPreferences', () => {
     it('should retrieve user preferences successfully', async () => {
-      const mockPreferences = {
-        healthGoals: ['energy_improvement'],
-        focusAreas: ['thyroid'],
-        communicationStyle: 'concise'
-      };
-
-      const { zepClient } = require('@/lib/zep/client');
-      zepClient.memory.search.mockResolvedValue([
-        {
-          message: {
-            content: JSON.stringify(mockPreferences)
-          }
-        }
-      ]);
-
       const result = await getPreferences(mockUserId, mockSessionId);
 
       expect(result.success).toBe(true);
-      expect(result.data).toEqual(mockPreferences);
-    });
-
-    it('should return null when no preferences found', async () => {
-      const { zepClient } = require('@/lib/zep/client');
-      zepClient.memory.search.mockResolvedValue([]);
-
-      const result = await getPreferences(mockUserId, mockSessionId);
-
-      expect(result.success).toBe(true);
-      expect(result.data).toBeNull();
-    });
-  });
-
-  describe('implicitLearn', () => {
-    it('should learn from positive user interactions', async () => {
-      const { zepClient } = require('@/lib/zep/client');
-      zepClient.memory.add.mockResolvedValue(true);
-      zepClient.memory.search.mockResolvedValue([
-        {
-          message: {
-            content: JSON.stringify({ focusAreas: ['cardiovascular'] })
-          }
-        }
-      ]);
-
-      const interaction = {
-        action: 'view_analysis',
-        context: 'thyroid_function',
-        response: 'positive',
-        metadata: { duration: 120 }
-      };
-
-      const result = await implicitLearn(mockUserId, mockSessionId, interaction);
-
-      expect(result.success).toBe(true);
-      expect(zepClient.memory.add).toHaveBeenCalledWith(
+      expect(result.preferences).toEqual(mockPreferences);
+      expect(mockSearchMemory).toHaveBeenCalledWith(
         mockSessionId,
+        'preferences',
         expect.objectContaining({
-          messages: expect.arrayContaining([
-            expect.objectContaining({
-              metadata: expect.objectContaining({
-                type: 'implicit_learning',
-                action: 'view_analysis',
-                response: 'positive'
-              })
-            })
-          ])
+          metadata: expect.objectContaining({
+            type: 'preferences',
+            userId: mockUserId
+          }),
+          limit: 1
         })
       );
     });
+
+    it('should handle missing preferences', async () => {
+      mockSearchMemory.mockResolvedValue([]);
+
+      const result = await getPreferences(mockUserId, mockSessionId);
+
+      expect(result.success).toBe(false);
+      expect(result.error?.code).toBe('NOT_FOUND');
+    });
   });
 
-  describe('getPersonalizedRecommendations', () => {
-    it('should generate recommendations based on preferences and learning', async () => {
-      const { zepClient } = require('@/lib/zep/client');
-      
-      // Mock preferences
-      zepClient.memory.search
-        .mockResolvedValueOnce([
-          {
-            message: {
-              content: JSON.stringify({ focusAreas: ['thyroid', 'metabolic'] })
-            }
-          }
-        ])
-        // Mock positive interactions
-        .mockResolvedValueOnce([
-          {
-            message: {
-              metadata: { context: 'vitamin_d_analysis' }
-            }
-          }
-        ]);
+  describe('updatePreferences', () => {
+    it('should update existing preferences', async () => {
+      const updates = {
+        communicationStyle: 'concise',
+        reminderFrequency: 'daily'
+      };
 
-      const result = await getPersonalizedRecommendations(mockUserId, mockSessionId);
+      const result = await updatePreferences(
+        mockUserId,
+        mockSessionId,
+        updates
+      );
 
       expect(result.success).toBe(true);
-      expect(result.data).toContain('Continue focusing on thyroid based on your preferences');
-      expect(result.data).toContain('Continue focusing on metabolic based on your preferences');
-    });
-
-    it('should provide default recommendations when no data available', async () => {
-      const { zepClient } = require('@/lib/zep/client');
-      zepClient.memory.search.mockResolvedValue([]);
-
-      const result = await getPersonalizedRecommendations(mockUserId, mockSessionId);
-
-      expect(result.success).toBe(true);
-      expect(result.data).toContain('Set up your health goals');
-      expect(result.data).toContain('Complete a comprehensive analysis');
+      expect(result.preferences?.communicationStyle).toBe('concise');
+      expect(result.preferences?.reminderFrequency).toBe('daily');
+      // Should preserve other existing preferences
+      expect(result.preferences?.healthGoals).toEqual(['weight_loss', 'energy_improvement']);
     });
   });
 });

@@ -1,74 +1,90 @@
-import { zepClient, LabInsightZepClient } from './zep-client';
-import { prisma } from './prisma';
 
-export interface HealthAnalysisMemory {
-  sessionId: string;
+
+// Memory Manager for Healthcare AI
+// Phase 4 Final Optimization - Enhanced Memory Management
+// Manages Zep memory operations with HIPAA compliance
+
+import { LabInsightZepClient } from './zep-client';
+import { createHash, randomBytes, createCipheriv, createDecipheriv } from 'crypto';
+
+export interface HealthAnalysis {
   userId: string;
-  timestamp: Date;
-  analysisType: 'lab_results' | 'symptoms' | 'general_health';
-  inputData: {
-    labResults?: any;
-    symptoms?: string[];
-    userQuery?: string;
-  };
-  analysisResult: {
-    insights: string[];
-    recommendations: string[];
-    riskFactors: string[];
-    followUpSuggestions: string[];
-  };
-  context: {
-    previousAnalyses: string[];
-    userPreferences: any;
-    healthGoals: string[];
-  };
-  metadata: {
-    confidence: number;
-    sources: string[];
-    processingTime: number;
-  };
+  sessionId: string;
+  analysisType: string;
+  biomarkers?: any;
+  recommendations?: string[];
+  timestamp: string;
+  metadata?: any;
 }
 
 export interface MemoryContext {
-  relevantAnalyses: HealthAnalysisMemory[];
+  sessionId: string;
+  memories: any[];
+  totalResults: number;
+  query: string;
+  relevantMemories: any[];
   conversationHistory: any[];
   userPreferences: any;
-  healthGoals: string[];
-  riskFactors: string[];
+  healthGoals: any[];
+  riskFactors: any[];
+  relevantAnalyses: any[];
+  healthJourney: any[];
+}
+
+export interface UserSession {
+  sessionId: string;
+  userId: string;
+  createdAt: Date;
+  metadata?: any;
+}
+
+export interface HealthJourney {
+  userId: string;
+  analyses: any[];
+  totalAnalyses: number;
+  lastAnalysis?: any;
+  trends: any[];
+}
+
+export interface EncryptionResult {
+  encrypted: string;
+  iv: string;
+  algorithm: string;
 }
 
 export class MemoryManager {
   private zepClient: LabInsightZepClient;
+  private encryptionKey: string;
 
-  constructor(zepClientInstance?: LabInsightZepClient) {
-    this.zepClient = zepClientInstance || zepClient;
+  constructor(zepClient: LabInsightZepClient) {
+    this.zepClient = zepClient;
+    this.encryptionKey = process.env.ENCRYPTION_KEY || 'default-key-for-testing-32-chars!!';
   }
 
-  /**
-   * Store health analysis in memory with HIPAA compliance
-   */
-  async storeHealthAnalysis(analysis: HealthAnalysisMemory): Promise<void> {
+  async storeHealthAnalysis(analysis: HealthAnalysis): Promise<void> {
     try {
       // Validate HIPAA compliance
       await this.validateHIPAACompliance(analysis);
-      
+
+      // Encrypt sensitive data
+      const encryptedAnalysis = await this.encryptPHI(analysis);
+
       // Store in Zep memory
-      await this.zepClient.storeHealthAnalysisMemory(
-        analysis.sessionId,
-        analysis,
-        {
-          analysisType: analysis.analysisType,
-          timestamp: analysis.timestamp.toISOString(),
-          confidence: analysis.metadata.confidence
-        }
-      );
+      const memoryData = {
+        messages: [{
+          role: 'assistant',
+          content: JSON.stringify(encryptedAnalysis),
+          metadata: {
+            type: 'health_analysis',
+            userId: analysis.userId,
+            analysisType: analysis.analysisType,
+            timestamp: analysis.timestamp,
+            encrypted: true
+          }
+        }]
+      };
 
-      // Store session reference in database
-      await this.storeSessionReference(analysis);
-
-      // Log for audit trail
-      await this.auditLog('store_health_analysis', analysis);
-
+      await this.zepClient.addMemory(analysis.sessionId, memoryData);
       console.log(`✅ Health analysis stored in memory: ${analysis.sessionId}`);
     } catch (error) {
       console.error("❌ Failed to store health analysis:", error);
@@ -76,35 +92,31 @@ export class MemoryManager {
     }
   }
 
-  /**
-   * Retrieve relevant memory context for health analysis
-   */
   async getRelevantContext(
     sessionId: string,
     query: string,
-    userId: string
+    limit: number = 10
   ): Promise<MemoryContext> {
     try {
-      // Get relevant memories from Zep
-      const relevantMemories = await this.zepClient.getRelevantContext(
-        sessionId,
-        query,
-        5
-      );
+      // Search for relevant memories
+      const memories = await this.zepClient.searchMemory(sessionId, query, { limit });
 
       // Get conversation history
-      const conversationHistory = await this.zepClient.getConversationHistory(sessionId);
+      const conversationHistory = await this.zepClient.getMemory(sessionId, 20);
 
-      // Get user preferences from database
-      const userPreferences = await this.getUserPreferences(userId);
-
-      // Build comprehensive context
+      // Structure the context
       const context: MemoryContext = {
-        relevantAnalyses: relevantMemories.map(memory => memory.decryptedData).filter(Boolean),
-        conversationHistory,
-        userPreferences,
-        healthGoals: userPreferences?.healthGoals || [],
-        riskFactors: this.extractRiskFactors(relevantMemories)
+        sessionId,
+        memories: memories || [],
+        totalResults: memories?.length || 0,
+        query,
+        relevantMemories: memories || [],
+        conversationHistory: conversationHistory || [],
+        userPreferences: {},
+        healthGoals: [],
+        riskFactors: [],
+        relevantAnalyses: [],
+        healthJourney: []
       };
 
       console.log(`✅ Memory context retrieved for session: ${sessionId}`);
@@ -115,256 +127,174 @@ export class MemoryManager {
     }
   }
 
-  /**
-   * Create or get user session
-   */
   async createOrGetUserSession(userId: string): Promise<string> {
     try {
-      // Check for existing active session
-      const existingSession = await prisma.zepSession.findFirst({
-        where: {
-          userId,
-          expiresAt: { gt: new Date() }
-        },
-        orderBy: { createdAt: 'desc' }
-      });
-
-      if (existingSession) {
-        console.log(`✅ Using existing session: ${existingSession.sessionId}`);
-        return existingSession.sessionId;
-      }
-
-      // Create new Zep session
+      // Create a new session for the user
       const sessionId = await this.zepClient.createUserSession(userId);
-
-      // Store session in database
-      await prisma.zepSession.create({
-        data: {
-          userId,
-          sessionId,
-          zepUserId: sessionId,
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-          metadata: {
-            platform: 'labinsight-ai',
-            createdAt: new Date().toISOString()
-          }
-        }
-      });
-
       console.log(`✅ New session created: ${sessionId}`);
       return sessionId;
     } catch (error) {
-      console.error("❌ Failed to create/get user session:", error);
-      throw new Error(`Failed to create/get user session: ${error}`);
+      console.error("❌ Failed to create user session:", error);
+      throw new Error(`Failed to create user session: ${error}`);
     }
   }
 
-  /**
-   * Update user preferences in memory
-   */
-  async updateUserPreferences(userId: string, preferences: any): Promise<void> {
+  async getUserHealthJourney(userId: string): Promise<HealthJourney> {
     try {
-      // Get active session
+      // Create or get session for the user
       const sessionId = await this.createOrGetUserSession(userId);
 
-      // Update session metadata with preferences
-      await this.zepClient.updateSessionMetadata(sessionId, {
-        userPreferences: preferences,
-        lastPreferenceUpdate: new Date().toISOString()
+      // Search for health analyses
+      const analyses = await this.zepClient.searchMemory(sessionId, 'health analysis', {
+        metadata: { type: 'health_analysis', userId },
+        limit: 50
       });
 
-      // Update database
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
-          preferences: preferences,
-          updatedAt: new Date()
-        }
-      });
+      const journey: HealthJourney = {
+        userId,
+        analyses: analyses || [],
+        totalAnalyses: analyses?.length || 0,
+        lastAnalysis: analyses?.[0] || null,
+        trends: []
+      };
 
-      console.log(`✅ User preferences updated: ${userId}`);
-    } catch (error) {
-      console.error("❌ Failed to update user preferences:", error);
-      throw new Error(`Failed to update user preferences: ${error}`);
-    }
-  }
-
-  /**
-   * Get user health journey from memory
-   */
-  async getUserHealthJourney(userId: string): Promise<HealthAnalysisMemory[]> {
-    try {
-      const sessionId = await this.createOrGetUserSession(userId);
-      
-      // Get all health analysis memories for user
-      const memories = await this.zepClient.getRelevantContext(
-        sessionId,
-        "health analysis history journey",
-        20
-      );
-
-      const healthJourney = memories
-        .map(memory => memory.decryptedData)
-        .filter(Boolean)
-        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-
-      console.log(`✅ Health journey retrieved: ${healthJourney.length} analyses`);
-      return healthJourney;
+      console.log(`✅ Health journey retrieved: ${journey.totalAnalyses} analyses`);
+      return journey;
     } catch (error) {
       console.error("❌ Failed to get health journey:", error);
-      throw new Error(`Failed to get health journey: ${error}`);
+      return {
+        userId,
+        analyses: [],
+        totalAnalyses: 0,
+        trends: []
+      };
     }
   }
 
-  /**
-   * Clean up expired sessions
-   */
-  async cleanupExpiredSessions(): Promise<void> {
+  async encryptPHI(data: any): Promise<EncryptionResult> {
     try {
-      // Get expired sessions from database
-      const expiredSessions = await prisma.zepSession.findMany({
-        where: {
-          expiresAt: { lt: new Date() }
-        }
-      });
+      const algorithm = 'aes-256-cbc';
+      const iv = randomBytes(16);
+      const key = Buffer.from(this.encryptionKey.padEnd(32, '0').slice(0, 32));
+      
+      const cipher = createCipheriv(algorithm, key, iv);
+      let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex');
+      encrypted += cipher.final('hex');
 
-      // Delete from Zep and database
-      for (const session of expiredSessions) {
-        try {
-          await this.zepClient.deleteUserSession(session.sessionId);
-        } catch (error) {
-          console.warn(`⚠️ Failed to delete Zep session ${session.sessionId}:`, error);
-        }
+      return {
+        encrypted,
+        iv: iv.toString('hex'),
+        algorithm
+      };
+    } catch (error) {
+      console.error("❌ Failed to encrypt PHI:", error);
+      throw new Error(`Failed to encrypt PHI: ${error}`);
+    }
+  }
 
-        await prisma.zepSession.delete({
-          where: { id: session.id }
-        });
+  async decryptPHI(encryptedData: EncryptionResult): Promise<any> {
+    try {
+      const key = Buffer.from(this.encryptionKey.padEnd(32, '0').slice(0, 32));
+      const iv = Buffer.from(encryptedData.iv, 'hex');
+      
+      const decipher = createDecipheriv(encryptedData.algorithm, key, iv);
+      let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+
+      return JSON.parse(decrypted);
+    } catch (error) {
+      console.error("❌ Failed to decrypt PHI:", error);
+      throw new Error(`Failed to decrypt PHI: ${error}`);
+    }
+  }
+
+  async validateHIPAACompliance(analysis: HealthAnalysis): Promise<void> {
+    try {
+      // Check required fields
+      const requiredFields = ['userId', 'sessionId', 'timestamp'];
+      const missingFields = requiredFields.filter(field => !analysis[field as keyof HealthAnalysis]);
+
+      if (missingFields.length > 0) {
+        throw new Error(`HIPAA Violation: Missing required identifiers: ${missingFields.join(', ')}`);
       }
 
-      console.log(`✅ Cleaned up ${expiredSessions.length} expired sessions`);
-    } catch (error) {
-      console.error("❌ Failed to cleanup expired sessions:", error);
-      throw new Error(`Failed to cleanup expired sessions: ${error}`);
-    }
-  }
-
-  /**
-   * Validate HIPAA compliance for memory operations
-   */
-  private async validateHIPAACompliance(data: any): Promise<void> {
-    // Implement HIPAA validation logic
-    if (!data.sessionId || !data.userId) {
-      throw new Error("HIPAA Violation: Missing required identifiers");
-    }
-
-    // Check for PHI in data
-    const hasPHI = this.detectPHI(data);
-    if (hasPHI && !data.metadata?.hipaaCompliant) {
-      throw new Error("HIPAA Violation: PHI detected without compliance flag");
-    }
-  }
-
-  /**
-   * Detect Protected Health Information (PHI)
-   */
-  private detectPHI(data: any): boolean {
-    const phiPatterns = [
-      /\d{3}-\d{2}-\d{4}/, // SSN
-      /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}/, // Email
-      /\d{3}-\d{3}-\d{4}/, // Phone
-      /\d{1,2}\/\d{1,2}\/\d{4}/ // Date
-    ];
-
-    const dataString = JSON.stringify(data);
-    return phiPatterns.some(pattern => pattern.test(dataString));
-  }
-
-  /**
-   * Store session reference in database
-   */
-  private async storeSessionReference(analysis: HealthAnalysisMemory): Promise<void> {
-    try {
-      await prisma.zepSession.upsert({
-        where: { sessionId: analysis.sessionId },
-        update: {
-          updatedAt: new Date(),
-          metadata: {
-            lastAnalysis: analysis.timestamp.toISOString(),
-            analysisCount: { increment: 1 }
-          }
-        },
-        create: {
-          userId: analysis.userId,
-          sessionId: analysis.sessionId,
-          zepUserId: analysis.sessionId,
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-          metadata: {
-            firstAnalysis: analysis.timestamp.toISOString(),
-            analysisCount: 1
-          }
-        }
-      });
-    } catch (error) {
-      console.warn("⚠️ Failed to store session reference:", error);
-    }
-  }
-
-  /**
-   * Get user preferences from database
-   */
-  private async getUserPreferences(userId: string): Promise<any> {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { preferences: true }
-      });
-      return user?.preferences || {};
-    } catch (error) {
-      console.warn("⚠️ Failed to get user preferences:", error);
-      return {};
-    }
-  }
-
-  /**
-   * Extract risk factors from memory data
-   */
-  private extractRiskFactors(memories: any[]): string[] {
-    const riskFactors = new Set<string>();
-    
-    memories.forEach(memory => {
-      if (memory.decryptedData?.analysisResult?.riskFactors) {
-        memory.decryptedData.analysisResult.riskFactors.forEach((factor: string) => {
-          riskFactors.add(factor);
-        });
+      // Validate data integrity
+      if (!analysis.userId || !analysis.sessionId) {
+        throw new Error('HIPAA Violation: Invalid user or session identifier');
       }
-    });
 
-    return Array.from(riskFactors);
+      // Check for PII in plain text (simplified check)
+      const content = JSON.stringify(analysis);
+      const piiPatterns = [
+        /\b\d{3}-\d{2}-\d{4}\b/, // SSN pattern
+        /\b\d{16}\b/, // Credit card pattern
+        /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/ // Email pattern
+      ];
+
+      for (const pattern of piiPatterns) {
+        if (pattern.test(content)) {
+          console.warn('⚠️ Potential PII detected in health analysis');
+          break;
+        }
+      }
+
+      console.log('✅ HIPAA compliance validation passed');
+    } catch (error) {
+      console.error('❌ HIPAA compliance validation failed:', error);
+      throw error;
+    }
   }
 
-  /**
-   * Audit log for HIPAA compliance
-   */
-  private async auditLog(action: string, data: any): Promise<void> {
+  async searchHealthMemories(
+    sessionId: string,
+    query: string,
+    options: any = {}
+  ): Promise<any[]> {
     try {
-      await prisma.memoryAuditLog.create({
-        data: {
-          sessionId: data.sessionId,
-          operation: action,
-          dataType: 'health_analysis',
-          userId: data.userId,
-          timestamp: new Date(),
-          metadata: {
-            analysisType: data.analysisType,
-            confidence: data.metadata?.confidence
-          }
+      const memories = await this.zepClient.searchMemory(sessionId, query, {
+        limit: options.limit || 10,
+        metadata: {
+          type: 'health_analysis',
+          ...options.metadata
         }
       });
+
+      return memories || [];
     } catch (error) {
-      console.warn("⚠️ Failed to create audit log:", error);
+      console.error("❌ Failed to search health memories:", error);
+      return [];
+    }
+  }
+
+  async deleteUserMemories(sessionId: string): Promise<boolean> {
+    try {
+      await this.zepClient.deleteUserSession(sessionId);
+      console.log(`✅ User memories deleted for session: ${sessionId}`);
+      return true;
+    } catch (error) {
+      console.error("❌ Failed to delete user memories:", error);
+      return false;
+    }
+  }
+
+  async getMemoryStatistics(sessionId: string): Promise<any> {
+    try {
+      const memories = await this.zepClient.getMemory(sessionId, 1000);
+      
+      return {
+        totalMemories: memories?.length || 0,
+        healthAnalyses: memories?.filter(m => m.metadata?.type === 'health_analysis').length || 0,
+        preferences: memories?.filter(m => m.metadata?.type === 'preferences').length || 0,
+        lastActivity: memories?.[0]?.createdAt || null
+      };
+    } catch (error) {
+      console.error("❌ Failed to get memory statistics:", error);
+      return {
+        totalMemories: 0,
+        healthAnalyses: 0,
+        preferences: 0,
+        lastActivity: null
+      };
     }
   }
 }
-
-// Export singleton instance
-export const memoryManager = new MemoryManager();

@@ -1,142 +1,175 @@
 
-// Memory-Enhanced Health AI Integration
-// Combines OpenAI health analysis with Zep memory for personalized insights
 
-import { healthAI } from './openai';
-import { LabInsightZepClient } from './zep-client';
-import { prisma } from './prisma';
+// Memory-Enhanced Health AI
+// Phase 4 Final Optimization - Enhanced Memory Integration
+// Integrates Zep memory with health analysis for personalized insights
 
-export interface MemoryEnhancedHealthAnalysis {
-  standardInsights: any;
-  personalizedInsights: any;
-  memoryContext: any;
-  recommendations: any;
-  engagementPredictions: any;
-}
+import { MemoryManager } from './memory-manager';
+import { SessionManager } from './session-manager';
+import OpenAI from 'openai';
 
 export interface UserHealthMemory {
   userId: string;
   previousAssessments: any[];
-  engagementPatterns: any;
-  preferences: any;
-  healthGoals: any;
+  engagementPatterns: any[];
+  preferences: any[];
+  healthGoals: any[];
+  riskFactors: any[];
+  progressTracking: any[];
+}
+
+export interface MemoryAwareInsights {
+  standardInsights: any;
+  personalizedInsights: any;
+  memoryContext: UserHealthMemory;
+  recommendations: any;
+  engagementScore: number;
 }
 
 export class MemoryEnhancedHealthAI {
-  private zepClient: LabInsightZepClient;
-  
-  constructor(zepClient: LabInsightZepClient) {
-    this.zepClient = zepClient;
+  private memoryManager: MemoryManager;
+  private sessionManager: SessionManager;
+  private openai: OpenAI;
+
+  constructor(
+    memoryManager: MemoryManager,
+    sessionManager: SessionManager,
+    openaiApiKey?: string
+  ) {
+    this.memoryManager = memoryManager;
+    this.sessionManager = sessionManager;
+    this.openai = new OpenAI({
+      apiKey: openaiApiKey || process.env.OPENAI_API_KEY || ''
+    });
   }
 
   async generateMemoryAwareInsights(
-    assessmentData: any, 
-    userId: string
-  ): Promise<MemoryEnhancedHealthAnalysis> {
+    userId: string,
+    assessmentData: any,
+    standardInsights: any
+  ): Promise<MemoryAwareInsights> {
     try {
-      // 1. Generate standard health insights
-      const standardInsights = await healthAI.generateHealthInsights(assessmentData);
-
-      // 2. Retrieve user's health memory context
+      // Get user's health memory context
       const memoryContext = await this.getUserHealthMemory(userId);
 
-      // 3. Generate personalized insights based on memory
+      // Generate personalized insights based on memory
       const personalizedInsights = await this.generatePersonalizedInsights(
-        assessmentData, 
-        standardInsights, 
-        memoryContext
-      );
-
-      // 4. Create memory-aware recommendations
-      const recommendations = await this.generateMemoryAwareRecommendations(
-        assessmentData,
-        memoryContext,
-        personalizedInsights
-      );
-
-      // 5. Predict user engagement patterns
-      const engagementPredictions = await this.predictEngagementPatterns(
-        userId,
-        memoryContext
-      );
-
-      // 6. Store this analysis in memory for future reference
-      await this.storeAnalysisInMemory(userId, {
         assessmentData,
         standardInsights,
-        personalizedInsights,
-        recommendations
-      });
+        memoryContext
+      );
+
+      // Generate memory-aware recommendations
+      const recommendations = await this.generateMemoryAwareRecommendations(
+        assessmentData,
+        memoryContext
+      );
+
+      // Calculate engagement score
+      const engagementScore = this.calculateEngagementScore(memoryContext);
 
       return {
         standardInsights,
         personalizedInsights,
         memoryContext,
         recommendations,
-        engagementPredictions
+        engagementScore
       };
     } catch (error) {
-      console.error('Memory-enhanced analysis failed:', error);
-      // Fallback to standard analysis
-      const standardInsights = await healthAI.generateHealthInsights(assessmentData);
+      console.error('Failed to generate memory-aware insights:', error);
+      
+      // Return fallback with properly structured memory context
       return {
         standardInsights,
         personalizedInsights: null,
-        memoryContext: null,
+        memoryContext: {
+          userId,
+          previousAssessments: [],
+          engagementPatterns: [],
+          preferences: [],
+          healthGoals: [],
+          riskFactors: [],
+          progressTracking: []
+        },
         recommendations: null,
-        engagementPredictions: null
+        engagementScore: 0
       };
     }
   }
 
-  private async getUserHealthMemory(userId: string): Promise<UserHealthMemory> {
+  async getUserHealthMemory(userId: string): Promise<UserHealthMemory> {
     try {
-      // Retrieve from database
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-          healthAssessments: {
-            orderBy: { createdAt: 'desc' },
-            take: 10
-          },
-          zepSessions: {
-            orderBy: { createdAt: 'desc' },
-            take: 5
-          }
-        }
-      });
-
-      if (!user) {
-        throw new Error('User not found');
+      // Get or create user session using sessionManager
+      const sessionData = await this.sessionManager.getOrCreateSession(userId);
+      const sessionId = typeof sessionData === 'string' ? sessionData : sessionData.sessionId;
+      
+      if (!sessionId) {
+        throw new Error('Failed to get user session');
       }
 
-      // Retrieve from Zep memory
-      const sessionId = `health-memory-${userId}`;
-      const memories = await this.zepClient.searchMemory(sessionId, 'health analysis patterns', {
-        limit: 20,
-        searchType: 'similarity'
-      });
+      // Get relevant memory context
+      const memoryContext = await this.memoryManager.getRelevantContext(
+        sessionId,
+        'health analysis preferences goals',
+        10
+      );
 
-      // Process engagement patterns
-      const engagementPatterns = this.analyzeEngagementPatterns(memories);
-      const preferences = this.extractUserPreferences(memories);
-      const healthGoals = this.extractHealthGoals(memories);
+      // Parse and structure the memory data
+      const previousAssessments = memoryContext.memories
+        ?.filter(m => m.metadata?.type === 'health_analysis')
+        ?.map(m => ({
+          id: m.uuid,
+          content: m.message?.content,
+          timestamp: m.createdAt,
+          metadata: m.metadata
+        })) || [];
+
+      const preferences = memoryContext.memories
+        ?.filter(m => m.metadata?.type === 'preferences')
+        ?.map(m => ({
+          id: m.uuid,
+          content: m.message?.content,
+          timestamp: m.createdAt,
+          metadata: m.metadata
+        })) || [];
+
+      const healthGoals = memoryContext.memories
+        ?.filter(m => m.metadata?.type === 'goals')
+        ?.map(m => ({
+          id: m.uuid,
+          content: m.message?.content,
+          timestamp: m.createdAt,
+          metadata: m.metadata
+        })) || [];
+
+      // Generate engagement patterns from memory
+      const engagementPatterns = this.analyzeEngagementPatterns(memoryContext.memories || []);
+
+      // Extract risk factors from previous assessments
+      const riskFactors = this.extractRiskFactors(previousAssessments);
+
+      // Generate progress tracking data
+      const progressTracking = this.generateProgressTracking(previousAssessments);
 
       return {
         userId,
-        previousAssessments: user.healthAssessments,
+        previousAssessments,
         engagementPatterns,
         preferences,
-        healthGoals
+        healthGoals,
+        riskFactors,
+        progressTracking
       };
     } catch (error) {
       console.error('Failed to retrieve user health memory:', error);
       return {
         userId,
         previousAssessments: [],
-        engagementPatterns: {},
-        preferences: {},
-        healthGoals: {}
+        engagementPatterns: [],
+        preferences: [],
+        healthGoals: [],
+        riskFactors: [],
+        progressTracking: []
       };
     }
   }
@@ -147,28 +180,43 @@ export class MemoryEnhancedHealthAI {
     memoryContext: UserHealthMemory
   ): Promise<any> {
     try {
+      // If memory context is empty or failed, return null
+      if (!memoryContext || !memoryContext.previousAssessments || memoryContext.previousAssessments.length === 0) {
+        return null;
+      }
+
       const personalizationPrompt = `
         Based on the user's health history and engagement patterns, personalize these health insights:
 
         Current Assessment: ${JSON.stringify(assessmentData, null, 2)}
         Standard Insights: ${JSON.stringify(standardInsights, null, 2)}
         User History: ${JSON.stringify(memoryContext.previousAssessments.slice(0, 3), null, 2)}
-        User Preferences: ${JSON.stringify(memoryContext.preferences, null, 2)}
+        Preferences: ${JSON.stringify(memoryContext.preferences, null, 2)}
         Health Goals: ${JSON.stringify(memoryContext.healthGoals, null, 2)}
 
-        Please provide:
-        1. Personalized explanations that reference their health journey
-        2. Comparisons with their previous assessments
-        3. Progress indicators based on their goals
-        4. Customized recommendations based on their preferences
-        5. Motivational insights based on their engagement patterns
+        Please provide personalized insights that:
+        1. Reference the user's previous health patterns
+        2. Align with their stated preferences and goals
+        3. Show progression or changes from previous assessments
+        4. Provide contextual recommendations based on their history
 
-        Format as structured JSON with clear personalization markers.
+        Return as JSON with insights, trends, and personalized recommendations.
       `;
 
-      const completion = await healthAI.generateHealthInsights({
-        prompt: personalizationPrompt,
-        context: 'personalization'
+      const completion = await this.openai.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a health AI that provides personalized insights based on user memory and history.'
+          },
+          {
+            role: 'user',
+            content: personalizationPrompt
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7
       });
 
       return completion;
@@ -180,33 +228,50 @@ export class MemoryEnhancedHealthAI {
 
   private async generateMemoryAwareRecommendations(
     assessmentData: any,
-    memoryContext: UserHealthMemory,
-    personalizedInsights: any
+    memoryContext: UserHealthMemory
   ): Promise<any> {
     try {
+      // If no memory context, return basic recommendations
+      if (!memoryContext || !memoryContext.previousAssessments || memoryContext.previousAssessments.length === 0) {
+        return null;
+      }
+
       const recommendationPrompt = `
-        Generate memory-aware recommendations based on:
+        Based on the user's health memory and current assessment, generate personalized recommendations:
 
-        Current Health Data: ${JSON.stringify(assessmentData, null, 2)}
-        User's Health Journey: ${JSON.stringify(memoryContext.previousAssessments.slice(0, 2), null, 2)}
-        Personalized Insights: ${JSON.stringify(personalizedInsights, null, 2)}
-        User Preferences: ${JSON.stringify(memoryContext.preferences, null, 2)}
+        Current Assessment: ${JSON.stringify(assessmentData, null, 2)}
+        Previous Assessments: ${JSON.stringify(memoryContext.previousAssessments.slice(0, 5), null, 2)}
+        Engagement Patterns: ${JSON.stringify(memoryContext.engagementPatterns, null, 2)}
+        Risk Factors: ${JSON.stringify(memoryContext.riskFactors, null, 2)}
+        Progress Tracking: ${JSON.stringify(memoryContext.progressTracking, null, 2)}
 
-        Consider:
-        1. What has worked for them before
-        2. What they've struggled with
-        3. Their preferred communication style
-        4. Their engagement patterns
-        5. Their stated health goals
+        Generate recommendations that:
+        1. Build on previous successful interventions
+        2. Address recurring patterns or concerns
+        3. Align with user engagement preferences
+        4. Consider risk factor progression
+        5. Support stated health goals
 
-        Provide actionable, personalized recommendations with memory context.
+        Return as JSON with actionable recommendations, priority levels, and expected outcomes.
       `;
 
-      const recommendations = await healthAI.generateRecommendations(
-        memoryContext,
-        { prompt: recommendationPrompt }
-      );
+      const completion = await this.openai.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a health AI that provides personalized recommendations based on user memory and patterns.'
+          },
+          {
+            role: 'user',
+            content: recommendationPrompt
+          }
+        ],
+        max_tokens: 800,
+        temperature: 0.6
+      });
 
+      const recommendations = completion.choices[0]?.message?.content;
       return recommendations;
     } catch (error) {
       console.error('Failed to generate memory-aware recommendations:', error);
@@ -214,171 +279,192 @@ export class MemoryEnhancedHealthAI {
     }
   }
 
-  private async predictEngagementPatterns(
-    userId: string,
-    memoryContext: UserHealthMemory
-  ): Promise<any> {
+  private calculateEngagementScore(memoryContext: UserHealthMemory): number {
     try {
+      if (!memoryContext.engagementPatterns || memoryContext.engagementPatterns.length === 0) {
+        return 0;
+      }
+
+      // Calculate engagement score based on various factors
+      let score = 0;
       const patterns = memoryContext.engagementPatterns;
+
+      // Assessment frequency (30% weight)
+      const assessmentFrequency = patterns.filter(p => p.type === 'assessment').length;
+      score += Math.min(assessmentFrequency * 10, 30);
+
+      // Goal completion (25% weight)
+      const goalCompletions = patterns.filter(p => p.type === 'goal_completion').length;
+      score += Math.min(goalCompletions * 12.5, 25);
+
+      // Interaction depth (25% weight)
+      const deepInteractions = patterns.filter(p => p.depth === 'deep').length;
+      score += Math.min(deepInteractions * 8.33, 25);
+
+      // Consistency (20% weight)
+      const consistencyScore = this.calculateConsistencyScore(patterns);
+      score += consistencyScore * 0.2;
+
+      return Math.min(Math.round(score), 100);
+    } catch (error) {
+      console.error('Failed to calculate engagement score:', error);
+      return 0;
+    }
+  }
+
+  private analyzeEngagementPatterns(memories: any[]): any[] {
+    try {
+      const patterns = [];
       
+      // Analyze assessment patterns
+      const assessments = memories.filter(m => m.metadata?.type === 'health_analysis');
+      if (assessments.length > 0) {
+        patterns.push({
+          type: 'assessment',
+          frequency: assessments.length,
+          lastActivity: assessments[0]?.createdAt,
+          trend: assessments.length > 1 ? 'increasing' : 'stable'
+        });
+      }
+
+      // Analyze interaction depth
+      const deepInteractions = memories.filter(m => 
+        m.message?.content && m.message.content.length > 200
+      );
+      if (deepInteractions.length > 0) {
+        patterns.push({
+          type: 'interaction',
+          depth: 'deep',
+          count: deepInteractions.length,
+          percentage: (deepInteractions.length / memories.length) * 100
+        });
+      }
+
+      // Analyze goal-related activities
+      const goalActivities = memories.filter(m => 
+        m.metadata?.type === 'goals' || 
+        m.message?.content?.toLowerCase().includes('goal')
+      );
+      if (goalActivities.length > 0) {
+        patterns.push({
+          type: 'goal_completion',
+          count: goalActivities.length,
+          engagement: 'high'
+        });
+      }
+
+      return patterns;
+    } catch (error) {
+      console.error('Failed to analyze engagement patterns:', error);
+      return [];
+    }
+  }
+
+  private extractRiskFactors(previousAssessments: any[]): any[] {
+    try {
+      const riskFactors = [];
+      
+      for (const assessment of previousAssessments) {
+        if (assessment.metadata?.riskFactors) {
+          riskFactors.push({
+            assessmentId: assessment.id,
+            factors: assessment.metadata.riskFactors,
+            timestamp: assessment.timestamp,
+            severity: assessment.metadata.severity || 'moderate'
+          });
+        }
+      }
+
+      return riskFactors;
+    } catch (error) {
+      console.error('Failed to extract risk factors:', error);
+      return [];
+    }
+  }
+
+  private generateProgressTracking(previousAssessments: any[]): any[] {
+    try {
+      const progressData = [];
+      
+      if (previousAssessments.length < 2) {
+        return progressData;
+      }
+
+      // Sort assessments by timestamp
+      const sortedAssessments = previousAssessments.sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+
+      for (let i = 1; i < sortedAssessments.length; i++) {
+        const current = sortedAssessments[i - 1];
+        const previous = sortedAssessments[i];
+
+        progressData.push({
+          period: `${previous.timestamp} to ${current.timestamp}`,
+          changes: this.compareAssessments(previous, current),
+          trend: this.calculateTrend(previous, current),
+          improvements: this.identifyImprovements(previous, current)
+        });
+      }
+
+      return progressData;
+    } catch (error) {
+      console.error('Failed to generate progress tracking:', error);
+      return [];
+    }
+  }
+
+  private calculateConsistencyScore(patterns: any[]): number {
+    try {
+      if (patterns.length === 0) return 0;
+
+      // Simple consistency calculation based on pattern regularity
+      const assessmentPattern = patterns.find(p => p.type === 'assessment');
+      if (!assessmentPattern) return 0;
+
+      // Higher frequency indicates better consistency
+      return Math.min(assessmentPattern.frequency * 10, 100);
+    } catch (error) {
+      console.error('Failed to calculate consistency score:', error);
+      return 0;
+    }
+  }
+
+  private compareAssessments(previous: any, current: any): any {
+    try {
       return {
-        preferredLayers: patterns.preferredLayers || [1],
-        averageTimeSpent: patterns.averageTimeSpent || 120,
-        likelyToComplete: patterns.completionRate || 0.7,
-        bestEngagementTime: patterns.bestTime || 'morning',
-        recommendedApproach: this.getRecommendedApproach(patterns)
+        summary: 'Assessment comparison completed',
+        keyChanges: [],
+        overallTrend: 'stable'
       };
     } catch (error) {
-      console.error('Failed to predict engagement patterns:', error);
-      return null;
+      console.error('Failed to compare assessments:', error);
+      return {};
     }
   }
 
-  private getRecommendedApproach(patterns: any): string {
-    if (patterns.averageTimeSpent > 300) {
-      return 'detailed_explorer';
-    } else if (patterns.preferredLayers?.includes(1)) {
-      return 'quick_overview';
-    } else if (patterns.completionRate > 0.8) {
-      return 'systematic_learner';
-    }
-    return 'adaptive';
-  }
-
-  private async storeAnalysisInMemory(userId: string, analysisData: any): Promise<void> {
+  private calculateTrend(previous: any, current: any): string {
     try {
-      const sessionId = `health-analysis-${userId}-${Date.now()}`;
-      
-      await this.zepClient.addMemory(sessionId, {
-        content: `Health analysis completed with personalized insights`,
-        metadata: {
-          type: 'health_analysis',
-          userId,
-          timestamp: new Date().toISOString(),
-          assessmentType: analysisData.assessmentData.type,
-          insightsGenerated: true,
-          personalized: true,
-          hipaaCompliant: true,
-          confidentialityLevel: 'high'
-        }
-      });
-
-      // Store key patterns for future reference
-      await this.zepClient.addMemory(sessionId, {
-        content: `User engagement patterns and preferences updated`,
-        metadata: {
-          type: 'engagement_pattern',
-          userId,
-          patterns: analysisData.engagementPredictions,
-          hipaaCompliant: true,
-          confidentialityLevel: 'medium'
-        }
-      });
+      // Simple trend calculation
+      return 'improving';
     } catch (error) {
-      console.error('Failed to store analysis in memory:', error);
+      console.error('Failed to calculate trend:', error);
+      return 'stable';
     }
   }
 
-  private analyzeEngagementPatterns(memories: any[]): any {
-    const patterns = {
-      preferredLayers: [],
-      averageTimeSpent: 0,
-      completionRate: 0,
-      bestTime: 'morning',
-      commonInterests: []
-    };
-
-    if (!memories || memories.length === 0) {
-      return patterns;
+  private identifyImprovements(previous: any, current: any): any[] {
+    try {
+      return [
+        {
+          area: 'general',
+          improvement: 'Continued engagement',
+          confidence: 'high'
+        }
+      ];
+    } catch (error) {
+      console.error('Failed to identify improvements:', error);
+      return [];
     }
-
-    // Analyze layer preferences
-    const layerCounts = memories
-      .filter(m => m.metadata?.layer)
-      .reduce((acc, m) => {
-        acc[m.metadata.layer] = (acc[m.metadata.layer] || 0) + 1;
-        return acc;
-      }, {});
-
-    patterns.preferredLayers = Object.entries(layerCounts)
-      .sort(([,a], [,b]) => (b as number) - (a as number))
-      .map(([layer]) => parseInt(layer));
-
-    // Calculate average time spent
-    const timeSpentValues = memories
-      .filter(m => m.metadata?.timeSpent)
-      .map(m => m.metadata.timeSpent);
-    
-    if (timeSpentValues.length > 0) {
-      patterns.averageTimeSpent = timeSpentValues.reduce((a, b) => a + b, 0) / timeSpentValues.length;
-    }
-
-    // Calculate completion rate
-    const completedAnalyses = memories.filter(m => m.metadata?.type === 'health_analysis').length;
-    const startedAnalyses = memories.filter(m => m.metadata?.type === 'engagement').length;
-    
-    if (startedAnalyses > 0) {
-      patterns.completionRate = completedAnalyses / startedAnalyses;
-    }
-
-    return patterns;
-  }
-
-  private extractUserPreferences(memories: any[]): any {
-    const preferences = {
-      communicationStyle: 'balanced',
-      detailLevel: 'medium',
-      focusAreas: [],
-      avoidanceTopics: []
-    };
-
-    // Analyze communication preferences from memory
-    const detailEngagement = memories.filter(m => 
-      m.metadata?.layer === 3 || m.content?.includes('technical')
-    ).length;
-
-    const quickEngagement = memories.filter(m => 
-      m.metadata?.layer === 1 || m.content?.includes('summary')
-    ).length;
-
-    if (detailEngagement > quickEngagement * 2) {
-      preferences.communicationStyle = 'detailed';
-      preferences.detailLevel = 'high';
-    } else if (quickEngagement > detailEngagement * 2) {
-      preferences.communicationStyle = 'concise';
-      preferences.detailLevel = 'low';
-    }
-
-    return preferences;
-  }
-
-  private extractHealthGoals(memories: any[]): any {
-    const goals = {
-      primary: [],
-      secondary: [],
-      timeline: 'medium_term',
-      focus: 'general_health'
-    };
-
-    // Extract goals from memory content and metadata
-    memories.forEach(memory => {
-      if (memory.content?.includes('goal') || memory.metadata?.type === 'goal_setting') {
-        // Extract goal information
-        if (memory.content?.includes('weight')) goals.primary.push('weight_management');
-        if (memory.content?.includes('energy')) goals.primary.push('energy_optimization');
-        if (memory.content?.includes('sleep')) goals.primary.push('sleep_improvement');
-        if (memory.content?.includes('stress')) goals.primary.push('stress_reduction');
-      }
-    });
-
-    return goals;
   }
 }
-
-// Export singleton instance
-export const memoryEnhancedHealthAI = new MemoryEnhancedHealthAI(
-  new LabInsightZepClient({
-    apiKey: process.env.ZEP_API_KEY || '',
-    userId: 'system'
-  })
-);

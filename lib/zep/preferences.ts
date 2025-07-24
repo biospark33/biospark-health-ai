@@ -1,220 +1,224 @@
 
-/**
- * Zep User Preferences & Learning
- * Phase 2B - AI-Powered Learning from User Interactions
- */
 
-import { zepClient, withZepErrorHandling } from './client';
-import { UserPreferences, HealthGoal, ZepOperationResult } from './types';
+// Zep Preferences Management
+// Phase 4 Final Optimization - Enhanced Preferences Handling
+// Manages user preferences storage and retrieval in Zep memory
 
-/**
- * Store user health preferences
- */
+import { LabInsightZepClient } from '../zep-client';
+
+export interface UserPreferences {
+  healthGoals: string[];
+  focusAreas: string[];
+  communicationStyle: string;
+  reminderFrequency: string;
+  privacyLevel: string;
+  rayPeatFocus?: boolean;
+  bioenergetic?: boolean;
+}
+
+export interface PreferencesResult {
+  success: boolean;
+  preferences?: UserPreferences;
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+
+// Global client instance for preferences operations
+let globalZepClient: LabInsightZepClient | null = null;
+
+export function setZepClient(client: LabInsightZepClient) {
+  globalZepClient = client;
+}
+
 export async function storePreferences(
   userId: string,
   sessionId: string,
   preferences: UserPreferences
-): Promise<ZepOperationResult<boolean>> {
-  if (!zepClient) {
-    return { success: false, error: { code: 'CLIENT_NOT_AVAILABLE', message: 'Zep client not initialized', timestamp: new Date() } };
-  }
-
-  return withZepErrorHandling(async () => {
-    try {
-      await zepClient.memory.add(sessionId, {
-        messages: [{
-          role: 'system',
-          content: JSON.stringify(preferences),
-          metadata: {
-            userId,
-            type: 'preferences',
-            timestamp: new Date().toISOString(),
-            version: '2.0'
-          }
-        }]
-      });
-
-      return { success: true, data: true };
-    } catch (error) {
-      throw new Error(`Failed to store preferences: ${error instanceof Error ? error.message : 'Unknown error'}`);
+): Promise<PreferencesResult> {
+  try {
+    if (!globalZepClient) {
+      return {
+        success: false,
+        error: {
+          code: 'CLIENT_NOT_AVAILABLE',
+          message: 'Zep client not initialized'
+        }
+      };
     }
-  }) as Promise<ZepOperationResult<boolean>>;
+
+    // Store preferences as memory with proper metadata
+    const memoryData = {
+      messages: [{
+        role: 'system',
+        content: JSON.stringify(preferences),
+        metadata: {
+          type: 'preferences',
+          userId,
+          version: '2.0',
+          timestamp: new Date().toISOString()
+        }
+      }]
+    };
+
+    await globalZepClient.addMemory(sessionId, memoryData);
+
+    return {
+      success: true,
+      preferences
+    };
+  } catch (error) {
+    console.error('Failed to store preferences:', error);
+    return {
+      success: false,
+      error: {
+        code: 'STORAGE_FAILED',
+        message: `Failed to store preferences: ${error}`
+      }
+    };
+  }
 }
 
-/**
- * Retrieve user preferences
- */
 export async function getPreferences(
   userId: string,
   sessionId: string
-): Promise<ZepOperationResult<UserPreferences | null>> {
-  if (!zepClient) {
-    return { success: true, data: null };
-  }
-
-  return withZepErrorHandling(async () => {
-    try {
-      const searchResults = await zepClient.memory.search(sessionId, {
-        text: 'user preferences health goals',
-        limit: 1,
-        metadata: {
-          userId,
-          type: 'preferences'
+): Promise<PreferencesResult> {
+  try {
+    if (!globalZepClient) {
+      return {
+        success: false,
+        error: {
+          code: 'CLIENT_NOT_AVAILABLE',
+          message: 'Zep client not initialized'
         }
-      });
-
-      if (searchResults.length === 0) {
-        return { success: true, data: null };
-      }
-
-      const preferencesData = JSON.parse(searchResults[0].message?.content || '{}');
-      return { success: true, data: preferencesData };
-    } catch (error) {
-      console.warn('Failed to parse preferences from memory:', error);
-      return { success: true, data: null };
+      };
     }
-  }) as Promise<ZepOperationResult<UserPreferences | null>>;
-}
 
-/**
- * Learn preferences implicitly from user interactions
- */
-export async function implicitLearn(
-  userId: string,
-  sessionId: string,
-  interaction: {
-    action: string;
-    context: string;
-    response: 'positive' | 'negative' | 'neutral';
-    metadata?: Record<string, any>;
-  }
-): Promise<ZepOperationResult<boolean>> {
-  return withZepErrorHandling(async () => {
-    try {
-      // Store the interaction for learning
-      await zepClient?.memory.add(sessionId, {
-        messages: [{
-          role: 'system',
-          content: `User interaction: ${interaction.action} - ${interaction.response}`,
-          metadata: {
-            userId,
-            type: 'implicit_learning',
-            action: interaction.action,
-            context: interaction.context,
-            response: interaction.response,
-            timestamp: new Date().toISOString(),
-            ...interaction.metadata
-          }
-        }]
-      });
-
-      // Update preferences based on learning (simplified for Phase 2B)
-      const currentPrefs = await getPreferences(userId, sessionId);
-      if (currentPrefs.success && currentPrefs.data) {
-        const updatedPrefs = { ...currentPrefs.data };
-        
-        // Simple learning: adjust focus areas based on positive interactions
-        if (interaction.response === 'positive') {
-          if (!updatedPrefs.focusAreas) updatedPrefs.focusAreas = [];
-          if (interaction.context && !updatedPrefs.focusAreas.includes(interaction.context)) {
-            updatedPrefs.focusAreas.push(interaction.context);
-          }
-        }
-
-        await storePreferences(userId, sessionId, updatedPrefs);
-      }
-
-      return { success: true, data: true };
-    } catch (error) {
-      throw new Error(`Implicit learning failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }) as Promise<ZepOperationResult<boolean>>;
-}
-
-/**
- * Update health goals
- */
-export async function updateHealthGoals(
-  userId: string,
-  sessionId: string,
-  goals: HealthGoal[]
-): Promise<ZepOperationResult<boolean>> {
-  return withZepErrorHandling(async () => {
-    try {
-      await zepClient?.memory.add(sessionId, {
-        messages: [{
-          role: 'system',
-          content: JSON.stringify({ healthGoals: goals }),
-          metadata: {
-            userId,
-            type: 'goals',
-            timestamp: new Date().toISOString(),
-            goalCount: goals.length
-          }
-        }]
-      });
-
-      return { success: true, data: true };
-    } catch (error) {
-      throw new Error(`Failed to update health goals: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }) as Promise<ZepOperationResult<boolean>>;
-}
-
-/**
- * Get personalized recommendations based on preferences and history
- */
-export async function getPersonalizedRecommendations(
-  userId: string,
-  sessionId: string,
-  currentContext?: string
-): Promise<ZepOperationResult<string[]>> {
-  return withZepErrorHandling(async () => {
-    // Get user preferences
-    const prefsResult = await getPreferences(userId, sessionId);
-    const preferences = prefsResult.data;
-
-    // Get recent positive interactions
-    const learningResults = await zepClient?.memory.search(sessionId, {
-      text: 'positive interaction',
-      limit: 10,
+    // Search for user preferences
+    const results = await globalZepClient.searchMemory(sessionId, 'preferences', {
       metadata: {
-        userId,
-        type: 'implicit_learning',
-        response: 'positive'
-      }
+        type: 'preferences',
+        userId
+      },
+      limit: 1
     });
 
-    const recommendations: string[] = [];
-
-    // Generate recommendations based on preferences
-    if (preferences?.focusAreas) {
-      preferences.focusAreas.forEach(area => {
-        recommendations.push(`Continue focusing on ${area} based on your preferences`);
-      });
+    if (!results || results.length === 0) {
+      return {
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'No preferences found for user'
+        }
+      };
     }
 
-    // Add recommendations based on positive interactions
-    if (learningResults && learningResults.length > 0) {
-      const positiveContexts = learningResults
-        .map(r => r.message?.metadata?.context)
-        .filter(Boolean)
-        .slice(0, 3);
+    const preferencesData = results[0];
+    const preferences = JSON.parse(preferencesData.message?.content || '{}');
 
-      positiveContexts.forEach(context => {
-        recommendations.push(`Explore more about ${context} - you've shown interest in this area`);
-      });
+    return {
+      success: true,
+      preferences
+    };
+  } catch (error) {
+    console.error('Failed to get preferences:', error);
+    return {
+      success: false,
+      error: {
+        code: 'RETRIEVAL_FAILED',
+        message: `Failed to get preferences: ${error}`
+      }
+    };
+  }
+}
+
+export async function updatePreferences(
+  userId: string,
+  sessionId: string,
+  updates: Partial<UserPreferences>
+): Promise<PreferencesResult> {
+  try {
+    // Get existing preferences
+    const existingResult = await getPreferences(userId, sessionId);
+    
+    let currentPreferences: UserPreferences;
+    if (existingResult.success && existingResult.preferences) {
+      currentPreferences = existingResult.preferences;
+    } else {
+      // Default preferences if none exist
+      currentPreferences = {
+        healthGoals: [],
+        focusAreas: [],
+        communicationStyle: 'balanced',
+        reminderFrequency: 'weekly',
+        privacyLevel: 'standard'
+      };
     }
 
-    // Default recommendations if none found
-    if (recommendations.length === 0) {
-      recommendations.push(
-        'Set up your health goals to get personalized recommendations',
-        'Complete a comprehensive analysis to establish your baseline',
-        'Track your progress regularly for better insights'
-      );
+    // Merge updates with existing preferences
+    const updatedPreferences = {
+      ...currentPreferences,
+      ...updates
+    };
+
+    // Store updated preferences
+    return await storePreferences(userId, sessionId, updatedPreferences);
+  } catch (error) {
+    console.error('Failed to update preferences:', error);
+    return {
+      success: false,
+      error: {
+        code: 'UPDATE_FAILED',
+        message: `Failed to update preferences: ${error}`
+      }
+    };
+  }
+}
+
+export async function deletePreferences(
+  userId: string,
+  sessionId: string
+): Promise<PreferencesResult> {
+  try {
+    if (!globalZepClient) {
+      return {
+        success: false,
+        error: {
+          code: 'CLIENT_NOT_AVAILABLE',
+          message: 'Zep client not initialized'
+        }
+      };
     }
 
-    return { success: true, data: recommendations };
-  }) as Promise<ZepOperationResult<string[]>>;
+    // Note: Zep doesn't have direct delete memory functionality
+    // We'll mark preferences as deleted by storing a deletion marker
+    const deletionMarker = {
+      messages: [{
+        role: 'system',
+        content: JSON.stringify({ deleted: true, deletedAt: new Date().toISOString() }),
+        metadata: {
+          type: 'preferences_deleted',
+          userId,
+          version: '2.0',
+          timestamp: new Date().toISOString()
+        }
+      }]
+    };
+
+    await globalZepClient.addMemory(sessionId, deletionMarker);
+
+    return {
+      success: true
+    };
+  } catch (error) {
+    console.error('Failed to delete preferences:', error);
+    return {
+      success: false,
+      error: {
+        code: 'DELETION_FAILED',
+        message: `Failed to delete preferences: ${error}`
+      }
+    };
+  }
 }
