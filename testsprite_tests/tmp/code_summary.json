@@ -1,0 +1,139 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "Next.js 14",
+    "React 18",
+    "Prisma ORM",
+    "Supabase",
+    "PostgreSQL",
+    "NextAuth.js",
+    "OpenAI API",
+    "Zep Cloud Memory",
+    "Tailwind CSS",
+    "Radix UI",
+    "Framer Motion",
+    "Jest Testing",
+    "Sentry Monitoring"
+  ],
+  "features": [
+    {
+      "name": "PDF Upload & Analysis",
+      "description": "Core feature for uploading lab reports (PDFs) and extracting biomarker data using AI",
+      "files": [
+        "app/api/comprehensive-analysis/route.ts",
+        "app/upload/page.tsx",
+        "lib/biomarker-analysis.ts",
+        "components/health/comprehensive-analysis.tsx"
+      ]
+    },
+    {
+      "name": "Memory-Enhanced Health AI",
+      "description": "Zep Cloud integration for persistent memory and contextual health analysis",
+      "files": [
+        "lib/zep/client.ts",
+        "lib/zep/sessions.ts",
+        "lib/zep/memory.ts",
+        "lib/memory-enhanced-health-ai.ts",
+        "components/MemoryEnhancedAnalysis.tsx"
+      ]
+    },
+    {
+      "name": "Progressive Disclosure Dashboard",
+      "description": "Multi-layer health insights dashboard with progressive information disclosure",
+      "files": [
+        "components/health/progressive-disclosure.tsx",
+        "components/health/memory-enhanced-progressive-disclosure.tsx",
+        "components/health/enhanced-health-dashboard.tsx",
+        "app/dashboard/page.tsx"
+      ]
+    },
+    {
+      "name": "Authentication & User Management",
+      "description": "NextAuth.js based authentication with user session management",
+      "files": [
+        "app/api/auth/[...nextauth]/route.ts",
+        "app/api/auth/signup/route.ts",
+        "lib/auth.ts",
+        "lib/session-manager.ts"
+      ]
+    },
+    {
+      "name": "HIPAA Compliance & Security",
+      "description": "Healthcare data compliance with encryption, audit logging, and consent management",
+      "files": [
+        "lib/compliance/hipaa.ts",
+        "lib/compliance/audit.ts",
+        "lib/crypto.ts",
+        "lib/consent.ts",
+        "components/consent/ConsentManager.tsx"
+      ]
+    },
+    {
+      "name": "Database Integration",
+      "description": "Prisma ORM with Supabase PostgreSQL for health data persistence",
+      "files": [
+        "lib/db.ts",
+        "lib/prisma.ts",
+        "lib/supabase.ts",
+        "prisma/schema.prisma"
+      ]
+    },
+    {
+      "name": "Bioenergetic Health Analysis",
+      "description": "Ray Peat inspired bioenergetic medicine analysis engine",
+      "files": [
+        "lib/ai/bioenergetics-engine.ts",
+        "lib/ray-peat-integration.ts",
+        "lib/enhanced-biomarker-analysis.ts"
+      ]
+    },
+    {
+      "name": "Memory API Endpoints",
+      "description": "RESTful APIs for memory management and health journey tracking",
+      "files": [
+        "app/api/memory/analyze-with-memory/route.ts",
+        "app/api/memory/sessions/route.ts",
+        "app/api/memory/health-journey/[userId]/route.ts",
+        "app/api/memory/context/route.ts"
+      ]
+    },
+    {
+      "name": "Health Assessment System",
+      "description": "Comprehensive health assessment with scoring and recommendations",
+      "files": [
+        "app/assessment/page.tsx",
+        "lib/ai/health-pattern-ai.ts",
+        "lib/ai/personalized-recommendation-ai.ts",
+        "components/health/health-snapshot.tsx"
+      ]
+    },
+    {
+      "name": "Role-Based Access Control",
+      "description": "RBAC system for different user roles and permissions",
+      "files": [
+        "lib/rbac.ts",
+        "components/rbac/RoleGuard.tsx"
+      ]
+    },
+    {
+      "name": "Performance Monitoring",
+      "description": "Application performance tracking and optimization",
+      "files": [
+        "app/api/performance/metrics/route.ts",
+        "lib/cache/memory-cache.ts",
+        "performance_test.js"
+      ]
+    },
+    {
+      "name": "UI Component Library",
+      "description": "Reusable UI components built with Radix UI and Tailwind CSS",
+      "files": [
+        "components/ui/button.tsx",
+        "components/ui/card.tsx",
+        "components/ui/dialog.tsx",
+        "components/ui/progress.tsx",
+        "components/ui/toast.tsx"
+      ]
+    }
+  ]
+}

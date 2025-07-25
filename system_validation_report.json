@@ -1,0 +1,138 @@
+{
+  "timestamp": "2025-07-25T15:00:00.400Z",
+  "environment": "development",
+  "tests": [
+    {
+      "category": "Environment",
+      "name": "DATABASE_URL",
+      "status": "FAIL",
+      "message": "Missing or contains placeholder",
+      "critical": true
+    },
+    {
+      "category": "Environment",
+      "name": "OPENAI_API_KEY",
+      "status": "FAIL",
+      "message": "Missing or contains placeholder",
+      "critical": true
+    },
+    {
+      "category": "Environment",
+      "name": "ZEP_API_KEY",
+      "status": "FAIL",
+      "message": "Missing or contains placeholder",
+      "critical": true
+    },
+    {
+      "category": "Environment",
+      "name": "NEXTAUTH_SECRET",
+      "status": "FAIL",
+      "message": "Missing or contains placeholder",
+      "critical": true
+    },
+    {
+      "category": "Environment",
+      "name": "ENCRYPTION_KEY",
+      "status": "FAIL",
+      "message": "Missing or contains placeholder",
+      "critical": true
+    },
+    {
+      "category": "Database",
+      "name": "Connection Health",
+      "status": "PASS",
+      "message": "Database connected successfully",
+      "critical": true,
+      "details": {
+        "status": "healthy",
+        "timestamp": "2025-07-25T15:00:00.805Z"
+      }
+    },
+    {
+      "category": "API",
+      "name": "GET /api/health",
+      "status": "PASS",
+      "message": "HTTP 200 - Responding correctly",
+      "critical": true,
+      "details": {
+        "status": 200,
+        "statusText": "OK"
+      }
+    },
+    {
+      "category": "API",
+      "name": "POST /api/comprehensive-analysis",
+      "status": "PASS",
+      "message": "HTTP 200 - Responding correctly",
+      "critical": true,
+      "details": {
+        "status": 200,
+        "statusText": "OK"
+      }
+    },
+    {
+      "category": "FileSystem",
+      "name": "./package.json",
+      "status": "PASS",
+      "message": "file exists and accessible",
+      "critical": true
+    },
+    {
+      "category": "FileSystem",
+      "name": "./app/api",
+      "status": "PASS",
+      "message": "directory exists and accessible",
+      "critical": true
+    },
+    {
+      "category": "FileSystem",
+      "name": "./lib",
+      "status": "PASS",
+      "message": "directory exists and accessible",
+      "critical": true
+    },
+    {
+      "category": "FileSystem",
+      "name": "./prisma",
+      "status": "PASS",
+      "message": "directory exists and accessible",
+      "critical": true
+    },
+    {
+      "category": "FileSystem",
+      "name": "./.env.local",
+      "status": "PASS",
+      "message": "file exists and accessible",
+      "critical": true
+    },
+    {
+      "category": "Security",
+      "name": "Environment Secrets",
+      "status": "PASS",
+      "message": "Security check passed",
+      "critical": false
+    },
+    {
+      "category": "Security",
+      "name": "HTTPS Ready",
+      "status": "PASS",
+      "message": "Security check passed",
+      "critical": false
+    },
+    {
+      "category": "Security",
+      "name": "Encryption Libraries",
+      "status": "PASS",
+      "message": "Security check passed",
+      "critical": false
+    }
+  ],
+  "summary": {
+    "total": 16,
+    "passed": 11,
+    "failed": 5,
+    "warnings": 0,
+    "systemHealth": "NEEDS ATTENTION",
+    "readyForProduction": false
+  }
+}
