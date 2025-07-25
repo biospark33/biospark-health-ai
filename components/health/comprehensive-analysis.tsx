@@ -394,7 +394,7 @@ export function ComprehensiveAnalysis({
               🎉 Achievement Unlocked: Deep Diver
             </h3>
             <p className="text-sm text-gray-600 mt-1">
-              You've explored all layers of your health analysis. You're committed to understanding your health!
+              You&apos;ve explored all layers of your health analysis. You&apos;re committed to understanding your health!
             </p>
           </div>
         </div>

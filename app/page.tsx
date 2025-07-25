@@ -161,7 +161,7 @@ export default function HomePage() {
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-gray-800 mb-4">Simple, Transparent Pricing</h2>
-              <p className="text-xl text-gray-600">Start free, upgrade when you're ready. No hidden fees, no long-term commitments.</p>
+              <p className="text-xl text-gray-600">Start free, upgrade when you&apos;re ready. No hidden fees, no long-term commitments.</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">

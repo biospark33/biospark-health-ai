@@ -351,7 +351,7 @@ export function HealthSnapshot({
             >
               <Clock className="w-4 h-4" />
               <span>
-                You've been here for {curiosityTimer} seconds. Ready to dive deeper?
+                You&apos;ve been here for {curiosityTimer} seconds. Ready to dive deeper?
               </span>
             </motion.div>
           )}

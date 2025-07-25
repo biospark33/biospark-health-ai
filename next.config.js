@@ -1,15 +1,15 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Temporarily disable TypeScript checking for clean deployment
+  // Enable TypeScript and ESLint checking for production builds
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   
-  // Performance optimizations - FIXED: Use experimental.serverComponentsExternalPackages
+  // Performance optimizations
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client'],
   },

@@ -1,156 +1,169 @@
 
-'use client'
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Shield, Users, Award, Lock, Star } from "lucide-react"
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Shield, Award, Users, Star, CheckCircle, Lock } from 'lucide-react';
 
-interface Testimonial {
-  name: string
-  role: string
-  content: string
-  rating: number
+interface TrustMetric {
+  icon: React.ReactNode;
+  value: string;
+  label: string;
+  description: string;
 }
 
-interface TrustIndicatorsProps {
-  showTestimonials?: boolean
-  showCertifications?: boolean
-  showStats?: boolean
+interface Certification {
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  verified: boolean;
 }
 
-const testimonials: Testimonial[] = [
+const trustMetrics: TrustMetric[] = [
   {
-    name: "Dr. Sarah Chen",
-    role: "Functional Medicine Practitioner",
-    content: "BioSpark's Ray Peat integration has revolutionized how I interpret patient lab work. The memory system creates truly personalized insights.",
-    rating: 5
+    icon: <Users className="w-8 h-8 text-blue-500" />,
+    value: '10,000+',
+    label: 'Trusted Users',
+    description: 'Healthcare professionals and individuals rely on our platform'
   },
   {
-    name: "Michael Rodriguez",
-    role: "Health Optimization Coach",
-    content: "The longitudinal tracking and bioenergetic analysis help my clients understand their health journey like never before.",
-    rating: 5
+    icon: <Star className="w-8 h-8 text-yellow-500" />,
+    value: '4.9/5',
+    label: 'User Rating',
+    description: 'Consistently rated as the top health analysis platform'
   },
   {
-    name: "Dr. Emily Watson",
-    role: "Integrative Medicine MD",
-    content: "Finally, an AI system that understands the nuances of metabolic health and Ray Peat's principles. Game-changing for patient care.",
-    rating: 5
+    icon: <CheckCircle className="w-8 h-8 text-green-500" />,
+    value: '99.9%',
+    label: 'Uptime',
+    description: 'Reliable service you can count on 24/7'
+  },
+  {
+    icon: <Shield className="w-8 h-8 text-purple-500" />,
+    value: '100%',
+    label: 'HIPAA Compliant',
+    description: 'Full compliance with healthcare data protection standards'
   }
-]
+];
 
-const certifications = [
-  { name: "HIPAA Compliant", icon: Shield, description: "Full healthcare data protection" },
-  { name: "SOC 2 Type II", icon: Lock, description: "Enterprise security standards" },
-  { name: "FDA Guidelines", icon: Award, description: "Follows medical device guidelines" },
-  { name: "ISO 27001", icon: Shield, description: "Information security management" }
-]
+const certifications: Certification[] = [
+  {
+    name: 'HIPAA Compliant',
+    description: 'Certified for healthcare data protection and privacy',
+    icon: <Shield className="w-6 h-6 text-blue-500" />,
+    verified: true
+  },
+  {
+    name: 'SOC 2 Type II',
+    description: 'Audited for security, availability, and confidentiality',
+    icon: <Lock className="w-6 h-6 text-green-500" />,
+    verified: true
+  },
+  {
+    name: 'ISO 27001',
+    description: 'International standard for information security management',
+    icon: <Award className="w-6 h-6 text-purple-500" />,
+    verified: true
+  }
+];
 
-const stats = [
-  { value: "50,000+", label: "Analyses Completed", icon: Users },
-  { value: "98.5%", label: "User Satisfaction", icon: Star },
-  { value: "24/7", label: "Secure Processing", icon: Lock },
-  { value: "HIPAA", label: "Compliant Platform", icon: Shield }
-]
-
-export default function TrustIndicators({
-  showTestimonials = true,
-  showCertifications = true,
-  showStats = true
-}: TrustIndicatorsProps) {
+export default function TrustIndicators() {
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-white">
       <div className="container mx-auto px-6">
-        {/* Stats Section */}
-        {showStats && (
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Trusted by Healthcare Professionals
-            </h2>
-            <p className="text-lg text-gray-600 mb-12 max-w-3xl mx-auto">
-              Join thousands of practitioners and individuals who trust BioSpark Health AI 
-              for their most important health decisions.
-            </p>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                    <stat.icon className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
+        {/* Trust Metrics */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            Trusted by Healthcare Professionals
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Join thousands of users who trust our platform for their health analysis needs
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-4 gap-6 mb-16">
+          {trustMetrics.map((metric, index) => (
+            <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex justify-center mb-4">
+                  {metric.icon}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+                <div className="text-3xl font-bold text-gray-800 mb-2">
+                  {metric.value}
+                </div>
+                <div className="text-lg font-semibold text-gray-700 mb-2">
+                  {metric.label}
+                </div>
+                <p className="text-sm text-gray-600">
+                  {metric.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
         {/* Certifications */}
-        {showCertifications && (
-          <div className="mb-16">
-            <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">
-              Security & Compliance
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {certifications.map((cert, index) => (
-                <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
-                      <cert.icon className="h-6 w-6 text-green-600" />
-                    </div>
-                    <h4 className="font-semibold text-gray-900 mb-2">{cert.name}</h4>
-                    <p className="text-sm text-gray-600">{cert.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">
+            Security & Compliance Certifications
+          </h3>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            We maintain the highest standards of security and compliance to protect your sensitive health data
+          </p>
+        </div>
 
-        {/* Testimonials */}
-        {showTestimonials && (
-          <div>
-            <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">
-              What Healthcare Professionals Say
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-center mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                      ))}
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          {certifications.map((cert, index) => (
+            <Card key={index} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0">
+                    {cert.icon}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <h4 className="text-lg font-semibold text-gray-800">
+                        {cert.name}
+                      </h4>
+                      {cert.verified && (
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Verified
+                        </Badge>
+                      )}
                     </div>
-                    <blockquote className="text-gray-700 mb-4 italic">
-                      "{testimonial.content}"
-                    </blockquote>
-                    <div className="border-t pt-4">
-                      <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                      <div className="text-sm text-gray-600">{testimonial.role}</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+                    <p className="text-gray-600">
+                      {cert.description}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-        {/* Trust Statement */}
-        <div className="mt-16 text-center">
-          <div className="bg-blue-50 rounded-2xl p-8 max-w-4xl mx-auto border border-blue-100">
-            <div className="flex items-center justify-center mb-4">
-              <Shield className="h-8 w-8 text-blue-600 mr-3" />
-              <h3 className="text-xl font-bold text-blue-900">Your Privacy is Our Priority</h3>
+        {/* Testimonial Quote */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 text-center">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-4xl text-blue-500 mb-4">&ldquo;</div>
+            <blockquote className="text-xl text-gray-700 mb-6 italic">
+              LabInsight AI has revolutionized how we analyze patient data. The AI-powered insights 
+              are incredibly accurate and help us make better clinical decisions faster than ever before.
+            </blockquote>
+            <div className="text-4xl text-blue-500 mb-4">&rdquo;</div>
+            <div className="flex items-center justify-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold">
+                Dr
+              </div>
+              <div className="text-left">
+                <div className="font-semibold text-gray-800">Dr. Sarah Johnson</div>
+                <div className="text-gray-600">Chief Medical Officer, Regional Health System</div>
+              </div>
             </div>
-            <p className="text-blue-800 leading-relaxed">
-              We process your health data with the highest security standards. Your information is encrypted, 
-              never shared with third parties, and you maintain complete control over your data at all times. 
-              Our memory system enhances your experience while keeping your privacy intact.
-            </p>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

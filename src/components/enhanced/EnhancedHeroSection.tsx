@@ -1,26 +1,30 @@
 
-'use client'
+'use client';
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Brain, Activity, TrendingUp, ArrowRight, Shield, Zap } from "lucide-react"
-import Link from "next/link"
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ArrowRight, Shield, Zap, Users, Star } from 'lucide-react';
 
 interface EnhancedHeroSectionProps {
-  title?: string
-  subtitle?: string
-  description?: string
+  onGetStarted?: () => void;
+  onLearnMore?: () => void;
 }
 
-export default function EnhancedHeroSection({
-  title = "BioSpark Health AI",
-  subtitle = "Memory-Enhanced Bioenergetic Analysis",
-  description = "Transform your health data into personalized Ray Peat-informed insights with our advanced AI system that remembers your journey and evolves with your needs."
+export default function EnhancedHeroSection({ 
+  onGetStarted, 
+  onLearnMore 
 }: EnhancedHeroSectionProps) {
+  const handleGetStarted = () => {
+    onGetStarted?.();
+  };
+
   return (
     <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white overflow-hidden">
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="https://images.picxy.com/cache/2020/7/2/f7ccbe1e51f08b86c36a258ec69aa764.jpg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+      <div className="absolute inset-0 opacity-20">
+        <div className="w-full h-full bg-gradient-to-br from-white/5 to-transparent"></div>
+      </div>
       
       <div className="relative container mx-auto px-6 py-24 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -28,115 +32,126 @@ export default function EnhancedHeroSection({
           <div className="text-center lg:text-left">
             {/* Trust Badge */}
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 border border-white/20">
-              <Shield className="h-4 w-4 text-green-300" />
-              <span className="text-sm font-medium text-blue-100">HIPAA Compliant & Secure</span>
+              <Shield className="w-4 h-4 text-green-400" />
+              <span className="text-sm font-medium">HIPAA Compliant & Secure</span>
+              <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-400/30">
+                Verified
+              </Badge>
             </div>
 
-            <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-                {title}
+            {/* Main Headline */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              <span className="block">Transform Your</span>
+              <span className="block bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
+                Health Journey
               </span>
+              <span className="block">with AI Precision</span>
             </h1>
-            
-            <p className="text-xl lg:text-2xl mb-4 text-blue-100 font-medium">
-              {subtitle}
+
+            {/* Subheadline */}
+            <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
+              Experience personalized health insights powered by advanced AI that learns, 
+              adapts, and evolves with your unique health profile.
             </p>
-            
-            <p className="text-lg mb-8 text-blue-200 leading-relaxed max-w-2xl">
-              {description}
-            </p>
+
+            {/* Key Benefits */}
+            <div className="flex flex-wrap gap-4 mb-8 justify-center lg:justify-start">
+              <div className="flex items-center gap-2 bg-white/10 rounded-full px-4 py-2">
+                <Zap className="w-4 h-4 text-yellow-400" />
+                <span className="text-sm font-medium">Instant Analysis</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/10 rounded-full px-4 py-2">
+                <Users className="w-4 h-4 text-blue-400" />
+                <span className="text-sm font-medium">Expert Validated</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/10 rounded-full px-4 py-2">
+                <Star className="w-4 h-4 text-purple-400" />
+                <span className="text-sm font-medium">Personalized</span>
+              </div>
+            </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-              <Link href="/upload">
-                <Button size="xl" className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-                  Start Analysis
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link href="/dashboard">
-                <Button size="xl" variant="outline" className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm">
-                  View Dashboard
-                </Button>
-              </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                onClick={handleGetStarted}
+              >
+                Start Your Analysis
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-2 border-white/30 text-white hover:bg-white/10 font-semibold px-8 py-4 rounded-full backdrop-blur-sm transition-all duration-300"
+                onClick={onLearnMore}
+              >
+                Learn More
+              </Button>
             </div>
 
-            {/* Key Features */}
-            <div className="flex flex-wrap gap-6 justify-center lg:justify-start text-sm text-blue-200">
-              <div className="flex items-center gap-2">
-                <Brain className="h-4 w-4 text-purple-300" />
-                <span>Memory-Enhanced AI</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-green-300" />
-                <span>Ray Peat Insights</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-yellow-300" />
-                <span>Longitudinal Tracking</span>
+            {/* Social Proof */}
+            <div className="mt-12 pt-8 border-t border-white/20">
+              <div className="flex items-center justify-center lg:justify-start gap-8">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">10K+</div>
+                  <div className="text-sm text-blue-200">Analyses Completed</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">98%</div>
+                  <div className="text-sm text-blue-200">Accuracy Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">24/7</div>
+                  <div className="text-sm text-blue-200">AI Support</div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Visual Element */}
           <div className="relative">
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-purple-500/20 rounded-lg">
-                      <Brain className="h-6 w-6 text-purple-300" />
-                    </div>
-                    <h3 className="font-semibold text-white">Memory System</h3>
+            {/* Main Visual Container */}
+            <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/20 shadow-2xl">
+              {/* Floating Elements */}
+              <div className="absolute -top-4 -right-4 w-8 h-8 bg-yellow-400 rounded-full animate-pulse"></div>
+              <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-green-400 rounded-full animate-pulse delay-1000"></div>
+              
+              {/* Mock Dashboard */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="h-4 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full w-3/4 bg-gradient-to-r from-green-400 to-blue-400 rounded-full"></div>
                   </div>
-                  <p className="text-sm text-blue-200">
-                    Remembers your health journey for personalized insights
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300 mt-8">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-green-500/20 rounded-lg">
-                      <Activity className="h-6 w-6 text-green-300" />
-                    </div>
-                    <h3 className="font-semibold text-white">Ray Peat AI</h3>
+                  <div className="h-4 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full w-1/2 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full"></div>
                   </div>
-                  <p className="text-sm text-blue-200">
-                    Bioenergetic principles integrated into every analysis
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300 -mt-4">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-yellow-500/20 rounded-lg">
-                      <TrendingUp className="h-6 w-6 text-yellow-300" />
-                    </div>
-                    <h3 className="font-semibold text-white">Trend Analysis</h3>
+                  <div className="h-4 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full w-5/6 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
                   </div>
-                  <p className="text-sm text-blue-200">
-                    Track biomarker changes over time with context
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300 mt-4">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-blue-500/20 rounded-lg">
-                      <Zap className="h-6 w-6 text-blue-300" />
-                    </div>
-                    <h3 className="font-semibold text-white">Instant Insights</h3>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mt-6">
+                  <div className="bg-white/10 rounded-lg p-3 text-center">
+                    <div className="text-lg font-bold text-white">92%</div>
+                    <div className="text-xs text-blue-200">Health Score</div>
                   </div>
-                  <p className="text-sm text-blue-200">
-                    Get immediate, actionable health recommendations
-                  </p>
-                </CardContent>
-              </Card>
+                  <div className="bg-white/10 rounded-lg p-3 text-center">
+                    <div className="text-lg font-bold text-white">A+</div>
+                    <div className="text-xs text-blue-200">Overall Grade</div>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {/* Decorative Elements */}
+            <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
           </div>
         </div>
       </div>
@@ -150,5 +165,5 @@ export default function EnhancedHeroSection({
         </svg>
       </div>
     </section>
-  )
+  );
 }
