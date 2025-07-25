@@ -145,14 +145,26 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="text-center">
-        <Link href="/memory">
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
-            Experience Memory-Enhanced Analysis
-          </Button>
-        </Link>
-        <p className="text-sm text-gray-500 mt-4">
-          Start your personalized health journey with contextual Ray Peat insights
+      <div className="text-center space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/dashboard">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
+              View Dashboard
+            </Button>
+          </Link>
+          <Link href="/upload">
+            <Button size="lg" variant="outline" className="px-8 py-3 text-lg">
+              Upload Lab Data
+            </Button>
+          </Link>
+          <Link href="/assessment">
+            <Button size="lg" variant="outline" className="px-8 py-3 text-lg">
+              Start Assessment
+            </Button>
+          </Link>
+        </div>
+        <p className="text-sm text-gray-500">
+          Choose your preferred way to start your personalized health journey
         </p>
       </div>
 

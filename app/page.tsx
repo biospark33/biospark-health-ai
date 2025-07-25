@@ -1,245 +1,212 @@
 
-'use client';
-
-import { Suspense } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { 
-  Activity, 
-  Zap, 
-  Brain, 
-  Heart, 
-  ChevronRight, 
-  Play,
-  Users,
-  Award,
-  Clock,
-  Shield
-} from 'lucide-react';
-
-function HeroSection() {
-  return (
-    <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight">
-              Transform Your Health with
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> AI Insights</span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Experience the future of health analysis with our 3-layer progressive disclosure system that takes you from quick insights to comprehensive understanding.
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg"
-            >
-              <Play className="w-5 h-5 mr-2" />
-              View Demo Assessment
-            </Link>
-            <button className="inline-flex items-center justify-center px-8 py-4 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-              Learn More
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FeaturesSection() {
-  const features = [
-    {
-      icon: Activity,
-      title: 'Health Snapshot',
-      description: 'Get immediate insights into your key health metrics with our Layer 1 overview.',
-      color: 'bg-blue-100 text-blue-600'
-    },
-    {
-      icon: Brain,
-      title: 'Detailed Insights',
-      description: 'Explore contextual analysis and Ray Peat-based explanations in Layer 2.',
-      color: 'bg-purple-100 text-purple-600'
-    },
-    {
-      icon: Heart,
-      title: 'Comprehensive Analysis',
-      description: 'Access professional-grade insights with research references in Layer 3.',
-      color: 'bg-red-100 text-red-600'
-    },
-    {
-      icon: Zap,
-      title: 'Smart Tooltips',
-      description: 'Learn medical terminology with contextual explanations and Ray Peat insights.',
-      color: 'bg-yellow-100 text-yellow-600'
-    }
-  ];
-
-  return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-4 mb-16">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Progressive Disclosure System
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Our 3-layer system guides you from quick insights to comprehensive understanding, improving engagement by 300%.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
-            <div key={index} className="text-center space-y-4">
-              <div className={`w-16 h-16 rounded-full ${feature.color} flex items-center justify-center mx-auto`}>
-                <feature.icon className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function BenefitsSection() {
-  const benefits = [
-    {
-      icon: Users,
-      title: '300% Longer Sessions',
-      description: 'Users spend 3+ minutes exploring their health data instead of bouncing after 1 minute.'
-    },
-    {
-      icon: Award,
-      title: '50% Less Bounce Rate',
-      description: 'Mobile users stay engaged with our touch-friendly progressive disclosure system.'
-    },
-    {
-      icon: Clock,
-      title: '<200ms Transitions',
-      description: 'Smooth animations and instant feedback keep users engaged throughout their journey.'
-    },
-    {
-      icon: Shield,
-      title: 'Ray Peat Methodology',
-      description: 'Based on proven bioenergetic principles for optimal metabolic health assessment.'
-    }
-  ];
-
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-4 mb-16">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Proven Results
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Our UX improvements deliver measurable engagement increases and better health outcomes.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {benefits.map((benefit, index) => (
-            <div key={index} className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <benefit.icon className="w-6 h-6 text-blue-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {benefit.title}
-                </h3>
-              </div>
-              <p className="text-gray-600">
-                {benefit.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CTASection() {
-  return (
-    <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="space-y-8">
-          <h2 className="text-3xl font-bold text-white">
-            Ready to Experience the Future of Health Analysis?
-          </h2>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Try our demo assessment and see how progressive disclosure transforms the way you understand your health.
-          </p>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-lg font-medium hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 shadow-lg"
-          >
-            <Activity className="w-5 h-5 mr-2" />
-            Try Demo Assessment
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Brain, Activity, TrendingUp, Clock, Zap, Target } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Activity className="w-8 h-8 text-blue-600" />
-              <h1 className="text-xl font-semibold text-gray-900">
-                Health AI UX
-              </h1>
-            </div>
-            <nav className="flex items-center space-x-6">
-              <Link
-                href="/dashboard"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-              >
-                Dashboard
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center mb-12">
+        <h1 className="text-5xl font-bold text-gray-900 mb-4">
+          LabInsight AI
+        </h1>
+        <p className="text-xl text-gray-600 mb-2">
+          Phase 2C: Memory + Context Integration
+        </p>
+        <p className="text-lg text-gray-500 max-w-3xl mx-auto">
+          Experience the next evolution of personalized health analysis with memory-enhanced 
+          Ray Peat bioenergetic insights, contextual health journey tracking, and intelligent 
+          longitudinal biomarker interpretation.
+        </p>
+      </div>
 
-      {/* Main Content */}
-      <main>
-        <HeroSection />
-        <FeaturesSection />
-        <BenefitsSection />
-        <CTASection />
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <Activity className="w-6 h-6 text-blue-400" />
-              <span className="text-xl font-semibold">Health AI UX Transformation</span>
-            </div>
-            <p className="text-gray-400">
-              Transforming health analysis through progressive disclosure and bioenergetic principles.
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <Card className="border-2 border-blue-200 bg-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-blue-800">
+              <Brain className="h-6 w-6" />
+              Memory System
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-blue-700 mb-4">
+              Advanced Zep-powered memory system that remembers your health journey, 
+              previous analyses, and personal patterns for truly contextual insights.
             </p>
+            <ul className="text-sm text-blue-600 space-y-1">
+              <li>• Session persistence across interactions</li>
+              <li>• Health journey tracking</li>
+              <li>• Contextual query enhancement</li>
+              <li>• Behavioral pattern learning</li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card className="border-2 border-green-200 bg-green-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-800">
+              <TrendingUp className="h-6 w-6" />
+              Contextual AI
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-green-700 mb-4">
+              Transform static analysis into dynamic, personalized health intelligence 
+              that evolves with your unique bioenergetic patterns.
+            </p>
+            <ul className="text-sm text-green-600 space-y-1">
+              <li>• Historical context integration</li>
+              <li>• Trend analysis with Ray Peat interpretation</li>
+              <li>• Personalized recommendations</li>
+              <li>• Intervention effectiveness tracking</li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card className="border-2 border-purple-200 bg-purple-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-purple-800">
+              <Activity className="h-6 w-6" />
+              Health Journey
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-purple-700 mb-4">
+              Comprehensive longitudinal tracking of your biomarkers with 
+              Ray Peat-informed insights and predictive analytics.
+            </p>
+            <ul className="text-sm text-purple-600 space-y-1">
+              <li>• Biomarker progression tracking</li>
+              <li>• Ray Peat protocol monitoring</li>
+              <li>• Early warning systems</li>
+              <li>• Personalized optimization</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">
+          Phase 2C Features
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="flex items-start gap-4">
+            <div className="bg-blue-100 p-3 rounded-full">
+              <Clock className="h-6 w-6 text-blue-600" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-semibold text-gray-900 mb-2">Temporal Intelligence</h3>
+              <p className="text-gray-600">
+                Understand how your biomarkers change over time with Ray Peat's bioenergetic principles, 
+                identifying patterns and predicting optimal intervention timing.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <div className="bg-green-100 p-3 rounded-full">
+              <Target className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-semibold text-gray-900 mb-2">Precision Personalization</h3>
+              <p className="text-gray-600">
+                Every analysis is tailored to your unique health history, response patterns, 
+                and bioenergetic profile for maximum relevance and effectiveness.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <div className="bg-purple-100 p-3 rounded-full">
+              <Zap className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-semibold text-gray-900 mb-2">Adaptive Learning</h3>
+              <p className="text-gray-600">
+                The system learns from your responses to recommendations, continuously 
+                improving its understanding of your unique bioenergetic needs.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <div className="bg-yellow-100 p-3 rounded-full">
+              <Brain className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-semibold text-gray-900 mb-2">Contextual Wisdom</h3>
+              <p className="text-gray-600">
+                Combines Ray Peat's extensive knowledge with your personal health journey 
+                for insights that are both scientifically grounded and individually relevant.
+              </p>
+            </div>
           </div>
         </div>
-      </footer>
+      </div>
+
+      <div className="text-center space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/dashboard">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
+              View Dashboard
+            </Button>
+          </Link>
+          <Link href="/upload">
+            <Button size="lg" variant="outline" className="px-8 py-3 text-lg">
+              Upload Lab Data
+            </Button>
+          </Link>
+          <Link href="/assessment">
+            <Button size="lg" variant="outline" className="px-8 py-3 text-lg">
+              Start Assessment
+            </Button>
+          </Link>
+        </div>
+        <p className="text-sm text-gray-500">
+          Choose your preferred way to start your personalized health journey
+        </p>
+      </div>
+
+      <div className="mt-16 bg-gray-100 rounded-lg p-8">
+        <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">
+          System Architecture - Phase 2C
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="text-blue-600 font-semibold">Memory Layer</div>
+            <div className="text-sm text-gray-600 mt-2">
+              Zep Memory System<br/>
+              PostgreSQL + pgvector<br/>
+              Session Management
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="text-green-600 font-semibold">Context Engine</div>
+            <div className="text-sm text-gray-600 mt-2">
+              Health Journey Tracking<br/>
+              Pattern Recognition<br/>
+              Trend Analysis
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="text-purple-600 font-semibold">RAG Foundation</div>
+            <div className="text-sm text-gray-600 mt-2">
+              Ray Peat Knowledge<br/>
+              Vector Search<br/>
+              Contextual Retrieval
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="text-orange-600 font-semibold">AI Analysis</div>
+            <div className="text-sm text-gray-600 mt-2">
+              Memory-Enhanced<br/>
+              Personalized Insights<br/>
+              Predictive Analytics
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
