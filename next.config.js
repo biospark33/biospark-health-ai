@@ -1,3 +1,4 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Temporarily disable TypeScript checking for clean deployment
@@ -8,8 +9,10 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   
-  // Performance optimizations
-  serverExternalPackages: ['@prisma/client'],
+  // Performance optimizations - FIXED: Use experimental.serverComponentsExternalPackages
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client'],
+  },
   
   // Compression and optimization
   compress: true,

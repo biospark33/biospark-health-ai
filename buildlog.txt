@@ -1,0 +1,105 @@
+
+> biospark-health-ai@1.0.0-phase1 build
+> next build
+
+ ⚠ Invalid next.config.js options detected: 
+ ⚠     Unrecognized key(s) in object: 'serverExternalPackages'
+ ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+  ▲ Next.js 14.2.30
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ⚠ Compiled with warnings
+
+./lib/crypto.ts
+A Node.js API is used (process.versions at line: 7) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./lib/crypto.ts
+./lib/audit.ts
+
+./lib/crypto.ts
+A Node.js API is used (process.versions at line: 7) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./lib/crypto.ts
+./lib/audit.ts
+
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+Zep client initialized successfully with API key
+Zep client initialized successfully with API key
+Supabase client initialized successfully
+Zep client initialized successfully with API key
+Zep client initialized successfully with API key
+Supabase client initialized successfully
+Supabase client initialized successfully
+Zep client initialized successfully with API key
+Supabase client initialized successfully
+Supabase client initialized successfully
+   Generating static pages (0/20) ...
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+PHI_ENCRYPTION_KEY not set. Using generated key for development only.
+   Generating static pages (5/20) 
+Zep client initialized successfully with API key
+Supabase client initialized successfully
+Zep client initialized successfully with API key
+   Generating static pages (10/20) 
+Supabase client initialized successfully
+   Generating static pages (15/20) 
+prisma:error 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Can't reach database server at `aws-0-us-east-2.pooler.supabase.com:6543`
+
+Please make sure your database server is running at `aws-0-us-east-2.pooler.supabase.com:6543`.
+ ✓ Generating static pages (20/20)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                               Size     First Load JS
+┌ ○ /                                     176 B          96.3 kB
+├ ○ /_not-found                           876 B          88.3 kB
+├ ○ /admin/compliance                     4.8 kB          105 kB
+├ ƒ /api/analysis/[id]                    0 B                0 B
+├ ƒ /api/auth/[...nextauth]               0 B                0 B
+├ ƒ /api/auth/signup                      0 B                0 B
+├ ƒ /api/chat/memory-enhanced             0 B                0 B
+├ ƒ /api/compliance/audit-logs            0 B                0 B
+├ ƒ /api/compliance/metrics               0 B                0 B
+├ ƒ /api/comprehensive-analysis           0 B                0 B
+├ ƒ /api/consent                          0 B                0 B
+├ ƒ /api/consent/validate                 0 B                0 B
+├ ○ /api/health                           0 B                0 B
+├ ƒ /api/health/engagement-tracking       0 B                0 B
+├ ƒ /api/health/memory-enhanced-analysis  0 B                0 B
+├ ƒ /api/memory/cleanup                   0 B                0 B
+├ ƒ /api/memory/context                   0 B                0 B
+├ ƒ /api/memory/history                   0 B                0 B
+├ ƒ /api/memory/insights                  0 B                0 B
+├ ƒ /api/memory/preferences               0 B                0 B
+├ ƒ /api/memory/trends                    0 B                0 B
+├ ƒ /api/performance/metrics              0 B                0 B
+├ ○ /assessment                           29.8 kB         130 kB
+├ ○ /dashboard                            149 kB          244 kB
+├ ƒ /results/[id]                         5.11 kB         114 kB
+└ ○ /upload                               5.19 kB        99.8 kB
++ First Load JS shared by all             87.4 kB
+  ├ chunks/117-12de5c233cd20cce.js        31.8 kB
+  ├ chunks/fd9d1056-8bd31246ee1b9f44.js   53.6 kB
+  └ other shared chunks (total)           2.01 kB
+
+
+ƒ Middleware                              28.8 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

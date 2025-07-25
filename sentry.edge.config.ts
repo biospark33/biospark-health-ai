@@ -1,9 +1,8 @@
 
-
 import * as Sentry from "@sentry/nextjs";
 
 // Only initialize Sentry if DSN is provided and valid
-const dsn = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
+const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 if (dsn && dsn !== "https://your-sentry-dsn@sentry.io/project-id" && dsn.startsWith("https://")) {
   Sentry.init({
