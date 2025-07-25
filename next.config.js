@@ -9,9 +9,7 @@ const nextConfig = {
   },
   
   // Performance optimizations
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client'],
-  },
+  serverExternalPackages: ['@prisma/client'],
   
   // Compression and optimization
   compress: true,

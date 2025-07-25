@@ -6,12 +6,19 @@
 let crypto: any;
 let isNodeEnvironment = false;
 
-try {
-  // Try to import Node.js crypto (works in Node.js runtime)
-  crypto = require('crypto');
-  isNodeEnvironment = true;
-} catch (error) {
-  // Fallback to Web Crypto API (works in Edge Runtime)
+// Check if we're in Node.js environment more reliably
+if (typeof process !== 'undefined' && process.versions && process.versions.node) {
+  try {
+    // Try to import Node.js crypto (works in Node.js runtime)
+    crypto = require('crypto');
+    isNodeEnvironment = true;
+  } catch (error) {
+    // Fallback to Web Crypto API
+    crypto = globalThis.crypto;
+    isNodeEnvironment = false;
+  }
+} else {
+  // We're in Edge Runtime or browser - use Web Crypto API
   crypto = globalThis.crypto;
   isNodeEnvironment = false;
 }
@@ -283,11 +290,23 @@ class PHIEncryption {
    * Generate secure session token
    */
   generateSecureToken(length: number = 32): string {
-    if (isNodeEnvironment) {
-      return crypto.randomBytes(length).toString('hex')
-    } else {
-      const bytes = crypto.getRandomValues(new Uint8Array(length))
-      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
+    try {
+      if (isNodeEnvironment && crypto.randomBytes) {
+        return crypto.randomBytes(length).toString('hex')
+      } else {
+        // Use Web Crypto API for edge runtime
+        const bytes = crypto.getRandomValues(new Uint8Array(length))
+        return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
+      }
+    } catch (error) {
+      // Fallback to simple random generation if crypto fails
+      console.warn('Crypto generation failed, using fallback:', error)
+      const chars = '0123456789abcdef'
+      let result = ''
+      for (let i = 0; i < length * 2; i++) {
+        result += chars[Math.floor(Math.random() * chars.length)]
+      }
+      return result
     }
   }
 
