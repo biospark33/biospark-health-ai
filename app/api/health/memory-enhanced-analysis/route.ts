@@ -3,8 +3,7 @@
 // BMAD Phase 1 Implementation - Real Agent Integration
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 import { memoryEnhancedHealthAI } from '@/lib/memory-enhanced-health-ai';
 import { LabInsightZepClient } from '@/lib/zep-client';
 import { prisma } from '@/lib/prisma';
@@ -26,7 +25,7 @@ const AnalysisRequestSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Authentication check
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Authentication required' },
@@ -120,7 +119,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Authentication check
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Authentication required' },

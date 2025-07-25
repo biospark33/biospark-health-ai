@@ -4,8 +4,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/app/api/auth/[...nextauth]/route';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { auth } from '@/auth';
+
 import { 
   getHealthContext, 
   storeConversationContext, 

@@ -7,7 +7,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/app/api/auth/[...nextauth]/route';
+import { auth } from '@/auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { getUserAnalysisHistory } from '@/lib/zep/memory';
 import { auditLog } from '@/lib/compliance/audit';

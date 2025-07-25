@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/app/api/auth/[...nextauth]/route';
+import { auth } from '@/auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { storePreferences, getPreferences } from '@/lib/zep/preferences';
 import { auditLog } from '@/lib/compliance/audit';
